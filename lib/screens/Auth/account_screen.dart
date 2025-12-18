@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import '../../models/student.dart';
 import '../../services/auth/user_services.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/intl.dart';
+import 'dart:io';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -14,18 +17,51 @@ class AccountScreen extends StatefulWidget {
 
 class _AccountScreenState extends State<AccountScreen> {
   final UserService _userhService = UserService();
+  final DeviceInfoPlugin _deviceInfoPlugin = DeviceInfoPlugin();
   student? _student;
+  Map<String, dynamic> _deviceData = {};
 
   @override
   void initState() {
     super.initState();
     _loadProfile();
+    _loadDeviceInfo();
   }
 
   Future<void> _loadProfile() async {
     final profile = await _userhService.getProfile();
     setState(() {
       _student = profile;
+    });
+  }
+
+  Future<void> _loadDeviceInfo() async {
+    var deviceData = <String, dynamic>{};
+
+    try {
+      if (Platform.isAndroid) {
+        final androidInfo = await _deviceInfoPlugin.androidInfo;
+        deviceData = {
+          'Hệ điều hành': 'Android ${androidInfo.version.release}',
+          'Thiết bị': '${androidInfo.brand} ${androidInfo.model}',
+          'SDK': 'API ${androidInfo.version.sdkInt}',
+        };
+      } else if (Platform.isIOS) {
+        final iosInfo = await _deviceInfoPlugin.iosInfo;
+        deviceData = {
+          'Hệ điều hành': '${iosInfo.systemName} ${iosInfo.systemVersion}',
+          'Thiết bị': iosInfo.modelName ?? iosInfo.model,
+          'Tên': iosInfo.name,
+        };
+      }
+    } catch (e) {
+      deviceData = {'Lỗi': 'Không thể lấy thông tin thiết bị'};
+    }
+
+    if (!mounted) return;
+
+    setState(() {
+      _deviceData = deviceData;
     });
   }
 
@@ -148,6 +184,68 @@ class _AccountScreenState extends State<AccountScreen> {
                         style: TextStyle(fontSize: 16, color: Colors.grey),
                       ),
               ),
+              SizedBox(height: 20),
+              // Thông tin thiết bị
+              if (_deviceData.isNotEmpty)
+                Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.grey[300]!),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          HugeIcon(
+                            icon: HugeIcons.strokeRoundedSmartPhone01,
+                            color: Colors.blue,
+                            size: 24,
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            'Thông tin thiết bị',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 12),
+                      ..._deviceData.entries.map((entry) {
+                        return Padding(
+                          padding: EdgeInsets.only(bottom: 8),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${entry.key}: ',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  '${entry.value}',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ],
+                  ),
+                ),
               SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,

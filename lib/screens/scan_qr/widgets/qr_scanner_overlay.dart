@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 /// Custom painter cho overlay vùng quét QR
 class QrScannerOverlay extends CustomPainter {
   final Rect scanWindow;
+  final double scale; // Thêm scale cho hiệu ứng giãn ra co lại
 
-  const QrScannerOverlay(this.scanWindow);
+  const QrScannerOverlay(this.scanWindow, {this.scale = 1.0});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -18,7 +19,7 @@ class QrScannerOverlay extends CustomPainter {
     );
 
     final overlayPaint = Paint();
-    overlayPaint.color = Colors.black.withOpacity(0.6);
+    overlayPaint.color = Colors.black.withOpacity(0.1);
     overlayPaint.style = PaintingStyle.fill;
 
     final path = Path.combine(
@@ -29,62 +30,98 @@ class QrScannerOverlay extends CustomPainter {
 
     canvas.drawPath(path, overlayPaint);
 
-    // Viền bo trắng dạng cong mềm
+    // Viền bo trắng dạng cong mềm với hiệu ứng giãn ra co lại
     final borderPaint = Paint();
     borderPaint.color = Colors.white;
-    borderPaint.strokeWidth = 4;
+    borderPaint.strokeWidth = 7;
     borderPaint.style = PaintingStyle.stroke;
     borderPaint.strokeCap = StrokeCap.round;
     borderPaint.strokeJoin = StrokeJoin.round;
 
-    const radius = 16.0;
-    const cornerLength = 28.0;
+    // Tính toán vùng quét mới với scale
+    final centerX = scanWindow.left + scanWindow.width / 2;
+    final centerY = scanWindow.top + scanWindow.height / 2;
+    final scaledWidth = scanWindow.width * scale;
+    final scaledHeight = scanWindow.height * scale;
+    final scaledScanWindow = Rect.fromCenter(
+      center: Offset(centerX, centerY),
+      width: scaledWidth,
+      height: scaledHeight,
+    );
+
+    const radius = 18.0;
+    const cornerLength = 36.0;
 
     final borderPath = Path();
 
     // Top-left
-    borderPath.moveTo(scanWindow.left + cornerLength, scanWindow.top);
-    borderPath.lineTo(scanWindow.left + radius, scanWindow.top);
+    borderPath.moveTo(
+      scaledScanWindow.left + cornerLength,
+      scaledScanWindow.top,
+    );
+    borderPath.lineTo(scaledScanWindow.left + radius, scaledScanWindow.top);
     borderPath.arcToPoint(
-      Offset(scanWindow.left, scanWindow.top + radius),
+      Offset(scaledScanWindow.left, scaledScanWindow.top + radius),
       radius: const Radius.circular(radius),
       clockwise: false,
     );
-    borderPath.lineTo(scanWindow.left, scanWindow.top + cornerLength);
+    borderPath.lineTo(
+      scaledScanWindow.left,
+      scaledScanWindow.top + cornerLength,
+    );
 
     // Bottom-left
-    borderPath.moveTo(scanWindow.left, scanWindow.bottom - cornerLength);
-    borderPath.lineTo(scanWindow.left, scanWindow.bottom - radius);
+    borderPath.moveTo(
+      scaledScanWindow.left,
+      scaledScanWindow.bottom - cornerLength,
+    );
+    borderPath.lineTo(scaledScanWindow.left, scaledScanWindow.bottom - radius);
     borderPath.arcToPoint(
-      Offset(scanWindow.left + radius, scanWindow.bottom),
+      Offset(scaledScanWindow.left + radius, scaledScanWindow.bottom),
       radius: const Radius.circular(radius),
       clockwise: false,
     );
-    borderPath.lineTo(scanWindow.left + cornerLength, scanWindow.bottom);
+    borderPath.lineTo(
+      scaledScanWindow.left + cornerLength,
+      scaledScanWindow.bottom,
+    );
 
     // Bottom-right
-    borderPath.moveTo(scanWindow.right - cornerLength, scanWindow.bottom);
-    borderPath.lineTo(scanWindow.right - radius, scanWindow.bottom);
+    borderPath.moveTo(
+      scaledScanWindow.right - cornerLength,
+      scaledScanWindow.bottom,
+    );
+    borderPath.lineTo(scaledScanWindow.right - radius, scaledScanWindow.bottom);
     borderPath.arcToPoint(
-      Offset(scanWindow.right, scanWindow.bottom - radius),
+      Offset(scaledScanWindow.right, scaledScanWindow.bottom - radius),
       radius: const Radius.circular(radius),
       clockwise: false,
     );
-    borderPath.lineTo(scanWindow.right, scanWindow.bottom - cornerLength);
+    borderPath.lineTo(
+      scaledScanWindow.right,
+      scaledScanWindow.bottom - cornerLength,
+    );
 
     // Top-right
-    borderPath.moveTo(scanWindow.right, scanWindow.top + cornerLength);
-    borderPath.lineTo(scanWindow.right, scanWindow.top + radius);
+    borderPath.moveTo(
+      scaledScanWindow.right,
+      scaledScanWindow.top + cornerLength,
+    );
+    borderPath.lineTo(scaledScanWindow.right, scaledScanWindow.top + radius);
     borderPath.arcToPoint(
-      Offset(scanWindow.right - radius, scanWindow.top),
+      Offset(scaledScanWindow.right - radius, scaledScanWindow.top),
       radius: const Radius.circular(radius),
       clockwise: false,
     );
-    borderPath.lineTo(scanWindow.right - cornerLength, scanWindow.top);
+    borderPath.lineTo(
+      scaledScanWindow.right - cornerLength,
+      scaledScanWindow.top,
+    );
 
     canvas.drawPath(borderPath, borderPaint);
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant QrScannerOverlay oldDelegate) =>
+      oldDelegate.scale != scale;
 }

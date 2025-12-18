@@ -13,7 +13,8 @@ class ScanExamQrScreen extends StatefulWidget {
   State<ScanExamQrScreen> createState() => _ScanExamQrScreenState();
 }
 
-class _ScanExamQrScreenState extends State<ScanExamQrScreen> {
+class _ScanExamQrScreenState extends State<ScanExamQrScreen>
+    with SingleTickerProviderStateMixin {
   final MobileScannerController controller = MobileScannerController(
     detectionSpeed: DetectionSpeed.noDuplicates,
     facing: CameraFacing.back,
@@ -21,9 +22,25 @@ class _ScanExamQrScreenState extends State<ScanExamQrScreen> {
 
   bool _isProcessing = false;
   double _zoomFactor = 0.0;
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _scaleAnimation = Tween<double>(begin: 0.95, end: 1.05).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+  }
 
   @override
   void dispose() {
+    _animationController.dispose();
     controller.dispose();
     super.dispose();
   }
@@ -155,10 +172,18 @@ class _ScanExamQrScreenState extends State<ScanExamQrScreen> {
             },
           ),
 
-          // Overlay với vùng quét
-          CustomPaint(
-            painter: QrScannerOverlay(scanWindow),
-            child: Container(),
+          // Overlay với vùng quét và hiệu ứng giãn ra co lại
+          AnimatedBuilder(
+            animation: _scaleAnimation,
+            builder: (context, child) {
+              return CustomPaint(
+                painter: QrScannerOverlay(
+                  scanWindow,
+                  scale: _scaleAnimation.value,
+                ),
+                child: Container(),
+              );
+            },
           ),
 
           // Zoom controls tách riêng widget

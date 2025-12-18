@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:quizz_mobile/mockData/exam_test_screen.dart';
 
 import '../models/newsmock.dart';
 import '../component/HomeNavigation.dart';
@@ -13,17 +12,6 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => ExamTestScreen()),
-          );
-        },
-        backgroundColor: Colors.deepPurple,
-        icon: Icon(Icons.science, color: Colors.white),
-        label: Text('Test LaTeX', style: TextStyle(color: Colors.white)),
-      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -101,7 +89,7 @@ class HomeScreen extends StatelessWidget {
                       color: Colors.blue,
                       size: 32,
                     ),
-                    label: "Quéc mã bài thi",
+                    label: "Quét mã",
                     color: Colors.blue,
                     onTap: () {
                       Navigator.push(
@@ -112,7 +100,19 @@ class HomeScreen extends StatelessWidget {
                   ),
                   _buildQuickButton(
                     child: HugeIcon(
-                      icon: HugeIcons.strokeRoundedQuiz03,
+                      icon: HugeIcons.strokeRoundedSearchArea,
+                      color: Colors.blue,
+                      size: 32,
+                    ),
+                    label: "Nhập mã",
+                    color: Colors.blue,
+                    onTap: () {
+                      _showEnterCodeDialog(context);
+                    },
+                  ),
+                  _buildQuickButton(
+                    child: HugeIcon(
+                      icon: HugeIcons.strokeRoundedTransactionHistory,
                       color: Colors.blue,
                       size: 32,
                     ),
@@ -132,6 +132,50 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  // Dialog nhập mã thủ công
+  void _showEnterCodeDialog(BuildContext context) {
+    final TextEditingController codeController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Text('Nhập mã bài thi'),
+          content: TextField(
+            controller: codeController,
+            decoration: InputDecoration(
+              hintText: 'Nhập mã bài thi',
+              border: OutlineInputBorder(),
+            ),
+            autofocus: true,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text('Hủy'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final code = codeController.text.trim();
+                if (code.isNotEmpty) {
+                  Navigator.pop(dialogContext);
+                  // TODO: Xử lý mã đã nhập
+                  print('Mã đã nhập: $code');
+                  // Gọi API startExamCore(code) ở đây
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Vui lòng nhập mã bài thi')),
+                  );
+                }
+              },
+              child: Text('Xác nhận'),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -157,8 +201,8 @@ class HomeScreen extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 70,
-            height: 70,
+            width: 60,
+            height: 60,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
@@ -170,11 +214,12 @@ class HomeScreen extends StatelessWidget {
             child: Center(child: iconWidget),
           ),
 
-          SizedBox(height: 8),
+          SizedBox(height: 6),
           Text(
             label,
+            textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 13,
+              fontSize: 11,
               fontWeight: FontWeight.w500,
               color: Colors.black87,
             ),

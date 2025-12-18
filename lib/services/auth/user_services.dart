@@ -6,6 +6,8 @@ import '../../models/student.dart';
 import '../../models/studentExamSession.dart';
 import '../../models/studentExamSessionHistory.dart';
 import '../../models/DTOs/originalExamPaperDto.dart';
+import '../../models/saveAnswerResponse.dart';
+import '../../models/submitExamResponse.dart';
 
 class UserService extends BaseService {
   // Đăng nhập
@@ -148,6 +150,32 @@ class UserService extends BaseService {
     }
   }
 
+  // Start Exam Core (Create Session with Original Paper Core)
+  Future<StartExamResponseDto?> startExamCore(
+    String originalExamPaperCore,
+  ) async {
+    try {
+      final response = await postForm(
+        'api/Student/create-session-original-core',
+        {'originalExamPaperCore': originalExamPaperCore},
+      );
+      print("Sending originalExamPaperCore: $originalExamPaperCore");
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final result = StartExamResponseDto.fromJson(data);
+
+        return result;
+      } else {
+        print('startExamCore failed: ${response.statusCode} ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print('Lỗi startExamCore: $e');
+      return null;
+    }
+  }
+
   Future<bool> resetExamSessionStartTime() async {
     try {
       final response = await post(
@@ -166,6 +194,52 @@ class UserService extends BaseService {
     } catch (e) {
       print('Lỗi resetExamSessionStartTime: $e');
       return false;
+    }
+  }
+
+  // Save Answer
+  Future<SaveAnswerResponse?> saveAnswer({
+    required int studentExamSessionId,
+    required int key,
+    required dynamic value,
+  }) async {
+    try {
+      final response = await post('api/Student/save-answer', {
+        'StudentExamSessionId': studentExamSessionId,
+        'key': key,
+        'value': value,
+      });
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return SaveAnswerResponse.fromJson(data);
+      } else {
+        print('saveAnswer failed: ${response.statusCode} ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print('Lỗi saveAnswer: $e');
+      return null;
+    }
+  }
+
+  // Submit Exam
+  Future<SubmitExamResponse?> submitExam(int studentExamSessionId) async {
+    try {
+      final response = await post('api/Student/submit-exam', {
+        'studentExamSessionId': studentExamSessionId,
+      });
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return SubmitExamResponse.fromJson(data);
+      } else {
+        print('submitExam failed: ${response.statusCode} ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print('Lỗi submitExam: $e');
+      return null;
     }
   }
 }

@@ -66,10 +66,13 @@ class QuestionCard extends StatelessWidget {
     return _buildMixedContent(content, 16);
   }
 
-  /// Render text có chứa LaTeX inline (dạng $...$ hoặc $$...$$)
+  /// Render text có chứa LaTeX inline (dạng $...$, $$...$$, \(...\), \[...\])
   Widget _buildMixedContent(String text, double fontSize) {
-    // Regex để tìm $...$ hoặc $$...$$
-    final regex = RegExp(r'\$\$([^$]+)\$\$|\$([^$]+)\$');
+    // Regex để tìm $$...$$, $...$, \[...\], \(...\)
+    // Thứ tự quan trọng: $$...$$ trước $...$, \[...\] trước \(...\)
+    final regex = RegExp(
+      r'\$\$([^$]+)\$\$|\$([^$]+)\$|\\\[(.*?)\\\]|\\\((.*?)\\\)',
+    );
     final matches = regex.allMatches(text).toList();
 
     if (matches.isEmpty) {
@@ -92,15 +95,21 @@ class QuestionCard extends StatelessWidget {
         );
       }
 
-      // LaTeX content
-      final latex = match.group(1) ?? match.group(2) ?? '';
+      // LaTeX content - kiểm tra group nào match
+      // group(1): $$...$$ | group(2): $...$ | group(3): \[...\] | group(4): \(...\)
+      final latex =
+          match.group(1) ??
+          match.group(2) ??
+          match.group(3) ??
+          match.group(4) ??
+          '';
       spans.add(
         WidgetSpan(
           alignment: PlaceholderAlignment.middle,
           child: Math.tex(
             latex,
-            mathStyle: MathStyle.text,
-            textStyle: TextStyle(fontSize: fontSize),
+            mathStyle: MathStyle.display, // Dùng display để công thức to hơn
+            textStyle: TextStyle(fontSize: fontSize * 1.4), // Tăng thêm 40%
             onErrorFallback: (err) => Text(
               '\$${latex}\$',
               style: TextStyle(fontSize: fontSize, color: Colors.red),
