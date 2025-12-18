@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
 import '../../models/DTOs/originalExamPaperDto.dart';
+import '../../services/auth/user_services.dart';
 
 class QuestionCard extends StatelessWidget {
   final OriginalExamPaperDetailDto question;
   final int questionNumber;
   final int? selectedAnswerId;
   final Function(int answerId)? onAnswerSelected;
+  final int studentExamSessionId;
+  final UserService userService;
 
   const QuestionCard({
     super.key,
@@ -14,6 +17,8 @@ class QuestionCard extends StatelessWidget {
     required this.questionNumber,
     this.selectedAnswerId,
     this.onAnswerSelected,
+    required this.studentExamSessionId,
+    required this.userService,
   });
 
   @override
@@ -145,7 +150,13 @@ class QuestionCard extends StatelessWidget {
 
     return GestureDetector(
       onTap: onAnswerSelected != null
-          ? () => onAnswerSelected!(answer.answerId)
+          ? () async {
+              // Gọi callback để cập nhật UI
+              onAnswerSelected!(answer.answerId);
+              
+              // Gọi API saveAnswer
+              await _saveAnswerToServer(answer.answerId);
+            }
           : null,
       child: Container(
         margin: const EdgeInsets.only(bottom: 8),
@@ -169,7 +180,27 @@ class QuestionCard extends StatelessWidget {
     );
   }
 
-  // ================= ANSWER CONTENT (LaTeX AN TOÀN) =================
+  // ================= SAVE ANSWER TO SERVER =================
+  Future<void> _saveAnswerToServer(int answerId) async {
+    try {
+      final response = await userService.saveAnswer(
+        studentExamSessionId: studentExamSessionId,
+        key: question.originalExamPaperDetailId,
+        value: answerId,
+      );
+
+      if (response != null && response.success) {
+        // Lưu thành công
+        debugPrint('✅ Đã lưu câu trả lời: Question ${question.originalExamPaperDetailId} -> Answer $answerId');
+      } else {
+        // Lưu thất bại
+        debugPrint('❌ Lỗi lưu câu trả lời: ${response?.message ?? "Unknown error"}');
+      }
+    } catch (e) {
+      debugPrint('❌ Exception khi lưu câu trả lời: $e');
+    }
+  }
+
   Widget _buildAnswerContent(String text) {
     return _buildMixedContent(text, 15);
   }

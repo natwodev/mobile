@@ -24,15 +24,14 @@ class _AccountScreenState extends State<AccountScreen> {
   @override
   void initState() {
     super.initState();
-    _loadProfile();
-    _loadDeviceInfo();
+    _loadData();
   }
 
-  Future<void> _loadProfile() async {
-    final profile = await _userhService.getProfile();
-    setState(() {
-      _student = profile;
-    });
+  Future<void> _loadData() async {
+    // Load device info trước
+    await _loadDeviceInfo();
+    // Load profile sau
+    await _loadProfile();
   }
 
   Future<void> _loadDeviceInfo() async {
@@ -50,7 +49,7 @@ class _AccountScreenState extends State<AccountScreen> {
         final iosInfo = await _deviceInfoPlugin.iosInfo;
         deviceData = {
           'Hệ điều hành': '${iosInfo.systemName} ${iosInfo.systemVersion}',
-          'Thiết bị': iosInfo.modelName ?? iosInfo.model,
+          'Thiết bị': iosInfo.modelName,
           'Tên': iosInfo.name,
         };
       }
@@ -62,6 +61,23 @@ class _AccountScreenState extends State<AccountScreen> {
 
     setState(() {
       _deviceData = deviceData;
+    });
+  }
+
+  Future<void> _loadProfile() async {
+    final profile = await _userhService.getProfile();
+    if (!mounted) return;
+
+    setState(() {
+      _student = profile;
+      // Thêm đăng nhập cuối vào device data sau khi có student
+      if (_student?.lastLoggedIn != null) {
+        _deviceData['Đăng nhập cuối'] = DateFormat(
+          'HH:mm dd/MM/yyyy',
+        ).format(_student!.lastLoggedIn!);
+      } else {
+        _deviceData['Đăng nhập cuối'] = 'Chưa đăng nhập';
+      }
     });
   }
 
@@ -138,51 +154,6 @@ class _AccountScreenState extends State<AccountScreen> {
                     ),
                   ],
                 ),
-              ),
-              SizedBox(height: 60),
-              Container(
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: _student != null
-                    ? Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          //HugeIcons.strokeRoundedLogin02
-                          SizedBox(height: 8),
-                          Row(
-                            children: [
-                              CircleAvatar(
-                                radius: 20,
-                                backgroundColor: Colors.grey[300],
-                                child: HugeIcon(
-                                  icon: HugeIcons.strokeRoundedLoginSquare02,
-                                  color: Colors.black,
-                                  size: 30.0,
-                                ),
-                              ),
-                              SizedBox(width: 8),
-                              Text(
-                                "Đăng nhập cuối: " +
-                                    (_student?.lastLoggedIn != null
-                                        ? DateFormat(
-                                            'dd/MM/yyyy HH:mm',
-                                          ).format(_student!.lastLoggedIn!)
-                                        : 'Chưa đăng nhập'),
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      )
-                    : Text(
-                        "Đang tải...",
-                        style: TextStyle(fontSize: 16, color: Colors.grey),
-                      ),
               ),
               SizedBox(height: 20),
               // Thông tin thiết bị

@@ -123,7 +123,7 @@ class _ExamHistoryState extends State<ExamHistoryScreen> {
                                           child: Marquee(
                                             text:
                                                 session.subjectName ??
-                                                "Không tên môn",
+                                                "Không tên môn",                                               
                                             style: TextStyle(
                                               fontSize: 20,
                                               fontWeight: FontWeight.bold,

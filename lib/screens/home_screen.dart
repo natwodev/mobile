@@ -69,22 +69,6 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   _buildQuickButton(
                     child: HugeIcon(
-                      icon: HugeIcons.strokeRoundedMortarboard02,
-                      color: Colors.blue,
-                      size: 32,
-                    ),
-                    label: "Lớp học",
-                    color: Colors.blue,
-                    onTap: () {
-                      // Chuyển sang tab "Bài kiểm tra" (index 3) trong bottom navigation
-                      final navigationState = HomeNavigation.of(context);
-                      if (navigationState != null) {
-                        navigationState.changeTab(2);
-                      }
-                    },
-                  ),
-                  _buildQuickButton(
-                    child: HugeIcon(
                       icon: HugeIcons.strokeRoundedQrCode01,
                       color: Colors.blue,
                       size: 32,
@@ -201,8 +185,8 @@ class HomeScreen extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 60,
-            height: 60,
+            width: 70,
+            height: 70,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),

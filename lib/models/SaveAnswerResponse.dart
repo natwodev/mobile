@@ -16,7 +16,6 @@ class SaveAnswerResponse {
       data: SaveAnswerData.fromJson(json['data'] ?? {}),
     );
   }
-  
 }
 
 class SaveAnswerData {

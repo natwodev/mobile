@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../component/HomeNavigation.dart';
 
 /// Widget nút về trang chủ
 class HomeButton extends StatelessWidget {
@@ -11,9 +12,17 @@ class HomeButton extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton.icon(
-        onPressed:
-            onPressed ??
-            () => Navigator.of(context).popUntil((route) => route.isFirst),
+        onPressed: onPressed ??
+            () {
+              // Pop về HomeNavigation
+              Navigator.of(context).popUntil((route) => route.isFirst);
+              
+              // Chuyển về tab Home (index 0)
+              final navigationState = HomeNavigation.of(context);
+              if (navigationState != null) {
+                navigationState.changeTab(0);
+              }
+            },
         icon: Icon(Icons.home),
         label: Text(
           'Về trang chủ',

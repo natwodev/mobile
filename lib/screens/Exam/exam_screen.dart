@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../services/auth/user_services.dart';
 import '../../models/DTOs/originalExamPaperDto.dart';
+import '../../models/SubmitExamResponse.dart';
 import '../../widget/exam/question_card.dart';
 import '../../widget/exam/question_navigator.dart';
 import '../../widget/exam/anti_cheat_detector.dart';
@@ -44,6 +45,7 @@ class _ExamScreenState extends State<ExamScreen> {
     if (widget.initialData != null) {
       _futureSessions = Future.value(widget.initialData);
       _setupCountdownFromQr(widget.initialData!);
+      _loadPreviousAnswers(widget.initialData!);
     } else {
       // Trường hợp bình thường: vào từ danh sách ca thi
       _futureSessions = UserService().startExam(widget.sessionId);
@@ -52,8 +54,47 @@ class _ExamScreenState extends State<ExamScreen> {
       _futureSessions.then((examData) {
         if (examData != null) {
           _setupCountdownFromSession(examData);
+          _loadPreviousAnswers(examData);
         }
       });
+    }
+  }
+
+  /// Parse và load lại các câu trả lời đã chọn từ studentAnswersString
+  /// Format: "(key:value);(key:value);..."
+  void _loadPreviousAnswers(StartExamResponseDto examData) {
+    final answersString = examData.studentSession.studentAnswersString;
+    if (answersString == null || answersString.isEmpty) {
+      return;
+    }
+
+    try {
+      // Parse chuỗi dạng: "(123:456);(789:101);..."
+      final pairs = answersString.split(';');
+      
+      for (final pair in pairs) {
+        if (pair.isEmpty) continue;
+        
+        // Loại bỏ dấu ngoặc đơn nếu có
+        final cleanPair = pair.replaceAll('(', '').replaceAll(')', '').trim();
+        if (cleanPair.isEmpty) continue;
+        
+        final parts = cleanPair.split(':');
+        if (parts.length == 2) {
+          final key = int.tryParse(parts[0].trim());
+          final value = int.tryParse(parts[1].trim());
+          
+          if (key != null && value != null) {
+            setState(() {
+              selectedAnswers[key] = value;
+            });
+          }
+        }
+      }
+      
+      debugPrint('✅ Đã khôi phục ${selectedAnswers.length} câu trả lời từ studentAnswersString');
+    } catch (e) {
+      debugPrint('❌ Lỗi parse studentAnswersString: $e');
     }
   }
 
@@ -310,6 +351,8 @@ class _ExamScreenState extends State<ExamScreen> {
                       });
                     }
                   },
+                  studentExamSessionId: widget.sessionId,
+                  userService: UserService(),
                 ),
               );
             },
@@ -379,34 +422,92 @@ class _ExamScreenState extends State<ExamScreen> {
               child: Text('Hủy'),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.pop(dialogContext);
 
-                // Tính điểm giả lập (số câu đúng / tổng số câu * 10)
-                final totalQuestions =
-                    examData.originalExamPaper.details.length;
-                final correctAnswers =
-                    selectedAnswers.length; // Tạm thời dùng số câu đã làm
-                final score = totalQuestions > 0
-                    ? (correctAnswers / totalQuestions * 10)
-                    : 0.0;
-
-                final timeSpent = _initialTime - _secondsLeft;
-
-                // Chuyển sang trang kết quả
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ExamResultScreen(
-                      examTitle: examData.originalExamPaper.title,
-                      totalQuestions: totalQuestions,
-                      answeredQuestions: selectedAnswers.length,
-                      timeSpent: timeSpent,
-                      totalTime: _initialTime,
-                      score: score,
-                    ),
+                // Hiển thị loading
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (context) => Center(
+                    child: CircularProgressIndicator(),
                   ),
                 );
+
+                try {
+                  // Gọi API submitExam
+                  final submitResult = await UserService().submitExam(
+                    widget.sessionId,
+                  );
+
+                  // Đóng loading
+                  if (mounted) Navigator.pop(context);
+
+                  if (submitResult != null) {
+                    // Nộp bài thành công, gọi API lấy kết quả chi tiết
+                    debugPrint('✅ Nộp bài thành công, đang lấy kết quả...');
+
+                    final submissionData = await UserService().getSubmissionResult(
+                      widget.sessionId,
+                    );
+
+                    if (submissionData != null) {
+                      final timeSpent = _initialTime - _secondsLeft;
+
+                      // Chuyển sang trang kết quả với dữ liệu từ server
+                      if (mounted) {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ExamResultScreen(
+                              examTitle: examData.originalExamPaper.title,
+                              totalQuestions: submissionData.totalQuestions ?? 
+                                  examData.originalExamPaper.details.length,
+                              answeredQuestions: selectedAnswers.length,
+                              timeSpent: timeSpent,
+                              totalTime: _initialTime,
+                              score: submissionData.score ?? 0.0,
+                            ),
+                          ),
+                        );
+                      }
+                    } else {
+                      // Không lấy được kết quả chi tiết, dùng dữ liệu tạm
+                      debugPrint('⚠️ Không lấy được kết quả chi tiết');
+                      final timeSpent = _initialTime - _secondsLeft;
+
+                      if (mounted) {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ExamResultScreen(
+                              examTitle: examData.originalExamPaper.title,
+                              totalQuestions:
+                                  examData.originalExamPaper.details.length,
+                              answeredQuestions: selectedAnswers.length,
+                              timeSpent: timeSpent,
+                              totalTime: _initialTime,
+                              score: 0.0,
+                            ),
+                          ),
+                        );
+                      }
+                    }
+                  }
+                } catch (e) {
+                  // Đóng loading
+                  if (mounted) Navigator.pop(context);
+                  
+                  debugPrint('❌ Lỗi khi nộp bài: $e');
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Có lỗi xảy ra khi nộp bài: $e'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                }
               },
               child: Text('Nộp bài'),
             ),

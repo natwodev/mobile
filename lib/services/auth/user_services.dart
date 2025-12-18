@@ -6,6 +6,7 @@ import '../../models/student.dart';
 import '../../models/studentExamSession.dart';
 import '../../models/studentExamSessionHistory.dart';
 import '../../models/DTOs/originalExamPaperDto.dart';
+import '../../models/DTOs/ExamSubmissionDto.dart';
 import '../../models/saveAnswerResponse.dart';
 import '../../models/submitExamResponse.dart';
 
@@ -239,6 +240,33 @@ class UserService extends BaseService {
       }
     } catch (e) {
       print('Lỗi submitExam: $e');
+      return null;
+    }
+  }
+
+  // Get Submission Result
+  Future<ExamSubmissionDto?> getSubmissionResult(
+    int studentExamSessionId,
+  ) async {
+    try {
+      final response = await post('api/Student/get-submission-result', {
+        'studentExamSessionId': studentExamSessionId,
+      });
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return ExamSubmissionDto.fromJson(data);
+      } else if (response.statusCode == 404) {
+        print('Không tìm thấy kết quả nộp bài');
+        return null;
+      } else {
+        print(
+          'getSubmissionResult failed: ${response.statusCode} ${response.body}',
+        );
+        return null;
+      }
+    } catch (e) {
+      print('Lỗi getSubmissionResult: $e');
       return null;
     }
   }
