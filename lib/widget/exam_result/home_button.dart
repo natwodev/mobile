@@ -12,16 +12,14 @@ class HomeButton extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton.icon(
-        onPressed: onPressed ??
+        onPressed:
+            onPressed ??
             () {
-              // Pop về HomeNavigation
-              Navigator.of(context).popUntil((route) => route.isFirst);
-              
-              // Chuyển về tab Home (index 0)
-              final navigationState = HomeNavigation.of(context);
-              if (navigationState != null) {
-                navigationState.changeTab(0);
-              }
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => HomeNavigation(),
+                ),
+                (Route<dynamic> route) => false,
+              );
             },
         icon: Icon(Icons.home),
         label: Text(

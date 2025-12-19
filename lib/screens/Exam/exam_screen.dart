@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../services/auth/user_services.dart';
 import '../../models/DTOs/originalExamPaperDto.dart';
-import '../../models/SubmitExamResponse.dart';
 import '../../widget/exam/question_card.dart';
 import '../../widget/exam/question_navigator.dart';
 import '../../widget/exam/anti_cheat_detector.dart';
 import 'exam_result_screen.dart';
 import 'dart:async';
+import 'package:toastification/toastification.dart';
 
 class ExamScreen extends StatefulWidget {
   // Trường hợp 1: vào từ danh sách ca thi -> dùng sessionId và gọi startExam
@@ -71,19 +71,19 @@ class _ExamScreenState extends State<ExamScreen> {
     try {
       // Parse chuỗi dạng: "(123:456);(789:101);..."
       final pairs = answersString.split(';');
-      
+
       for (final pair in pairs) {
         if (pair.isEmpty) continue;
-        
+
         // Loại bỏ dấu ngoặc đơn nếu có
         final cleanPair = pair.replaceAll('(', '').replaceAll(')', '').trim();
         if (cleanPair.isEmpty) continue;
-        
+
         final parts = cleanPair.split(':');
         if (parts.length == 2) {
           final key = int.tryParse(parts[0].trim());
           final value = int.tryParse(parts[1].trim());
-          
+
           if (key != null && value != null) {
             setState(() {
               selectedAnswers[key] = value;
@@ -91,8 +91,10 @@ class _ExamScreenState extends State<ExamScreen> {
           }
         }
       }
-      
-      debugPrint('✅ Đã khôi phục ${selectedAnswers.length} câu trả lời từ studentAnswersString');
+
+      debugPrint(
+        '✅ Đã khôi phục ${selectedAnswers.length} câu trả lời từ studentAnswersString',
+      );
     } catch (e) {
       debugPrint('❌ Lỗi parse studentAnswersString: $e');
     }
@@ -429,9 +431,8 @@ class _ExamScreenState extends State<ExamScreen> {
                 showDialog(
                   context: context,
                   barrierDismissible: false,
-                  builder: (context) => Center(
-                    child: CircularProgressIndicator(),
-                  ),
+                  builder: (context) =>
+                      Center(child: CircularProgressIndicator()),
                 );
 
                 try {
@@ -444,12 +445,25 @@ class _ExamScreenState extends State<ExamScreen> {
                   if (mounted) Navigator.pop(context);
 
                   if (submitResult != null) {
-                    // Nộp bài thành công, gọi API lấy kết quả chi tiết
-                    debugPrint('✅ Nộp bài thành công, đang lấy kết quả...');
+                    // Nộp bài thành công, hiển thị toast
+                    debugPrint('✅ Nộp bài thành công: ${submitResult.message}');
+                    
+                    if (mounted) {
+                      toastification.show(
+                        context: context,
+                        type: ToastificationType.success,
+                        style: ToastificationStyle.fillColored,
+                        title: Text('Nộp bài thành công'),
+                        description: Text(submitResult.message),
+                        alignment: Alignment.topCenter,
+                        autoCloseDuration: Duration(seconds: 3),
+                        showProgressBar: true,
+                      );
+                    }
 
-                    final submissionData = await UserService().getSubmissionResult(
-                      widget.sessionId,
-                    );
+                    // Gọi API lấy kết quả chi tiết
+                    final submissionData = await UserService()
+                        .getSubmissionResult(widget.sessionId);
 
                     if (submissionData != null) {
                       final timeSpent = _initialTime - _secondsLeft;
@@ -461,7 +475,8 @@ class _ExamScreenState extends State<ExamScreen> {
                           MaterialPageRoute(
                             builder: (context) => ExamResultScreen(
                               examTitle: examData.originalExamPaper.title,
-                              totalQuestions: submissionData.totalQuestions ?? 
+                              totalQuestions:
+                                  submissionData.totalQuestions ??
                                   examData.originalExamPaper.details.length,
                               answeredQuestions: selectedAnswers.length,
                               timeSpent: timeSpent,
@@ -497,7 +512,7 @@ class _ExamScreenState extends State<ExamScreen> {
                 } catch (e) {
                   // Đóng loading
                   if (mounted) Navigator.pop(context);
-                  
+
                   debugPrint('❌ Lỗi khi nộp bài: $e');
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(

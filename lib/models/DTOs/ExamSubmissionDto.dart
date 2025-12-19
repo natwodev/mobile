@@ -39,7 +39,7 @@ class ExamSubmissionDto {
     );
   }
 
-  Map<String, dynamic> toJson() { 
+  Map<String, dynamic> toJson() {
     return {
       'studentCode': studentCode,
       'shuffledExamPaperId': shuffledExamPaperId,

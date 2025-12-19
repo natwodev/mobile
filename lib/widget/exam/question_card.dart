@@ -153,7 +153,7 @@ class QuestionCard extends StatelessWidget {
           ? () async {
               // Gọi callback để cập nhật UI
               onAnswerSelected!(answer.answerId);
-              
+
               // Gọi API saveAnswer
               await _saveAnswerToServer(answer.answerId);
             }
@@ -191,10 +191,14 @@ class QuestionCard extends StatelessWidget {
 
       if (response != null && response.success) {
         // Lưu thành công
-        debugPrint('✅ Đã lưu câu trả lời: Question ${question.originalExamPaperDetailId} -> Answer $answerId');
+        debugPrint(
+          '✅ Đã lưu câu trả lời: Question ${question.originalExamPaperDetailId} -> Answer $answerId',
+        );
       } else {
         // Lưu thất bại
-        debugPrint('❌ Lỗi lưu câu trả lời: ${response?.message ?? "Unknown error"}');
+        debugPrint(
+          '❌ Lỗi lưu câu trả lời: ${response?.message ?? "Unknown error"}',
+        );
       }
     } catch (e) {
       debugPrint('❌ Exception khi lưu câu trả lời: $e');

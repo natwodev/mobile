@@ -18,7 +18,9 @@ class ClassScreen extends StatelessWidget {
         backgroundColor: Colors.blue, // Đặt màu nền đúng định dạng ARGB
         centerTitle: true,
       ),
-      body: const Center(child: Text("Danh sách lớp học\n(đang được phát triển)")),
+      body: const Center(
+        child: Text("Danh sách lớp học\n(đang được phát triển)"),
+      ),
     );
   }
 }
