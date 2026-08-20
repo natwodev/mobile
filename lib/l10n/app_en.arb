@@ -345,6 +345,37 @@
   "homeNavAccount": "Account",
   "homeNavHistory": "History",
   "homeNavHome": "Home",
+  "homeNewsEmpty": "No news yet.",
+  "homeNewsError": "Couldn't load education news.",
+  "homeNewsOpenFailed": "Couldn't open the article.",
+  "homeNewsRetry": "Try again",
+  "homeNewsSource": "Source: VnExpress",
+  "homeNewsTimeDays": "{days}d ago",
+  "@homeNewsTimeDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "homeNewsTimeHours": "{hours}h ago",
+  "@homeNewsTimeHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "homeNewsTimeJustNow": "Just now",
+  "homeNewsTimeMinutes": "{minutes}m ago",
+  "@homeNewsTimeMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "homeNewsTitle": "Education news",
   "homeQrExamCreatedAt": "Created on",
   "homeQrExamDescription": "Description",
   "homeQrExamDuration": "Duration",

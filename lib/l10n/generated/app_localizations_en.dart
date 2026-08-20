@@ -810,6 +810,42 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeNavHome => 'Home';
 
   @override
+  String get homeNewsEmpty => 'No news yet.';
+
+  @override
+  String get homeNewsError => 'Couldn\'t load education news.';
+
+  @override
+  String get homeNewsOpenFailed => 'Couldn\'t open the article.';
+
+  @override
+  String get homeNewsRetry => 'Try again';
+
+  @override
+  String get homeNewsSource => 'Source: VnExpress';
+
+  @override
+  String homeNewsTimeDays(int days) {
+    return '${days}d ago';
+  }
+
+  @override
+  String homeNewsTimeHours(int hours) {
+    return '${hours}h ago';
+  }
+
+  @override
+  String get homeNewsTimeJustNow => 'Just now';
+
+  @override
+  String homeNewsTimeMinutes(int minutes) {
+    return '${minutes}m ago';
+  }
+
+  @override
+  String get homeNewsTitle => 'Education news';
+
+  @override
   String get homeQrExamCreatedAt => 'Created on';
 
   @override

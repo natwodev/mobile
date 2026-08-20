@@ -408,6 +408,37 @@
   "homeNavAccount": "Tài khoản",
   "homeNavHistory": "Lịch sử",
   "homeNavHome": "Trang chủ",
+  "homeNewsEmpty": "Chưa có tin nào.",
+  "homeNewsError": "Không tải được tin giáo dục.",
+  "homeNewsOpenFailed": "Không mở được bài viết.",
+  "homeNewsRetry": "Thử lại",
+  "homeNewsSource": "Nguồn: VnExpress",
+  "homeNewsTimeDays": "{days} ngày trước",
+  "@homeNewsTimeDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "homeNewsTimeHours": "{hours} giờ trước",
+  "@homeNewsTimeHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "homeNewsTimeJustNow": "Vừa xong",
+  "homeNewsTimeMinutes": "{minutes} phút trước",
+  "@homeNewsTimeMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "homeNewsTitle": "Tin giáo dục",
   "homeQrExamCreatedAt": "Ngày tạo",
   "homeQrExamDescription": "Mô tả",
   "homeQrExamDuration": "Thời gian",
