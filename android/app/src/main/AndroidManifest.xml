@@ -3,6 +3,15 @@
          không hợp lệ (StudentController.cs:115-122). -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <!-- Android 13+ không còn tự cho hiện thông báo; thiếu quyền này thì app
+         đặt lịch nhắc xong vẫn im, và không có lỗi nào báo ra. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <!-- Nhắc "còn 15 phút nữa tới ca thi" phải nổ đúng phút, nên cần báo thức
+         chính xác. Android 14+ còn đòi xin thêm lúc chạy, xem NotificationService. -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
+    <!-- Không có quyền này thì user khởi động lại máy là bay sạch lịch đã đặt. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <application
         android:label="Trắc nghiệm trực tuyến"
         android:name="${applicationName}"
@@ -35,6 +44,23 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+        <!-- Bộ nhận của flutter_local_notifications. Cái đầu bắn thông báo đã
+             hẹn giờ; cái sau đặt lại toàn bộ lịch sau khi máy khởi động lại
+             hoặc app vừa được cập nhật — thiếu nó thì lịch đã đặt mất sạch mà
+             người dùng không hề biết. -->
+        <receiver
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver"
+            android:exported="false"/>
+        <receiver
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+                <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
+            </intent-filter>
+        </receiver>
     </application>
     <uses-permission android:name="android.permission.INTERNET"/>
     <!-- Required to query activities that can process text, see:

@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../../controller/user_controller.dart';
 import '../../component/HomeNavigation.dart';
 import '../../controller/session_controller.dart';
+import '../../services/notification/local_notification_service.dart';
+import '../../services/notification/push_service.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../widget/common/app_buttons.dart';
 import '../../widget/common/app_toast.dart';
@@ -61,6 +65,20 @@ class _LoginScreenState extends State<LoginScreen> {
       // Không có dòng markSignedIn thì lần mở app sau vẫn vào đúng (vì đọc lại
       // token từ máy), nhưng trạng thái trong bộ nhớ sẽ lệch với thực tế.
       SessionController.instance.markSignedIn();
+
+      // Xin quyền hiện thông báo NGAY SAU khi đăng nhập, không phải lúc vừa mở
+      // app: tới đây người dùng đã là sinh viên có ca thi nên lời xin mới có
+      // nghĩa. Hỏi khi vừa mở app thì đa số bấm từ chối, mà từ chối một lần là
+      // phải vào Cài đặt hệ thống mới bật lại được.
+      //
+      // Không chặn luồng vào màn chính: từ chối quyền vẫn phải vào thi được.
+      unawaited(LocalNotificationService.instance.requestPermissions());
+
+      // Đăng ký token FCM với backend NGAY SAU khi có JWT. Lần đầu cài app thì
+      // PushService.init() chạy lúc chưa đăng nhập nên đã bỏ qua bước này —
+      // thiếu lần gọi ở đây là máy không bao giờ nhận được thông báo đẩy nào.
+      unawaited(PushService.instance.syncToken());
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const HomeNavigation()),

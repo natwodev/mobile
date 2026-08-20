@@ -18,6 +18,7 @@ import '../../models/DTOs/originalExamPaperDto.dart';
 import '../../models/DTOs/ExamSubmissionDto.dart';
 import '../../models/saveAnswerResponse.dart';
 import '../../models/submitExamResponse.dart';
+import '../notification/push_service.dart';
 
 /// Trạng thái lưu MỘT đáp án lên máy chủ.
 ///
@@ -537,6 +538,11 @@ class UserService extends BaseService {
 
   // Đăng xuất
   Future<void> logout() async {
+    // Gỡ token FCM TRƯỚC khi xoá JWT: xoá xong thì request nào cũng 401, backend
+    // không gỡ được gì, và máy tiếp tục nhận thông báo của tài khoản vừa thoát —
+    // chuyện nghiêm trọng với máy dùng chung ở phòng thi.
+    await PushService.instance.unregister();
+
     try {
       await post('api/auth/sessions/logout/student', {});
     } catch (_) {}
