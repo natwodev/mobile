@@ -8,6 +8,8 @@ import 'l10n/locale_controller.dart';
 import 'widget/common/app_buttons.dart';
 import 'component/HomeNavigation.dart';
 import 'controller/session_controller.dart';
+import 'services/notification/local_notification_service.dart';
+import 'services/notification/push_service.dart';
 import 'services/pending_submit_service.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/account_screen.dart';
@@ -46,6 +48,16 @@ void main() async {
   if (SessionController.instance.signedIn) {
     PendingSubmitService.instance.startAutoRetry();
   }
+
+  // Dựng kênh thông báo và nạp bảng múi giờ TRƯỚC khi giao diện chạy: tin tới
+  // lúc kênh chưa tồn tại thì Android bỏ qua thẳng, không vẽ và không báo lỗi.
+  // Hàm này tự nuốt lỗi của nó nên không chặn được `main()`.
+  await LocalNotificationService.instance.init();
+
+  // Push của FCM. Phải chạy SAU local vì lúc app đang mở, FCM nhờ chính tầng
+  // local vẽ thông báo. Chưa gắn google-services.json thì hàm này tự tắt và
+  // app chạy y như trước, không sập.
+  await PushService.instance.init();
 
   runApp(HutechCampusApp());
 }

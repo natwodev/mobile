@@ -1,4 +1,4 @@
-package com.example.quizz_mobile
+package com.natwodev1.quizzmobile
 
 import android.os.Bundle
 import android.view.WindowManager
