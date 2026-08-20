@@ -7,6 +7,7 @@ import '../screens/scan_qr/scan_exam_qr_screen.dart';
 import '../l10n/generated/app_localizations.dart';
 import '../widget/common/app_buttons.dart';
 import '../widget/home/home_banner_carousel.dart';
+import '../widget/home/home_news_section.dart';
 import '../widget/home/quiz_answer_banner.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -26,6 +27,9 @@ class HomeScreen extends StatelessWidget {
             // Header với Banner + 3 nút nhanh
             _buildHeader(context),
             _buildBannerCarousel(),
+            // Dải tin dưới băng ảnh — phần lấp chỗ trống nửa dưới màn hình và
+            // là lý do Trang chủ có gì để cuộn.
+            const HomeNewsSection(),
           ],
         ),
       ),

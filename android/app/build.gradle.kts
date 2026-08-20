@@ -11,6 +11,10 @@ android {
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
+        // flutter_local_notifications dùng java.time (API 26+) trong khi app
+        // vẫn chạy được trên máy cũ hơn, nên bắt buộc bật desugaring — không
+        // bật thì Gradle chặn ngay ở checkDebugAarMetadata, không build nổi.
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
@@ -41,4 +45,9 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    // Thư viện đi kèm bắt buộc của isCoreLibraryDesugaringEnabled.
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 }

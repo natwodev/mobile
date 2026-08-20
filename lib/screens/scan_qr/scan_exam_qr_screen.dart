@@ -18,7 +18,14 @@ class ScanExamQrScreen extends StatefulWidget {
 
 class _ScanExamQrScreenState extends State<ScanExamQrScreen> {
   final MobileScannerController controller = MobileScannerController(
-    detectionSpeed: DetectionSpeed.noDuplicates,
+    // KHÔNG dùng DetectionSpeed.noDuplicates: chế độ đó nhớ mã vừa quét và
+    // không phát lại mã ấy nữa cho tới khi có MỘT MÃ KHÁC được quét. Tắt popup
+    // rồi soi lại đúng tờ đề vừa quét là onDetect im lặng luôn — người dùng
+    // tưởng camera hỏng chứ không biết là bị coi như quét trùng.
+    // Chống quét trùng lúc dialog đang mở đã có _isProcessing lo, thêm
+    // detectionTimeoutMs để không bắn dồn dập giữa hai lần quét.
+    detectionSpeed: DetectionSpeed.normal,
+    detectionTimeoutMs: 1000,
     facing: CameraFacing.back,
   );
 

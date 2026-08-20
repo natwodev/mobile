@@ -1520,6 +1520,66 @@ abstract class AppLocalizations {
   /// **'Trang chủ'**
   String get homeNavHome;
 
+  /// No description provided for @homeNewsEmpty.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa có tin nào.'**
+  String get homeNewsEmpty;
+
+  /// No description provided for @homeNewsError.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không tải được tin giáo dục.'**
+  String get homeNewsError;
+
+  /// No description provided for @homeNewsOpenFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không mở được bài viết.'**
+  String get homeNewsOpenFailed;
+
+  /// No description provided for @homeNewsRetry.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thử lại'**
+  String get homeNewsRetry;
+
+  /// No description provided for @homeNewsSource.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nguồn: VnExpress'**
+  String get homeNewsSource;
+
+  /// No description provided for @homeNewsTimeDays.
+  ///
+  /// In vi, this message translates to:
+  /// **'{days} ngày trước'**
+  String homeNewsTimeDays(int days);
+
+  /// No description provided for @homeNewsTimeHours.
+  ///
+  /// In vi, this message translates to:
+  /// **'{hours} giờ trước'**
+  String homeNewsTimeHours(int hours);
+
+  /// No description provided for @homeNewsTimeJustNow.
+  ///
+  /// In vi, this message translates to:
+  /// **'Vừa xong'**
+  String get homeNewsTimeJustNow;
+
+  /// No description provided for @homeNewsTimeMinutes.
+  ///
+  /// In vi, this message translates to:
+  /// **'{minutes} phút trước'**
+  String homeNewsTimeMinutes(int minutes);
+
+  /// No description provided for @homeNewsTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tin giáo dục'**
+  String get homeNewsTitle;
+
   /// No description provided for @homeQrExamCreatedAt.
   ///
   /// In vi, this message translates to:

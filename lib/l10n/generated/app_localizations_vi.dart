@@ -801,6 +801,42 @@ class AppLocalizationsVi extends AppLocalizations {
   String get homeNavHome => 'Trang chủ';
 
   @override
+  String get homeNewsEmpty => 'Chưa có tin nào.';
+
+  @override
+  String get homeNewsError => 'Không tải được tin giáo dục.';
+
+  @override
+  String get homeNewsOpenFailed => 'Không mở được bài viết.';
+
+  @override
+  String get homeNewsRetry => 'Thử lại';
+
+  @override
+  String get homeNewsSource => 'Nguồn: VnExpress';
+
+  @override
+  String homeNewsTimeDays(int days) {
+    return '$days ngày trước';
+  }
+
+  @override
+  String homeNewsTimeHours(int hours) {
+    return '$hours giờ trước';
+  }
+
+  @override
+  String get homeNewsTimeJustNow => 'Vừa xong';
+
+  @override
+  String homeNewsTimeMinutes(int minutes) {
+    return '$minutes phút trước';
+  }
+
+  @override
+  String get homeNewsTitle => 'Tin giáo dục';
+
+  @override
   String get homeQrExamCreatedAt => 'Ngày tạo';
 
   @override
