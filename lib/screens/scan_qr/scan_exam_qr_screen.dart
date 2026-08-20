@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+
+import '../../l10n/generated/app_localizations.dart';
+import '../../widget/common/app_buttons.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'utils/qr_validator.dart';
 import 'widgets/qr_scanner_overlay.dart';
@@ -13,8 +16,7 @@ class ScanExamQrScreen extends StatefulWidget {
   State<ScanExamQrScreen> createState() => _ScanExamQrScreenState();
 }
 
-class _ScanExamQrScreenState extends State<ScanExamQrScreen>
-    with SingleTickerProviderStateMixin {
+class _ScanExamQrScreenState extends State<ScanExamQrScreen> {
   final MobileScannerController controller = MobileScannerController(
     detectionSpeed: DetectionSpeed.noDuplicates,
     facing: CameraFacing.back,
@@ -22,25 +24,9 @@ class _ScanExamQrScreenState extends State<ScanExamQrScreen>
 
   bool _isProcessing = false;
   double _zoomFactor = 0.0;
-  late AnimationController _animationController;
-  late Animation<double> _scaleAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    )..repeat(reverse: true);
-
-    _scaleAnimation = Tween<double>(begin: 0.95, end: 1.05).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
-    );
-  }
 
   @override
   void dispose() {
-    _animationController.dispose();
     controller.dispose();
     super.dispose();
   }
@@ -145,8 +131,8 @@ class _ScanExamQrScreenState extends State<ScanExamQrScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Quét mã QR bài thi'),
-        backgroundColor: Colors.blue,
+        title: Text(AppLocalizations.of(context).homeQrScanTitle),
+        backgroundColor: AppColors.barBg,
         foregroundColor: Colors.white,
       ),
       body: Stack(
@@ -160,11 +146,12 @@ class _ScanExamQrScreenState extends State<ScanExamQrScreen>
               if (barcodes.isNotEmpty && !_isProcessing) {
                 final String? code = barcodes.first.rawValue;
                 if (code != null && code.isNotEmpty) {
+                  debugPrint('[QR] Quét được: $code');
                   if (validateExamQrFormat(code)) {
                     _showQrResultDialog(code);
                   } else {
                     _showErrorDialog(
-                      'Mã QR không đúng định dạng bài thi.\nVui lòng quét mã QR hợp lệ.',
+                      AppLocalizations.of(context).homeQrWrongFormatMessage,
                     );
                   }
                 }
@@ -172,18 +159,10 @@ class _ScanExamQrScreenState extends State<ScanExamQrScreen>
             },
           ),
 
-          // Overlay với vùng quét và hiệu ứng giãn ra co lại
-          AnimatedBuilder(
-            animation: _scaleAnimation,
-            builder: (context, child) {
-              return CustomPaint(
-                painter: QrScannerOverlay(
-                  scanWindow,
-                  scale: _scaleAnimation.value,
-                ),
-                child: Container(),
-              );
-            },
+          // Overlay với vùng quét
+          CustomPaint(
+            painter: QrScannerOverlay(scanWindow),
+            child: Container(),
           ),
 
           // Zoom controls tách riêng widget

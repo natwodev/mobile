@@ -1,78 +1,79 @@
 import 'package:flutter/material.dart';
-import 'package:quizz_mobile/helpers/exam_result_helper.dart';
 
-/// Widget hiển thị card thông tin bài thi
+import '../../helpers/exam_result_helper.dart';
+import '../../l10n/generated/app_localizations.dart';
+
+/// Bảng số liệu bài làm, đặt trong thẻ kết quả.
+///
+/// Dựng theo lối của web: nhãn xám bên trái, số đậm bên phải, ngăn nhau bằng
+/// đường kẻ mảnh — không icon màu mè, để vòng điểm phía trên là thứ duy nhất
+/// bắt mắt.
 class ExamInfoCard extends StatelessWidget {
+  const ExamInfoCard({
+    super.key,
+    required this.totalQuestions,
+    required this.answeredQuestions,
+    required this.timeSpent,
+    required this.totalTime,
+  });
+
   final int totalQuestions;
   final int answeredQuestions;
   final int timeSpent;
   final int totalTime;
 
-  const ExamInfoCard({
-    Key? key,
-    required this.totalQuestions,
-    required this.answeredQuestions,
-    required this.timeSpent,
-    required this.totalTime,
-  }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          children: [
-            _buildCompactRow(
-              'Câu hỏi',
-              '$answeredQuestions/$totalQuestions',
-              Icons.assignment,
-              Colors.blue,
-            ),
-            Divider(height: 20),
-            _buildCompactRow(
-              'Chi tiết',
-              'Đã làm: $answeredQuestions | Chưa làm: ${totalQuestions - answeredQuestions} | Sai: 0',
-              Icons.checklist,
-              Colors.green,
-            ),
-            Divider(height: 20),
-            _buildCompactRow(
-              'Thời gian',
-              '${ExamResultHelper.formatTime(timeSpent)}/${ExamResultHelper.formatTime(totalTime)}',
-              Icons.access_time,
-              Colors.purple,
-            ),
-          ],
+    final l10n = AppLocalizations.of(context);
+    final unanswered = (totalQuestions - answeredQuestions).clamp(
+      0,
+      totalQuestions,
+    );
+
+    return Column(
+      children: [
+        _row(l10n.examInfoQuestionsLabel, '$totalQuestions'),
+        _divider(),
+        _row(l10n.questionStatAnswered, '$answeredQuestions'),
+        _divider(),
+        _row(l10n.questionStatUnanswered, '$unanswered'),
+        _divider(),
+        _row(
+          l10n.examInfoTimeLabel,
+          // Ca không giới hạn giờ thì `totalTime` bằng 0; ghép mẫu số "00:00"
+          // vào chỉ làm sinh viên tưởng ca thi hỏng.
+          totalTime > 0
+              ? '${ExamResultHelper.formatTime(timeSpent)} / ${ExamResultHelper.formatTime(totalTime)}'
+              : ExamResultHelper.formatTime(timeSpent),
         ),
-      ),
+      ],
     );
   }
 
-  Widget _buildCompactRow(
-    String label,
-    String value,
-    IconData icon,
-    Color color,
-  ) {
+  Widget _divider() =>
+      const Divider(height: 20, thickness: 1, color: ExamResultHelper.slate100);
+
+  Widget _row(String label, String value) {
     return Row(
       children: [
-        Icon(icon, color: color, size: 22),
-        SizedBox(width: 12),
-        Text(label, style: TextStyle(fontSize: 14, color: Colors.grey[600])),
-        Spacer(),
-        Flexible(
+        Expanded(
           child: Text(
-            value,
-            style: TextStyle(
+            label,
+            style: const TextStyle(
               fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
+              color: ExamResultHelper.slate500,
             ),
-            textAlign: TextAlign.right,
           ),
+        ),
+        const SizedBox(width: 12),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: ExamResultHelper.slate900,
+          ),
+          textAlign: TextAlign.right,
         ),
       ],
     );

@@ -1,37 +1,42 @@
 import 'package:flutter/material.dart';
+
 import '../../component/HomeNavigation.dart';
+import '../../helpers/exam_result_helper.dart';
+import '../../l10n/generated/app_localizations.dart';
 
-/// Widget nút về trang chủ
+/// Nút về trang chủ.
+///
+/// Kiểu viền như `btn-secondary` của web: trang kết quả chỉ có đúng một lối
+/// đi tiếp, không cần nút đặc to đùng để giành sự chú ý với vòng điểm.
 class HomeButton extends StatelessWidget {
-  final VoidCallback? onPressed;
+  const HomeButton({super.key, this.onPressed});
 
-  const HomeButton({Key? key, this.onPressed}) : super(key: key);
+  final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      child: ElevatedButton.icon(
+      child: OutlinedButton.icon(
         onPressed:
             onPressed ??
             () {
               Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => HomeNavigation(),
-                ),
+                MaterialPageRoute(builder: (context) => HomeNavigation()),
                 (Route<dynamic> route) => false,
               );
             },
-        icon: Icon(Icons.home),
+        icon: const Icon(Icons.home_outlined, size: 20),
         label: Text(
-          'Về trang chủ',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          AppLocalizations.of(context).examResultHomeButton,
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
         ),
-        style: ElevatedButton.styleFrom(
-          padding: EdgeInsets.symmetric(vertical: 14),
-          backgroundColor: Colors.blue,
-          foregroundColor: Colors.white,
+        style: OutlinedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          foregroundColor: ExamResultHelper.sky500,
+          side: const BorderSide(color: ExamResultHelper.sky500),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(12),
           ),
         ),
       ),

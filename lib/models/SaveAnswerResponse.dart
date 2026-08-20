@@ -1,26 +1,26 @@
 class SaveAnswerResponse {
   final bool success;
   final String message;
-  final SaveAnswerData data;
+  final SaveAnswerData? data;
 
   SaveAnswerResponse({
     required this.success,
     required this.message,
-    required this.data,
+    this.data,
   });
 
   factory SaveAnswerResponse.fromJson(Map<String, dynamic> json) {
     return SaveAnswerResponse(
       success: json['success'] ?? false,
-      message: json['message'] ?? '',
-      data: SaveAnswerData.fromJson(json['data'] ?? {}),
+      message: json['message'] ?? json['code'] ?? '',
+      data: json['data'] != null ? SaveAnswerData.fromJson(json['data']) : null,
     );
   }
 }
 
 class SaveAnswerData {
   final String newAnswersString;
-  final int key;
+  final dynamic key;
   final dynamic value;
 
   SaveAnswerData({
@@ -32,7 +32,7 @@ class SaveAnswerData {
   factory SaveAnswerData.fromJson(Map<String, dynamic> json) {
     return SaveAnswerData(
       newAnswersString: json['newAnswersString'] ?? '',
-      key: json['key'] ?? 0,
+      key: json['key'],
       value: json['value'],
     );
   }

@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 
-import '../models/newsmock.dart';
-import '../component/HomeNavigation.dart';
+import '../screens/Exam/quick_exam_code_screen.dart';
+import '../screens/notification/notification_screen.dart';
 import '../screens/scan_qr/scan_exam_qr_screen.dart';
+import '../l10n/generated/app_localizations.dart';
+import '../widget/common/app_buttons.dart';
+import '../widget/home/home_banner_carousel.dart';
+import '../widget/home/quiz_answer_banner.dart';
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
@@ -13,51 +17,96 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
+        // Thanh tab nổi đè lên nội dung, nên phần cuối màn phải chừa đúng chỗ
+        // nó chiếm (giá trị do HomeNavigation bơm vào MediaQuery) — không thì
+        // cuộn hết cỡ vẫn còn một mẩu nằm khuất dưới thanh.
+        padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom),
         child: Column(
           children: [
             // Header với Banner + 3 nút nhanh
             _buildHeader(context),
-            // Danh sách bài báo
-            _buildNewsList(),
+            _buildBannerCarousel(),
           ],
         ),
       ),
     );
   }
 
+  /// Băng ảnh động dưới thẻ 2 nút nhanh.
+  ///
+  /// Năm tấm đều 393x165, vẽ thẳng cho khung ngang của băng ảnh bằng
+  /// `tool/make_banners.py`. Bản trước lấy từ bộ panel dựng cho khung
+  /// 393x280, đặt vào đây là mất gần 40% chiều cao — mà phần mất luôn rơi
+  /// đúng vào chỗ có nội dung.
+  Widget _buildBannerCarousel() {
+    // Dải nền trắng ngả xám chạy hết bề ngang: các tấm ảnh đều có nền sáng,
+    // đặt thẳng trên nền trắng của màn thì mép ảnh lẫn vào nền và băng ảnh
+    // trông như trôi lơ lửng.
+    return Container(
+      width: double.infinity,
+      color: AppColors.surfaceMuted,
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      child: const HomeBannerCarousel(
+        slides: [
+          HomeBannerSlide(asset: 'assets/banners/38_chon_dap_an.gif'),
+          HomeBannerSlide(asset: 'assets/banners/42_diem_10.gif'),
+          HomeBannerSlide(asset: 'assets/banners/44_nhom_ban.gif'),
+          HomeBannerSlide(asset: 'assets/banners/35_cong_truong.gif'),
+          HomeBannerSlide(asset: 'assets/banners/47_but_chi_a_cong.gif'),
+        ],
+      ),
+    );
+  }
+
   // Header: Banner + 3 nút nhanh đè lên (Stack)
   Widget _buildHeader(BuildContext context) {
-    // Tăng chiều cao Stack để vùng 3 nút nhanh nằm TRONG vùng hit-test,
-    // tránh bị widget phía dưới "ăn" mất sự kiện chạm.
+    final l10n = AppLocalizations.of(context);
+    // Chiều cao Stack = đáy thẻ trắng + một dải đệm mỏng. Phải đủ bọc hết thẻ
+    // vì phần thò ra ngoài Stack mất vùng hit-test (nút bấm không ăn); nhưng dư
+    // ra bao nhiêu là chừng đó khoảng trắng chen giữa thẻ và băng ảnh bên dưới.
     return SizedBox(
-      height: 330,
+      height: 258,
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          Container(
-            height: 280,
+          // Banner pixel động "chọn đáp án A B C D": vẽ bằng code, không dùng
+          // ảnh nên không tăng dung lượng app và nét ở mọi mật độ điểm ảnh.
+          const SizedBox(
+            height: 180,
             width: double.infinity,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/images/backgrondH.jpg'),
-                fit: BoxFit.cover,
-              ),
-            ),
+            child: QuizAnswerBanner(),
+          ),
+
+          // Nút chuông đè lên banner. Lấy `padding.top` của MediaQuery thay vì
+          // bọc SafeArea: banner cố tình chạy lên tận mép trên, bọc SafeArea là
+          // đẩy tụt cả tấm ảnh xuống.
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 8,
+            right: 12,
+            child: _buildNotificationButton(context),
           ),
 
           // Container 3 nút nhanh đè lên banner với bóng xanh
+          // Kích thước thẻ trắng do 3 thứ quyết định, theo mức ảnh hưởng giảm dần:
+          //   1. `padding` dưới đây          -> chiều cao
+          //   2. ô icon 56x56 trong _buildQuickButton
+          //   3. `left`/`right`              -> bề rộng
+          // Lưu ý: `bottom` đo từ ĐÁY Stack lên, nên nó vừa là dải đệm dưới
+          // thẻ vừa quyết định thẻ thò xuống dưới banner bao nhiêu. Hạ số này
+          // là kéo băng ảnh lại gần, nhưng xuống dưới 0 thì thẻ lòi ra khỏi
+          // Stack và nút KHÔNG bấm được nữa.
           Positioned(
-            bottom: -50,
+            bottom: 8,
             left: 16,
             right: 16,
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.blue.withOpacity(0.18),
+                    color: AppColors.accent.withValues(alpha: 0.18),
                     blurRadius: 25,
                     offset: Offset(0, 5),
                     spreadRadius: 0,
@@ -69,45 +118,36 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   _buildQuickButton(
                     child: HugeIcon(
-                      icon: HugeIcons.strokeRoundedQrCode01,
-                      color: Colors.blue,
-                      size: 32,
+                      // Quiz01: nút này mở màn NHẬP MÃ ca thi để vào làm bài;
+                      // icon chìa khoá cũ dễ bị hiểu là đổi mật khẩu.
+                      icon: HugeIcons.strokeRoundedQuiz01,
+                      color: AppColors.accent,
+                      size: 26,
                     ),
-                    label: "Quét mã",
-                    color: Colors.blue,
+                    label: l10n.homeQuickExamButton,
+                    color: AppColors.accent,
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => ScanExamQrScreen()),
+                        MaterialPageRoute(
+                          builder: (_) => const QuickExamCodeScreen(),
+                        ),
                       );
                     },
                   ),
                   _buildQuickButton(
                     child: HugeIcon(
-                      icon: HugeIcons.strokeRoundedSearchArea,
-                      color: Colors.blue,
-                      size: 32,
+                      icon: HugeIcons.strokeRoundedQrCode01,
+                      color: AppColors.accent,
+                      size: 26,
                     ),
-                    label: "Nhập mã",
-                    color: Colors.blue,
+                    label: l10n.homeScanExamQrButton,
+                    color: AppColors.accent,
                     onTap: () {
-                      _showEnterCodeDialog(context);
-                    },
-                  ),
-                  _buildQuickButton(
-                    child: HugeIcon(
-                      icon: HugeIcons.strokeRoundedTransactionHistory,
-                      color: Colors.blue,
-                      size: 32,
-                    ),
-                    label: "Bài đã làm",
-                    color: Colors.blue,
-                    onTap: () {
-                      // Chuyển sang tab "Bài kiểm tra" (index 3) trong bottom navigation
-                      final navigationState = HomeNavigation.of(context);
-                      if (navigationState != null) {
-                        navigationState.changeTab(3);
-                      }
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => ScanExamQrScreen()),
+                      );
                     },
                   ),
                 ],
@@ -119,47 +159,38 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  // Dialog nhập mã thủ công
-  void _showEnterCodeDialog(BuildContext context) {
-    final TextEditingController codeController = TextEditingController();
+  // Nút chuông mở trang Thông báo.
+  //
+  // Vòng trắng tròn phía sau: ảnh banner chỗ sáng chỗ tối, icon trơn là có lúc
+  // chìm hẳn vào nền.
+  Widget _buildNotificationButton(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
 
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: Text('Nhập mã bài thi'),
-          content: TextField(
-            controller: codeController,
-            decoration: InputDecoration(
-              hintText: 'Nhập mã bài thi',
-              border: OutlineInputBorder(),
-            ),
-            autofocus: true,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: Text('Hủy'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                final code = codeController.text.trim();
-                if (code.isNotEmpty) {
-                  Navigator.pop(dialogContext);
-                  // TODO: Xử lý mã đã nhập
-                  print('Mã đã nhập: $code');
-                  // Gọi API startExamCore(code) ở đây
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Vui lòng nhập mã bài thi')),
-                  );
-                }
-              },
-              child: Text('Xác nhận'),
-            ),
-          ],
-        );
-      },
+    return Material(
+      color: Colors.white,
+      shape: const CircleBorder(),
+      clipBehavior: Clip.antiAlias,
+      elevation: 2,
+      child: IconButton(
+        tooltip: l10n.notificationsTitle,
+        // Siết đệm và vùng chạm tối thiểu: mặc định IconButton là 48x48 kèm
+        // đệm 8 mỗi bên, để nguyên thì vòng trắng phình thành một mảng to
+        // trên banner thay vì ôm sát cái chuông.
+        padding: const EdgeInsets.all(8),
+        constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+        visualDensity: VisualDensity.compact,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const NotificationScreen()),
+          );
+        },
+        icon: HugeIcon(
+          icon: HugeIcons.strokeRoundedNotification02,
+          color: AppColors.accent,
+          size: 22,
+        ),
+      ),
     );
   }
 
@@ -172,125 +203,42 @@ class HomeScreen extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     // Ưu tiên widget tùy biến nếu được truyền, fallback dùng IconData
-    final Widget iconWidget = child ?? Icon(icon, color: color, size: 32);
+    final Widget iconWidget = child ?? Icon(icon, color: color, size: 26);
 
-    return InkWell(
-      onTap: () {
-        // Log chung cho tất cả nút nhanh
-        print('QuickButton tapped: $label');
-        onTap();
-      },
-      borderRadius: BorderRadius.circular(16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 70,
-            height: 70,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: const Color.fromARGB(255, 19, 131, 223), // màu viền
-                width: 4, // độ dày viền
-              ),
-            ),
-            child: Center(child: iconWidget),
-          ),
-
-          SizedBox(height: 6),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
-              color: Colors.black87,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Danh sách bài báo
-  Widget _buildNewsList() {
-    return Padding(
-      padding: EdgeInsets.all(16),
-      child: ListView.builder(
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        itemCount: newsMockData.length,
-        itemBuilder: (context, index) {
-          final news = newsMockData[index];
-          return _buildNewsCard(news);
-        },
-      ),
-    );
-  }
-
-  // Card bài báo
-  Widget _buildNewsCard(NewsMock news) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 16),
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            news.title,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            news.content,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey.shade700,
-              height: 1.5,
-            ),
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
-          ),
-          SizedBox(height: 12),
-          Row(
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.person_outline, size: 16, color: Colors.grey.shade500),
-              SizedBox(width: 4),
-              Text(
-                news.author,
-                style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: AppColors.accentBg,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Center(child: iconWidget),
               ),
-              SizedBox(width: 16),
-              Icon(
-                Icons.access_time_outlined,
-                size: 16,
-                color: Colors.grey.shade500,
-              ),
-              SizedBox(width: 4),
+
+              SizedBox(height: 6),
               Text(
-                '${news.publishedAt.day}/${news.publishedAt.month}/${news.publishedAt.year}',
-                style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black87,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }

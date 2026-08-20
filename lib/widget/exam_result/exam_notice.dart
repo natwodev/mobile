@@ -1,32 +1,43 @@
 import 'package:flutter/material.dart';
 
-/// Widget hiển thị thông báo sau khi nộp bài
-class ExamNotice extends StatelessWidget {
-  final String message;
+import '../../helpers/exam_result_helper.dart';
+import '../../l10n/generated/app_localizations.dart';
 
-  const ExamNotice({
-    Key? key,
-    this.message =
-        'Nếu bạn kiểm tra điểm cao thì chúc mừng bạn, nếu bạn kiểm tra không được tốt thì cũng đừng buồn chúng ta còn cơ hội cho lần sau. À làm gì có lần sau :>>>',
-  }) : super(key: key);
+/// Lời nhắn sau khi nộp bài.
+///
+/// Giữ tông trầm của web: nền xám nhạt, chữ xám, không tranh sự chú ý với
+/// vòng điểm.
+class ExamNotice extends StatelessWidget {
+  const ExamNotice({super.key, this.message});
+
+  final String? message;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.blue.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.blue.withOpacity(0.3)),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: ExamResultHelper.slate200),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.info_outline, color: Colors.blue),
-          SizedBox(width: 12),
+          const Icon(
+            Icons.info_outline,
+            size: 20,
+            color: ExamResultHelper.slate500,
+          ),
+          const SizedBox(width: 12),
           Expanded(
             child: Text(
-              message,
-              style: TextStyle(fontSize: 14, color: Colors.blue[800]),
+              message ?? AppLocalizations.of(context).examNoticeDefaultMessage,
+              style: const TextStyle(
+                fontSize: 13,
+                height: 1.5,
+                color: ExamResultHelper.slate500,
+              ),
             ),
           ),
         ],
