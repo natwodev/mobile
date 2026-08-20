@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/generated/app_localizations.dart';
+
 /// Helper class chứa các hàm tiện ích cho ExamResult
 class ExamResultHelper {
   /// Format thời gian từ giây sang MM:SS
@@ -9,29 +11,33 @@ class ExamResultHelper {
     return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 
-  /// Lấy màu gradient dựa theo điểm số
-  static List<Color> getScoreColors(double score) {
-    if (score >= 8.0) return [Colors.green, Colors.green[700]!];
-    if (score >= 6.5) return [Colors.blue, Colors.blue[700]!];
-    if (score >= 5.0) return [Colors.orange, Colors.orange[700]!];
-    return [Colors.red, Colors.red[700]!];
+  /// Bảng màu của trang kết quả, lấy đúng của web
+  /// (`exam-results.css` + `ScoreDisplay.tsx`) để hai nền tảng nhìn ra là một
+  /// sản phẩm.
+  static const Color slate900 = Color(0xFF1E293B);
+  static const Color slate500 = Color(0xFF64748B);
+  static const Color slate200 = Color(0xFFE2E8F0);
+  static const Color slate100 = Color(0xFFF1F5F9);
+  static const Color slate50 = Color(0xFFF8FAFC);
+  static const Color sky500 = Color(0xFF0EA5E9);
+
+  /// Màu vòng điểm, theo đúng ngưỡng dự phòng của web khi chưa cấu hình bảng
+  /// quy đổi điểm chữ (`ScoreDisplay.tsx:218`): >= 8 xanh, >= 5 hổ phách, còn
+  /// lại đỏ. App di động chưa đọc bảng quy đổi nên luôn đi nhánh này.
+  static Color getScoreRingColor(double score) {
+    if (score >= 8.0) return const Color(0xFF16A34A);
+    if (score >= 5.0) return const Color(0xFFD97706);
+    return const Color(0xFFDC2626);
   }
 
   /// Lấy nhận xét dựa theo điểm số
-  static String getScoreComment(double score) {
-    if (score >= 9.0) return 'Xuất sắc!';
-    if (score >= 8.0) return 'Giỏi!';
-    if (score >= 6.5) return 'Khá!';
-    if (score >= 5.0) return 'Trung bình!';
-    return 'Cần cố gắng thêm!';
-  }
-
-  /// Lấy màu chính dựa theo điểm số
-  static Color getScoreMainColor(double score) {
-    if (score >= 8.0) return Colors.green;
-    if (score >= 6.5) return Colors.blue;
-    if (score >= 5.0) return Colors.orange;
-    return Colors.red;
+  static String getScoreComment(BuildContext context, double score) {
+    final l10n = AppLocalizations.of(context);
+    if (score >= 9.0) return l10n.examScoreCommentExcellent;
+    if (score >= 8.0) return l10n.examScoreCommentGood;
+    if (score >= 6.5) return l10n.examScoreCommentFair;
+    if (score >= 5.0) return l10n.examScoreCommentAverage;
+    return l10n.examScoreCommentNeedsImprovement;
   }
 
   /// Tính phần trăm hoàn thành

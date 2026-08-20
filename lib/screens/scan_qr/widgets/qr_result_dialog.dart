@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
+
+import '../../../l10n/generated/app_localizations.dart';
 import '../../../services/auth/user_services.dart';
+import '../../../services/exam_location_service.dart';
+import '../../../widget/common/app_modal.dart';
 import '../../Exam/exam_screen.dart';
 
-class QrResultDialog extends StatelessWidget {
+class QrResultDialog extends StatefulWidget {
   final Map<String, String> examData;
   final VoidCallback onCancel;
   final BuildContext parentContext;
@@ -13,6 +18,17 @@ class QrResultDialog extends StatelessWidget {
     required this.onCancel,
     required this.parentContext,
   });
+
+  @override
+  State<QrResultDialog> createState() => _QrResultDialogState();
+}
+
+class _QrResultDialogState extends State<QrResultDialog> {
+  /// Chặn bấm Xác nhận hai lần: mỗi lần vào thi có thể trừ một lượt làm bài.
+  bool _isStarting = false;
+
+  Map<String, String> get examData => widget.examData;
+  BuildContext get parentContext => widget.parentContext;
 
   String _formatDateTime(String? dateTimeStr) {
     if (dateTimeStr == null || dateTimeStr.isEmpty) return '';
@@ -60,42 +76,90 @@ class QrResultDialog extends StatelessWidget {
     );
   }
 
+  /// Vào phòng thi từ mã vừa quét.
+  ///
+  /// Đi ĐÚNG con đường của màn "nhập mã nhanh": tra ca thi theo mã → xin GPS nếu
+  /// ca thi bắt buộc → gọi `create-exam-session`. Bản cũ gọi thẳng API với
+  /// `originalExamPaperId`, mà backend chỉ đọc `ExamSessionSubjectId` nên nhận
+  /// Guid rỗng và KHÔNG BAO GIỜ mở được phiên thi; nó cũng không gửi GPS nên ca
+  /// thi bắt buộc định vị thì chặn thêm lần nữa.
   Future<void> _handleConfirm(BuildContext dialogContext) async {
-    final originalExamPaperIdStr = examData['id'];
-    if (originalExamPaperIdStr == null || originalExamPaperIdStr.isEmpty) {
-      Navigator.of(dialogContext).pop(); // đóng dialog
-      _showError(parentContext, 'Không tìm thấy mã đề trong QR.');
+    if (_isStarting) return;
+
+    final l10n = AppLocalizations.of(parentContext);
+    final core = examData['core']?.trim() ?? '';
+    if (core.isEmpty) {
+      Navigator.of(dialogContext).pop();
+      _showError(parentContext, l10n.homeQrMissingExamCode);
       return;
     }
 
-    final originalExamPaperId = int.tryParse(originalExamPaperIdStr);
-    if (originalExamPaperId == null) {
-      Navigator.of(dialogContext).pop(); // đóng dialog
+    setState(() => _isStarting = true);
+    debugPrint('[QR] Tra ca thi theo mã: "$core"');
+
+    final lookup = await UserService().findExamSessionByCore(core);
+    if (!mounted) return;
+
+    final session = lookup.session;
+    if (session == null) {
+      debugPrint('[QR] Không tra được ca thi: ${lookup.error}');
+      setState(() => _isStarting = false);
+      Navigator.of(dialogContext).pop();
+      _showError(parentContext, lookup.error ?? l10n.msgExamSessionNotFound);
+      return;
+    }
+
+    // Ca KHÔNG bắt buộc định vị thì không đụng tới GPS: giữ sentinel {0,0} như
+    // web, không hiện hộp xin quyền, không bắt sinh viên chờ.
+    double latitude = 0;
+    double longitude = 0;
+
+    if (session.requireLocationOnExamStart) {
+      final location = await ExamLocationService.current();
+      if (!mounted) return;
+
+      if (!location.isSuccess) {
+        debugPrint('[QR] Không lấy được vị trí: ${location.error}');
+        setState(() => _isStarting = false);
+        Navigator.of(dialogContext).pop();
+        _showError(
+          parentContext,
+          examLocationErrorMessage(l10n, location.error!),
+        );
+        return;
+      }
+
+      latitude = location.latitude!;
+      longitude = location.longitude!;
+    }
+
+    final start = await UserService().createExamSessionDetailed(
+      examSessionSubjectId: session.examSessionSubjectId,
+      latitude: latitude,
+      longitude: longitude,
+    );
+    if (!mounted) return;
+
+    final examResult = start.data;
+    if (examResult == null) {
+      debugPrint('[QR] Không mở được phiên thi: ${start.error}');
+      setState(() => _isStarting = false);
+      Navigator.of(dialogContext).pop();
       _showError(
         parentContext,
-        'Mã đề trong QR không hợp lệ.\nVui lòng quét lại mã khác.',
+        start.error ?? l10n.msgStudentExamSessionCreateFailed,
       );
       return;
     }
 
-    final result = await UserService().startExamQR(originalExamPaperId);
-
-    if (result == null) {
-      Navigator.of(dialogContext).pop(); // đóng dialog
-      _showError(
-        parentContext,
-        'Không thể tạo ca thi từ QR.\nVui lòng thử lại.',
-      );
-      return;
-    }
-
-    Navigator.of(dialogContext).pop(); // đóng dialog kết quả QR
+    debugPrint('[QR] Vào phòng thi OK: ${examResult.studentSession.studentExamSessionId}');
+    Navigator.of(dialogContext).pop();
 
     Navigator.of(parentContext).pushReplacement(
       MaterialPageRoute(
         builder: (context) => ExamScreen(
-          sessionId: result.studentSession.studentExamSessionId,
-          initialData: result,
+          sessionId: examResult.studentSession.studentExamSessionId,
+          initialData: examResult,
         ),
       ),
     );
@@ -105,19 +169,18 @@ class QrResultDialog extends StatelessWidget {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.error_outline, color: Colors.red),
-            SizedBox(width: 8),
-            Text('Mã QR không hợp lệ'),
-          ],
-        ),
-        content: Text(message),
+      builder: (ctx) => AppModal(
+        title: AppLocalizations.of(context).homeQrInvalidTitle,
+        icon: HugeIcons.strokeRoundedAlert01,
+        accentColor: Colors.red,
+        children: [Text(message)],
         actions: [
-          TextButton(
+          // ElevatedButton chứ không phải TextButton: đây là lối thoát DUY
+          // NHẤT của hộp thoại lỗi, để nút chữ mờ thì nó đọc ra như một dòng
+          // phụ chứ không phải việc người dùng buộc phải bấm.
+          ElevatedButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Thử lại'),
+            child: Text(AppLocalizations.of(context).commonRetry),
           ),
         ],
       ),
@@ -126,128 +189,48 @@ class QrResultDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Colors.white, Color(0xFFF5F5F5)],
-          ),
+    final l10n = AppLocalizations.of(context);
+
+    return AppModal(
+      title: l10n.homeQrExamInfoLabel,
+      icon: HugeIcons.strokeRoundedTaskDone01,
+      onClose: () {
+        Navigator.of(context).pop();
+        widget.onCancel();
+      },
+      children: [
+        Text(
+          examData['title'] ?? l10n.homeQrExamFallbackTitle,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.assignment,
-                    color: Colors.green,
-                    size: 28,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Thông tin bài thi',
-                        style: TextStyle(fontSize: 12, color: Colors.grey),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        examData['title'] ?? 'Bài thi',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  _buildInfoRow('Môn học', examData['sub'] ?? ''),
-                  _buildInfoRow('Mô tả', examData['desc'] ?? ''),
-                  _buildInfoRow('Thời gian', '${examData['dur'] ?? ''} phút'),
-                  _buildInfoRow(
-                    'Ngày tạo',
-                    _formatDateTime(examData['created']),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      onCancel();
-                    },
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: const Text('Huỷ', style: TextStyle(fontSize: 16)),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () => _handleConfirm(context),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 2,
-                    ),
-                    child: const Text(
-                      'Xác nhận',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
+        const SizedBox(height: 16),
+        _buildInfoRow(l10n.homeQrExamSubject, examData['sub'] ?? ''),
+        _buildInfoRow(l10n.homeQrExamDescription, examData['desc'] ?? ''),
+        _buildInfoRow(
+          l10n.homeQrExamDuration,
+          l10n.homeQrExamDurationMinutes(examData['dur'] ?? ''),
         ),
-      ),
+        _buildInfoRow(
+          l10n.homeQrExamCreatedAt,
+          _formatDateTime(examData['created']),
+        ),
+      ],
+      actions: [
+        ElevatedButton(
+          onPressed: _isStarting ? null : () => _handleConfirm(context),
+          // Không khai style: theme đã lo nền #2563EB, chữ trắng, bo 8, cao 48.
+          child: _isStarting
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : Text(l10n.commonConfirm),
+        ),
+      ],
     );
   }
 }

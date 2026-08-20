@@ -1,23 +1,34 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:quizz_mobile/l10n/locale_controller.dart';
 import 'package:quizz_mobile/main.dart';
 
 void main() {
-  testWidgets('App loads successfully', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(HutechCampusApp());
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    // Mỗi test bắt đầu từ tiếng Việt (mặc định của app).
+    await LocaleController.instance.setLocale(LocaleController.vietnamese);
+  });
 
-    // Verify that the app loads with bottom navigation
-    expect(find.text('Home'), findsOneWidget);
-    expect(find.text('Lớp học'), findsOneWidget);
-    expect(find.text('Bài kiểm tra'), findsOneWidget);
-    expect(find.text('Tài khoản'), findsOneWidget);
+  testWidgets('App mở ra màn đăng nhập bằng tiếng Việt', (tester) async {
+    await tester.pumpWidget(HutechCampusApp());
+    await tester.pumpAndSettle();
+
+    expect(find.text('Đăng nhập'), findsWidgets);
+    expect(find.text('Tiếng Việt'), findsOneWidget);
+  });
+
+  testWidgets('Đổi ngôn ngữ sang English thì giao diện đổi theo', (
+    tester,
+  ) async {
+    await tester.pumpWidget(HutechCampusApp());
+    await tester.pumpAndSettle();
+
+    await LocaleController.instance.setLocale(LocaleController.english);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Sign in'), findsWidgets);
+    expect(find.text('Đăng nhập'), findsNothing);
   });
 }

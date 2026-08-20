@@ -1,48 +1,44 @@
-// controllers/login_controller.dart
 import 'package:flutter/material.dart';
+import '../l10n/app_l10n.dart';
 import '../models/login.dart';
 import '../services/auth/user_services.dart';
 
-/// Controller xử lý logic đăng nhập
-/// Sử dụng AuthService để gọi API (composition thay vì inheritance)
 class UserController with ChangeNotifier {
   final UserService _authService = UserService();
 
   // State
   bool _loading = false;
   String? _error;
-  String _code1 = '';
-  String _code2 = '';
+  String _userName = '';
+  String _password = '';
 
   // Getters
   bool get loading => _loading;
   String? get error => _error;
-  String get code1 => _code1;
-  String get code2 => _code2;
+  String get userName => _userName;
+  String get password => _password;
 
   // Setters
-  void setCode1(String value) {
-    _code1 = value;
+  void setUserName(String value) {
+    _userName = value;
     notifyListeners();
   }
 
-  void setCode2(String value) {
-    _code2 = value;
+  void setPassword(String value) {
+    _password = value;
     notifyListeners();
   }
 
   /// Xử lý đăng nhập
-  /// Gọi AuthService để xử lý logic API
   Future<bool> login() async {
     _loading = true;
     _error = null;
     notifyListeners();
 
     try {
-      // Validation
       final request = StudentLoginModel(
-        studentCode1: _code1,
-        studentCode2: _code2,
+        userName: _userName,
+        password: _password,
       );
 
       final validationError = request.validate();
@@ -53,21 +49,20 @@ class UserController with ChangeNotifier {
         return false;
       }
 
-      // Gọi AuthService
-      final result = await _authService.login(_code1, _code2);
+      final result = await _authService.login(_userName, _password);
       _loading = false;
 
       if (result.success) {
         notifyListeners();
         return true;
       } else {
-        _error = result.error ?? 'Đăng nhập thất bại';
+        _error = result.error ?? AppL10n.current.msgLoginFailed;
         notifyListeners();
         return false;
       }
     } catch (e) {
       _loading = false;
-      _error = 'Lỗi: ${e.toString()}';
+      _error = AppL10n.current.msgErrorWithDetail(e.toString());
       notifyListeners();
       return false;
     }
@@ -86,8 +81,8 @@ class UserController with ChangeNotifier {
 
   /// Reset form
   void reset() {
-    _code1 = '';
-    _code2 = '';
+    _userName = '';
+    _password = '';
     _error = null;
     _loading = false;
     notifyListeners();

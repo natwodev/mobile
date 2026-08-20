@@ -49,7 +49,12 @@ Map<String, String> parseExamQrData(String qrData) {
   for (int i = 1; i < parts.length; i++) {
     final keyValue = parts[i].split('=');
     if (keyValue.length == 2) {
-      data[keyValue[0]] = keyValue[1].replaceAll('_', ' ');
+      final key = keyValue[0];
+      // `id` và `core` là giá trị đem đi TRA CỨU, không phải để đọc: giữ nguyên
+      // từng ký tự. Hoàn '_' về dấu cách ở đây là mã ca thi có gạch dưới sẽ tra
+      // trượt, app báo "không tìm thấy ca thi" mà không ai hiểu vì sao.
+      final isIdentifier = key == 'id' || key == 'core';
+      data[key] = isIdentifier ? keyValue[1] : keyValue[1].replaceAll('_', ' ');
     }
   }
 

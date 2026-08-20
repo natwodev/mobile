@@ -1,0 +1,673 @@
+{
+  "@@locale": "vi",
+  "appTitle": "HUTECH Campus Info",
+  "authAccountTitle": "Tài khoản",
+  "authAvatarChangeTitle": "Ảnh đại diện",
+  "authAvatarFromCamera": "Chụp ảnh mới",
+  "authAvatarFromGallery": "Chọn từ thư viện",
+  "authAvatarUpdateSuccess": "Đã cập nhật ảnh đại diện.",
+  "authChangePasswordFailed": "Đổi mật khẩu thất bại",
+  "authChangePasswordSuccess": "Đổi mật khẩu thành công.",
+  "authChangePasswordTitle": "Đổi mật khẩu",
+  "authConfirmPasswordHint": "Nhập lại mật khẩu mới...",
+  "authConfirmPasswordLabel": "Xác nhận mật khẩu mới",
+  "authConfirmPasswordMismatch": "Mật khẩu xác nhận không khớp",
+  "authConfirmPasswordRequired": "Vui lòng xác nhận mật khẩu mới",
+  "authCurrentPasswordHint": "Nhập mật khẩu đang dùng...",
+  "authCurrentPasswordLabel": "Mật khẩu hiện tại",
+  "authCurrentPasswordRequired": "Vui lòng nhập mật khẩu hiện tại",
+  "authDateOfBirthLabel": "Ngày sinh",
+  "authEdit": "Sửa",
+  "authEditProfileTitle": "Sửa thông tin cá nhân",
+  "authEmailHint": "Nhập email...",
+  "authEmailInvalid": "Email không hợp lệ",
+  "authEmailLabel": "Email",
+  "authFullNameHint": "Nhập họ và tên...",
+  "authFullNameLabel": "Họ và tên",
+  "authFullNameRequired": "Vui lòng nhập họ và tên",
+  "authGenderFemale": "Nữ",
+  "authGenderLabel": "Giới tính",
+  "authGenderMale": "Nam",
+  "authLoginSubtitle": "Nhập mã sinh viên và mật khẩu để đăng nhập",
+  "authLoginTitle": "Đăng nhập",
+  "authLogout": "Đăng xuất",
+  "authLogoutConfirmMessage": "Bạn có chắc muốn đăng xuất khỏi tài khoản này?",
+  "authLogoutFailed": "Đăng xuất thất bại: {error}",
+  "@authLogoutFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "authNewPasswordHint": "Nhập mật khẩu mới...",
+  "authNewPasswordLabel": "Mật khẩu mới",
+  "authNewPasswordRequired": "Vui lòng nhập mật khẩu mới",
+  "authNewPasswordSameAsCurrent": "Mật khẩu mới phải khác mật khẩu hiện tại",
+  "authNoName": "Chưa có tên",
+  "authNoStudentId": "Chưa có MSSV",
+  "authNotAvailable": "Chưa có",
+  "authNotSelected": "Chưa chọn",
+  "authPasswordHint": "Nhập mật khẩu...",
+  "authPasswordLabel": "Mật khẩu",
+  "authPasswordMinLength": "Mật khẩu phải từ 6 ký tự trở lên",
+  "authPasswordRequired": "Vui lòng nhập mật khẩu",
+  "authPersonalInfoTitle": "Thông tin cá nhân",
+  "authPhoneHint": "Nhập số điện thoại...",
+  "authPhoneLabel": "Số điện thoại",
+  "authPhoneMinLength": "Số điện thoại phải từ 9 chữ số trở lên",
+  "authPickDateOfBirth": "Chọn ngày sinh",
+  "authProfileLoadFailed": "Không tải được thông tin cá nhân.",
+  "authProfileLoadFailedRetry": "Không tải được thông tin cá nhân. Vui lòng thử lại.",
+  "authProfileUpdateFailed": "Cập nhật thông tin thất bại",
+  "authProfileUpdateSuccess": "Cập nhật thông tin cá nhân thành công.",
+  "authSaveChanges": "Lưu thay đổi",
+  "authSelect": "Chọn",
+  "authStudentIdHelper": "Mã sinh viên do nhà trường cấp, không thể tự sửa",
+  "authStudentIdLabel": "Mã sinh viên",
+  "authUsernameHint": "Nhập tên đăng nhập hoặc MSSV...",
+  "authUsernameLabel": "Tên đăng nhập / MSSV",
+  "authUsernameRequired": "Vui lòng nhập tên đăng nhập hoặc MSSV",
+  "clearCacheAlreadyEmpty": "Bộ nhớ đệm đang trống",
+  "clearCacheConfirm": "Xoá ngay",
+  "clearCacheDone": "Đã xoá {size} bộ nhớ đệm",
+  "@clearCacheDone": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "clearCacheFailed": "Không xoá được bộ nhớ đệm: {error}",
+  "@clearCacheFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "clearCacheMessage": "Xoá ảnh tạm và tệp tải về trong máy. Bạn vẫn đăng nhập, không mất bài thi hay cài đặt.",
+  "clearCacheSize": "Đang chiếm khoảng {size}",
+  "@clearCacheSize": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "clearCacheTitle": "Xoá bộ nhớ đệm",
+  "commonCancel": "Huỷ",
+  "commonClose": "Đóng",
+  "commonConfirm": "Xác nhận",
+  "commonLoading": "Đang tải...",
+  "commonNotUpdated": "Chưa cập nhật",
+  "commonRetry": "Thử lại",
+  "commonSave": "Lưu",
+  "contactCopied": "Đã sao chép {value}",
+  "@contactCopied": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "contactEmail": "Gửi email",
+  "contactHotline": "Gọi hotline",
+  "contactOpenFailed": "Không mở được: {value}",
+  "@contactOpenFailed": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "contactTitle": "Liên hệ hỗ trợ",
+  "contactWebsite": "Mở website",
+  "deviceInfoAppName": "Tên ứng dụng",
+  "deviceInfoAppSection": "Ứng dụng",
+  "deviceInfoBrand": "Hãng sản xuất",
+  "deviceInfoBuildNumber": "Bản dựng",
+  "deviceInfoCopied": "Đã sao chép thông tin thiết bị",
+  "deviceInfoCopy": "Sao chép thông tin",
+  "deviceInfoDeviceSection": "Thiết bị",
+  "deviceInfoDeviceType": "Loại thiết bị",
+  "deviceInfoEmulator": "Máy ảo",
+  "deviceInfoLanguage": "Ngôn ngữ app",
+  "deviceInfoLoadFailed": "Không đọc được thông tin thiết bị",
+  "deviceInfoModel": "Kiểu máy",
+  "deviceInfoOs": "Hệ điều hành",
+  "deviceInfoPackageName": "Mã ứng dụng",
+  "deviceInfoPhysical": "Máy thật",
+  "deviceInfoScreen": "Màn hình",
+  "deviceInfoTitle": "Thông tin thiết bị",
+  "deviceInfoVersion": "Phiên bản",
+  "examAllAnswersSaved": "Đã lưu xong toàn bộ đáp án.",
+  "examAnsweredProgress": "Đã trả lời: {answered}/{total}",
+  "@examAnsweredProgress": {
+    "placeholders": {
+      "answered": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "examAutoSubmitUnsavedWarning": "Có {count} câu không lưu được lên máy chủ nên có thể không được chấm.",
+  "@examAutoSubmitUnsavedWarning": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "examCannotExitWarning": "Không thể thoát khi đang làm bài! Vui lòng nộp bài để kết thúc.",
+  "examCodeAppBarTitle": "Làm kiểm tra",
+  "examCodeCheckingButton": "Đang kiểm tra...",
+  "examCodeCodeLabel": "Mã ca thi",
+  "examCodeConfirmMessage": "Bạn có chắc chắn muốn bắt đầu làm bài? Sau khi vào thi, thời gian làm bài sẽ bắt đầu được tính.",
+  "examCodeConfirmTitle": "Xác nhận vào thi",
+  "examCodeCreatingSession": "Đang tạo phiên thi...",
+  "examCodeDurationLabel": "Thời lượng",
+  "examCodeDurationMinutes": "{minutes} phút",
+  "@examCodeDurationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "examCodeEmptyError": "Vui lòng nhập mã bài thi",
+  "examCodeEndTimeLabel": "Thời gian kết thúc",
+  "examCodeEnterRoomButton": "Tìm ca thi",
+  "examCodeErrorTitle": "Không thể bắt đầu làm bài",
+  "examCodeFieldHint": "Chỉ chữ cái, số và dấu gạch nối",
+  "examCodeHeading": "Làm kiểm tra",
+  "examCodeHelpText": "Mã ca thi chỉ được chứa chữ cái (A-Z), số (0-9) và dấu gạch nối (-). Ký tự đặc biệt sẽ bị tự động xóa.",
+  "examCodeLocationRequiredNotice": "Ca thi này bắt buộc gửi vị trí GPS. Ứng dụng di động chưa hỗ trợ định vị nên rất có thể bạn sẽ không vào được từ đây.",
+  "examCodeSessionInfoTitle": "Thông tin ca thi",
+  "examCodeStartButton": "Vào thi",
+  "examCodeStartTimeLabel": "Thời gian bắt đầu",
+  "examCodeSubjectLabel": "Môn thi",
+  "examCodeSubtitle": "Nhập mã bài thi được giáo viên cung cấp để bắt đầu làm bài.",
+  "examDefaultTitle": "Bài kiểm tra",
+  "examEnterOverlayHint": "Vui lòng không thoát ứng dụng.",
+  "examEnterOverlayTitle": "Đang vào phòng thi",
+  "examInfoQuestionsLabel": "Câu hỏi",
+  "examInfoTimeLabel": "Thời gian",
+  "examLoadError": "Lỗi: {error}",
+  "@examLoadError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "examLocationDenied": "Bạn chưa cho phép ứng dụng truy cập vị trí. Cấp quyền rồi thử lại.",
+  "examLocationDeniedForever": "Quyền vị trí đang bị chặn. Mở Cài đặt để cấp lại quyền cho ứng dụng.",
+  "examLocationGetting": "Đang lấy vị trí của bạn",
+  "examLocationGettingHint": "Ca thi này yêu cầu định vị. Ra chỗ thoáng giúp máy bắt tín hiệu nhanh hơn.",
+  "examLocationServiceDisabled": "Định vị trên máy đang tắt. Bật định vị rồi thử lại để vào thi.",
+  "examLocationTimeout": "Chưa lấy được vị trí. Ra chỗ thoáng hoặc kiểm tra GPS rồi thử lại.",
+  "examLookupOverlayTitle": "Đang tìm ca thi",
+  "examNoData": "Không có dữ liệu bài kiểm tra",
+  "examNoQuestions": "Đề thi không có câu hỏi",
+  "examNoticeDefaultMessage": "Nếu bạn kiểm tra điểm cao thì chúc mừng bạn, nếu bạn kiểm tra không được tốt thì cũng đừng buồn chúng ta còn cơ hội cho lần sau. À làm gì có lần sau :>>>",
+  "examPartialLabel": "Làm dở",
+  "examPinQuestion": "Ghim",
+  "examPinnedHint": "Ghim để đánh dấu câu cần xem lại",
+  "examPinnedLabel": "Đã ghim",
+  "examQuestionProgress": "Câu {label}/{total}",
+  "@examQuestionProgress": {
+    "description": "Vị trí câu đang làm; label là nhãn số thứ tự, có thể là dải \"3-7\" với câu nối / TFNG",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "examRealtimeAutoSubmittedTitle": "Bài thi bị nộp tự động do vi phạm",
+  "examRealtimeBlockedMessage": "Giám thị đã dừng ca thi của bạn. Bài làm đã được nộp.",
+  "examRealtimeBlockedTitle": "Bạn đã bị chặn khỏi ca thi",
+  "examRealtimeExtraTimeAdded": "Giám thị cộng thêm {minutes} phút",
+  "@examRealtimeExtraTimeAdded": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "examRealtimeExtraTimeSubtracted": "Giám thị trừ {minutes} phút",
+  "@examRealtimeExtraTimeSubtracted": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "examRealtimeTeacherMessageTitle": "Thông báo từ giám thị",
+  "examRealtimeTeacherSubmittedTitle": "Giám thị đã nộp bài hộ bạn",
+  "examRealtimeViolationWarningMessage": "Bạn đã có {count}/{threshold} lần vi phạm quy chế. Tiếp tục vi phạm có thể bị nộp bài tự động hoặc bị đình chỉ.",
+  "@examRealtimeViolationWarningMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "threshold": {
+        "type": "int"
+      }
+    }
+  },
+  "examRealtimeViolationWarningTitle": "Cảnh báo vi phạm",
+  "examRealtimeViolationWarningUnderstood": "Tôi đã hiểu",
+  "examResultHomeButton": "Về trang chủ",
+  "examResultPendingSubmitFailed": "Máy chủ không nhận bài",
+  "examResultPendingSubmitFailedHint": "Bài của bạn đã bị đóng trước khi gửi được. Hãy báo ngay cho giám thị để được xử lý.",
+  "examResultPendingSubmitHint": "Bài làm đã được ghi lại trên máy lúc {time}. Ứng dụng sẽ tự gửi ngay khi có mạng — bạn không cần làm gì thêm.",
+  "@examResultPendingSubmitHint": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "examResultPendingSubmitTitle": "Đang chờ mạng để gửi bài",
+  "examResultTitle": "Kết quả bài thi",
+  "examSavingIndicator": "Đang lưu...",
+  "examScoreCommentAverage": "Trung bình!",
+  "examScoreCommentExcellent": "Xuất sắc!",
+  "examScoreCommentFair": "Khá!",
+  "examScoreCommentGood": "Giỏi!",
+  "examScoreCommentNeedsImprovement": "Cần cố gắng thêm!",
+  "examScoreLabel": "ĐIỂM CỦA BẠN",
+  "examSubmitButton": "Nộp bài",
+  "examSubmitDialogAllAnswered": "Bạn đã trả lời hết các câu.",
+  "examSubmitDialogAnsweredLabel": "Đã trả lời",
+  "examSubmitDialogConfirmQuestion": "Bạn có chắc chắn muốn nộp bài không?",
+  "examSubmitDialogTitle": "Nộp bài thi",
+  "examSubmitDialogUnansweredLabel": "Chưa trả lời",
+  "examSubmitDialogUnansweredWarning": "Còn {count} câu chưa trả lời. Nộp bài rồi thì không quay lại sửa được nữa.",
+  "@examSubmitDialogUnansweredWarning": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "examSubmitDialogUnsavedWarning": "⚠️ Còn {count} câu chưa lưu được lên máy chủ. Nếu nộp bây giờ, những câu đó có thể không được chấm.",
+  "@examSubmitDialogUnsavedWarning": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "examSubmitError": "Có lỗi xảy ra khi nộp bài: {error}",
+  "@examSubmitError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "examSubmitFailedMessage": "Máy chủ chưa ghi nhận bài nộp của bạn. Các đáp án đã chọn vẫn được lưu — hãy kiểm tra kết nối mạng rồi bấm Thử lại.",
+  "examSubmitFailedTitle": "Lỗi khi nộp bài",
+  "examSubmitOverlayHint": "Vui lòng giữ ứng dụng mở cho tới khi xong.",
+  "examSubmitOverlayTitle": "Đang nộp bài",
+  "examSubmitQueuedMessage": "Mất kết nối nên bài chưa gửi được. Giờ nộp của bạn đã được ghi lại, ứng dụng sẽ tự gửi khi có mạng.",
+  "examSubmitQueuedTitle": "Đã ghi nhận giờ nộp",
+  "examSubmitSuccess": "Nộp bài thành công",
+  "examTimeUpBannerTitle": "Hết giờ!",
+  "examTimeUpLockedHint": "Bài đã được khoá, bạn không thể thay đổi đáp án nữa.",
+  "examTimeUpSavingAnswers": "Đang chờ lưu nốt các đáp án đã chọn...",
+  "examTimeUpSubmitting": "Đang tự động nộp bài...",
+  "examTimeUpToastMessage": "Bài thi đang được nộp tự động. Vui lòng không thoát ứng dụng.",
+  "examOfflineBannerTitle": "Mất kết nối",
+  "examOfflineBannerHint": "Đáp án vẫn được lưu trên máy và sẽ tự gửi lên khi có mạng lại.",
+  "examOfflineRetryFailed": "Vẫn chưa gửi được. Kiểm tra mạng rồi thử lại.",
+  "examUnlimitedTime": "Không giới hạn",
+  "examUnpinQuestion": "Bỏ ghim",
+  "feedbackAttachNote": "Thông tin máy và phiên bản app được đính kèm tự động để dò lỗi nhanh hơn.",
+  "feedbackContactHint": "Để bên hỗ trợ liên hệ lại khi cần",
+  "feedbackContactLabel": "Email / số điện thoại của bạn (không bắt buộc)",
+  "feedbackContentHint": "Mô tả lỗi bạn gặp, hoặc điều bạn muốn app làm tốt hơn...",
+  "feedbackContentLabel": "Nội dung",
+  "feedbackContentRequired": "Nhập nội dung trước khi gửi",
+  "feedbackMailFallback": "Máy chưa có ứng dụng email. Nội dung đã được sao chép, bạn gửi giúp tới {email}.",
+  "@feedbackMailFallback": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "feedbackSend": "Gửi",
+  "feedbackTitle": "Báo lỗi / góp ý",
+  "feedbackTypeBug": "Báo lỗi",
+  "feedbackTypeIdea": "Góp ý",
+  "historyBadgeExtraMinutes": "+{count} phút",
+  "@historyBadgeExtraMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "historyBadgeViolations": "{count} vi phạm",
+  "@historyBadgeViolations": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "historyBlockedClosed": "Đã hết hạn xem lại",
+  "historyBlockedNotAllowed": "Ca thi không cho xem lại bài",
+  "historyBlockedNotCompleted": "Bài đang được mở lại để làm lại",
+  "historyBlockedNotOpenYet": "Mở xem lại từ {time}",
+  "@historyBlockedNotOpenYet": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "historyBlockedNotOpenYetGeneric": "Chưa tới giờ mở xem lại bài",
+  "historyColCorrect": "Số câu đúng",
+  "historyColDuration": "Thời gian làm",
+  "historyColExamDate": "Ngày thi",
+  "historyColScore": "Điểm",
+  "historyDurationMinutes": "{count} phút",
+  "@historyDurationMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "historyEmptyDesc": "Bạn chưa hoàn thành bài thi nào. Sau khi nộp bài, bài làm sẽ xuất hiện ở đây.",
+  "historyEmptyTitle": "Chưa có bài thi nào",
+  "historyGoToExam": "Vào thi",
+  "historyLoadFailed": "Không tải được lịch sử làm bài",
+  "historyOpenFailed": "Không mở được bài thi",
+  "historyOpening": "Đang mở...",
+  "historyReview": "Xem lại",
+  "historyReviewWithAnswerKey": "Xem lại bài kèm đáp án đúng",
+  "historyReviewWithoutAnswerKey": "Xem lại bài, không hiện đáp án đúng",
+  "historyReviewWithoutQuestionDetail": "Chỉ xem được câu đúng/sai, không có nội dung câu hỏi",
+  "historyStatAverage": "Điểm trung bình",
+  "historyStatBest": "Điểm cao nhất",
+  "historyStatTotal": "Số bài đã thi",
+  "historyStatViolations": "Tổng vi phạm",
+  "historySubtitle": "Danh sách các bài thi bạn đã hoàn thành",
+  "historyTitle": "Lịch sử làm bài",
+  "historyUnknownSubject": "Không rõ môn thi",
+  "homeNavAccount": "Tài khoản",
+  "homeNavHistory": "Lịch sử",
+  "homeNavHome": "Trang chủ",
+  "homeQrExamCreatedAt": "Ngày tạo",
+  "homeQrExamDescription": "Mô tả",
+  "homeQrExamDuration": "Thời gian",
+  "homeQrExamDurationMinutes": "{minutes} phút",
+  "@homeQrExamDurationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "homeQrExamFallbackTitle": "Bài thi",
+  "homeQrExamInfoLabel": "Thông tin bài thi",
+  "homeQrExamSubject": "Môn học",
+  "homeQrInvalidTitle": "Mã QR không hợp lệ",
+  "homeQrMissingExamCode": "Không tìm thấy mã đề trong QR.",
+  "homeQrScanTitle": "Quét mã QR bài thi",
+  "homeQrStartExamFailed": "Không thể tạo ca thi từ QR.\nVui lòng thử lại.",
+  "homeQrWrongFormatMessage": "Mã QR không đúng định dạng bài thi.\nVui lòng quét mã QR hợp lệ.",
+  "homeQuickExamButton": "Kiểm tra nhanh",
+  "homeScanExamQrButton": "Quét mã bài thi",
+  "msgAuthAccountLocked": "Tài khoản đã bị khoá.",
+  "msgAuthInvalidCredentials": "Sai tài khoản hoặc mật khẩu.",
+  "msgAuthInvalidData": "Dữ liệu không hợp lệ.",
+  "msgAvatarFileTooLarge": "Ảnh vượt quá 10MB. Hãy chọn ảnh nhỏ hơn.",
+  "msgAvatarFormatUnsupported": "Chỉ nhận ảnh JPG, PNG, GIF, WEBP hoặc BMP.",
+  "msgAvatarUploadFailed": "Cập nhật ảnh đại diện thất bại.",
+  "msgChangePasswordFailed": "Đổi mật khẩu thất bại",
+  "msgErrorWithDetail": "Lỗi: {error}",
+  "@msgErrorWithDetail": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "msgExamDataUnreadable": "Máy chủ đã nhận yêu cầu nhưng ứng dụng không đọc được dữ liệu đề thi. Đừng thử lại nhiều lần vì mỗi lần vào thi có thể tính một lượt làm bài — hãy báo giáo viên hoặc kỹ thuật viên.",
+  "msgExamHistoryFetchFailed": "Không tải được lịch sử làm bài.",
+  "msgExamReviewNotAllowed": "Bài này chưa được phép xem lại.",
+  "msgExamReviewOpenFailed": "Máy chủ gặp lỗi khi mở bài. Vui lòng thử lại.",
+  "msgExamSessionCoreRequired": "Vui lòng nhập mã ca thi.",
+  "msgExamSessionFetchFailed": "Không lấy được thông tin ca thi. Vui lòng thử lại.",
+  "msgExamSessionNotFound": "Không tìm thấy phiên thi với mã này",
+  "msgLoginFailed": "Đăng nhập thất bại",
+  "msgLoginPasswordRequired": "Vui lòng nhập mật khẩu",
+  "msgLoginPasswordTooShort": "Mật khẩu phải từ 6 ký tự trở lên",
+  "msgLoginUserNameRequired": "Vui lòng nhập tên đăng nhập / MSSV",
+  "msgProfileUpdateFailed": "Cập nhật thông tin thất bại",
+  "msgSaveAnswerFailed": "Máy chủ không nhận đáp án này. Hãy báo giám thị nếu tình trạng lặp lại.",
+  "msgSaveAnswerOffline": "Mất kết nối nên chưa lưu được đáp án lên máy chủ.",
+  "msgSaveAnswerServerError": "Máy chủ đang gặp lỗi nên chưa lưu được đáp án.",
+  "msgServerUnreachable": "Không kết nối được máy chủ. Vui lòng thử lại.",
+  "msgStudentExamSessionCreateFailed": "Không vào được ca thi này. Có thể chưa tới giờ, đã hết giờ, hết chỗ hoặc bạn đã dùng hết lượt làm bài.",
+  "msgStudentExamSessionCreateServerError": "Máy chủ gặp lỗi khi tạo phiên thi. Vui lòng thử lại sau.",
+  "msgStudentLocationRequired": "Ca thi này bắt buộc gửi vị trí GPS. Ứng dụng di động chưa hỗ trợ định vị nên bạn chưa vào được ca thi từ đây; hãy vào bằng trình duyệt trên máy tính.",
+  "msgStudentProfileFetchFailed": "Không tải được thông tin sinh viên.",
+  "msgStudentProfileNotFound": "Không tìm thấy thông tin sinh viên.",
+  "msgSubmitExamRejected": "Máy chủ không nhận bài nộp này.",
+  "msgSubmitExamSuccess": "Nộp bài thành công",
+  "msgUserAvatarFileRequired": "Chưa chọn ảnh để tải lên.",
+  "msgUserAvatarUpdateFailed": "Tải ảnh lên được nhưng chưa gắn được vào tài khoản.",
+  "msgUserAvatarUploadFailed": "Máy chủ không nhận được ảnh. Vui lòng thử lại.",
+  "msgUserChangePasswordFailed": "Đổi mật khẩu thất bại.",
+  "msgUserChangePasswordServerError": "Lỗi server khi đổi mật khẩu.",
+  "msgUserChangePasswordSuccess": "Đổi mật khẩu thành công.",
+  "msgUserProfileUpdateSuccess": "Cập nhật thông tin cá nhân thành công.",
+  "msgUserTokenMissing": "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
+  "msgUserUpdateFailed": "Không thể cập nhật thông tin người dùng.",
+  "msgValidationCompareMismatch": "Giá trị xác nhận không khớp.",
+  "msgValidationEmailDuplicated": "Email đã được sử dụng.",
+  "msgValidationEmailInvalid": "Email không hợp lệ.",
+  "msgValidationFieldInvalid": "Trường dữ liệu không hợp lệ.",
+  "msgValidationFieldRequired": "Vui lòng nhập đầy đủ thông tin bắt buộc.",
+  "msgValidationInvalid": "Dữ liệu không hợp lệ.",
+  "msgValidationMaxLength": "Giá trị vượt quá độ dài cho phép.",
+  "msgValidationMinLength": "Giá trị chưa đạt độ dài tối thiểu.",
+  "msgValidationPasswordCurrentIncorrect": "Mật khẩu hiện tại không đúng.",
+  "msgValidationPasswordRequiresDigit": "Mật khẩu phải có ít nhất một chữ số.",
+  "msgValidationPasswordRequiresLower": "Mật khẩu phải có ít nhất một chữ thường.",
+  "msgValidationPasswordRequiresSymbol": "Mật khẩu phải có ít nhất một ký tự đặc biệt.",
+  "msgValidationPasswordRequiresUniqueChars": "Mật khẩu phải có nhiều ký tự khác nhau hơn.",
+  "msgValidationPasswordRequiresUpper": "Mật khẩu phải có ít nhất một chữ hoa.",
+  "msgValidationPasswordTooShort": "Mật khẩu quá ngắn.",
+  "msgValidationPhoneInvalid": "Số điện thoại không hợp lệ.",
+  "msgValidationTokenInvalid": "Mã xác thực không hợp lệ hoặc đã hết hạn.",
+  "msgValidationUserNotFound": "Không tìm thấy người dùng.",
+  "msgValidationUsernameDuplicated": "Tên đăng nhập đã tồn tại.",
+  "notificationsEmptyMessage": "Thông báo về ca thi, điểm và nhắc nhở của giáo viên sẽ hiện ở đây.",
+  "notificationsEmptyTitle": "Chưa có thông báo",
+  "notificationsTitle": "Thông báo",
+  "questionAntiCheatAutoSubmitNotice": "Đủ {max} lần sẽ tự động nộp bài.",
+  "@questionAntiCheatAutoSubmitNotice": {
+    "description": "Cảnh báo sẽ tự động nộp bài khi đủ số lần vi phạm",
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "questionAntiCheatLeftApp": "Bạn đã rời khỏi ứng dụng thi.",
+  "questionAntiCheatOverlayDetected": "Phát hiện có ứng dụng hoặc cửa sổ khác đè lên ứng dụng thi!",
+  "questionAntiCheatRotationBlockedSubtitle": "Màn hình sẽ tự động quay lại sau vài giây",
+  "questionAntiCheatRotationBlockedTitle": "Không được quay màn hình!",
+  "questionAntiCheatRotationDetected": "Phát hiện quay màn hình trong lúc thi!",
+  "questionAntiCheatScreenRecordingDetected": "Phát hiện ghi màn hình!",
+  "questionAntiCheatScreenshotDetected": "Phát hiện chụp màn hình!",
+  "questionAntiCheatUnderstood": "Tôi hiểu",
+  "questionAntiCheatViolationCount": "Vi phạm: {count}/{max}",
+  "@questionAntiCheatViolationCount": {
+    "description": "Số lần vi phạm hiện tại trên tổng số lần cho phép",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "questionAntiCheatWarningTitle": "Cảnh báo gian lận!",
+  "questionBlankClear": "Gỡ đáp án khỏi ô trống",
+  "questionBlankLabel": "Ô trống {number}",
+  "@questionBlankLabel": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "questionBlankProgress": "Đã điền {filled}/{total}",
+  "@questionBlankProgress": {
+    "placeholders": {
+      "filled": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "questionDifficultyEasy": "Mức độ: Dễ",
+  "questionDifficultyHard": "Mức độ: Khó",
+  "questionDifficultyLevel": "Mức độ {level}",
+  "@questionDifficultyLevel": {
+    "description": "Mức độ khó không xác định, hiển thị bằng số",
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "questionDifficultyMedium": "Mức độ: Trung bình",
+  "questionDifficultyVeryHard": "Mức độ: Rất khó",
+  "questionDropdownHint": "({number}) Chọn...",
+  "@questionDropdownHint": {
+    "description": "Gợi ý cho ô chọn thả xuống theo số thứ tự chỗ trống",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "questionDropdownInstruction": "Chạm vào ô trống để chọn đáp án:",
+  "questionDropdownPlaceholder": "-- Chọn --",
+  "questionFillBlankAllWordsUsed": "Đã dùng hết từ trong ngân hàng",
+  "questionFillBlankInstruction": "Nhấn vào từ, sau đó nhấn vào ô trống:",
+  "questionHighlightClear": "Bỏ chọn hết",
+  "questionHighlightExtraHint": "Nhập nội dung bổ sung...",
+  "questionHighlightExtraLabel": "Phần bổ sung (nếu có)",
+  "questionHighlightInstruction": "Chọn các phần cần bôi trong đoạn văn:",
+  "questionHighlightSelectedCount": "Đã chọn {count} phần",
+  "@questionHighlightSelectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "questionImageLoadFailed": "Không thể tải hình ảnh",
+  "questionImageNoUrl": "Không có URL hình ảnh",
+  "questionLegendAnswered": "Đã trả lời",
+  "questionLegendCurrent": "Đang làm",
+  "questionListTitle": "Danh sách câu hỏi",
+  "questionMatchingColumnA": "Cột A",
+  "questionMatchingColumnB": "Cột B",
+  "questionMatchingEmptySlot": "Chưa nối",
+  "questionMatchingInstruction": "Hướng dẫn: Nhấn vào 1 vế Cột A, sau đó nhấn vế tương ứng ở Cột B để nối.",
+  "questionMatchingLinkedCount": "Đã nối {linked}/{total}",
+  "@questionMatchingLinkedCount": {
+    "placeholders": {
+      "linked": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "questionMatchingPickColumnAFirst": "Chọn một vế ở cột A trước",
+  "questionMultipleChoiceInstruction": "Hãy chọn một hoặc nhiều đáp án:",
+  "questionNext": "Tiếp theo",
+  "questionNumberOfTotal": "Câu {label} / {total}",
+  "@questionNumberOfTotal": {
+    "description": "Nhãn số thứ tự câu hỏi trên tổng số câu; label có thể là dải \"3-7\" với câu nối / TFNG",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "questionOrderingInstruction": "Kéo thả các biểu tượng bên phải để sắp xếp theo thứ tự đúng:",
+  "questionPrevious": "Trước",
+  "questionReadingPassageLabel": "Bài đọc / Ngữ cảnh:",
+  "questionShortAnswerHint": "Nhập câu trả lời của bạn tại đây...",
+  "questionShortAnswerInstruction": "Nhập câu trả lời cho từng ô trống:",
+  "questionSingleChoiceInstruction": "Chọn một đáp án đúng:",
+  "questionStatAnswered": "Đã làm",
+  "questionStatTotal": "Tổng số",
+  "questionStatUnanswered": "Chưa làm",
+  "questionStatementNumber": "Mệnh đề {number}",
+  "@questionStatementNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "questionSubmit": "Nộp bài",
+  "questionTfngInstruction": "Chọn True, False hoặc Not Given cho từng mệnh đề:",
+  "questionTypeDefault": "Câu hỏi",
+  "questionTypeDropdown": "Chọn từ Menu",
+  "questionTypeFillInBlank": "Điền vào chỗ trống",
+  "questionTypeHighlighting": "Bôi vùng",
+  "questionTypeMatching": "Câu nối",
+  "questionTypeMultipleChoice": "Chọn nhiều đáp án",
+  "questionTypeOrdering": "Sắp xếp thứ tự",
+  "questionTypeReading": "Bài đọc",
+  "questionTypeShortAnswer": "Trả lời ngắn",
+  "questionTypeSingleChoice": "Trắc nghiệm",
+  "questionTypeTfng": "True / False / Not Given",
+  "questionTypeTrueFalse": "Đúng / Sai",
+  "questionViewList": "Xem danh sách câu hỏi",
+  "questionWordBankLabel": "Ngân hàng từ",
+  "settingsChooseLanguage": "Chọn ngôn ngữ",
+  "settingsLanguage": "Ngôn ngữ",
+  "settingsLanguageEnglish": "English",
+  "settingsLanguageVietnamese": "Tiếng Việt",
+  "settingsTitle": "Cài đặt",
+  "supportClearCache": "Xoá bộ nhớ đệm",
+  "supportClearCacheSubtitle": "Xoá ảnh và tệp tạm, vẫn giữ đăng nhập",
+  "supportContact": "Liên hệ hỗ trợ",
+  "supportContactSubtitle": "Hotline, email, website",
+  "supportDeviceInfo": "Thông tin thiết bị",
+  "supportDeviceInfoSubtitle": "Phiên bản app, kiểu máy, hệ điều hành",
+  "supportFeedback": "Báo lỗi / góp ý",
+  "supportFeedbackSubtitle": "Gửi mô tả kèm thông tin máy",
+  "supportSectionTitle": "Hỗ trợ",
+  "toastErrorOccurred": "Có lỗi xảy ra",
+  "toastProcessing": "Đang xử lý..."
+}

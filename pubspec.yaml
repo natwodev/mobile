@@ -13,6 +13,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   cupertino_icons: ^1.0.8
   http: ^1.6.0
@@ -20,18 +22,32 @@ dependencies:
   flutter_dotenv: ^6.0.0
   convex_bottom_bar: ^3.2.0
   bottom_bar: ^2.0.5
+  carousel_slider: ^5.1.2
+  smooth_page_indicator: ^2.0.1
   font_awesome_flutter: ^10.12.0
   hugeicons: ^1.1.2
-  intl: ^0.18.1
-  marquee: ^2.3.0
   mobile_scanner: ^7.1.4
+  intl: ^0.20.2
   flutter_math_fork: ^0.7.4
   ai_barcode_scanner: ^7.1.0
   camera: ^0.11.3
-  device_info_plus: ^12.3.0
-  no_screenshot: ^0.3.1
-  screenshot: ^3.0.0
+  screen_protector: ^1.3.0
   toastification: ^3.0.3
+  # Chữ chạy ngang cho tiêu đề đề thi dài ở header màn làm bài.
+  marquee: ^2.3.0
+  
+  # Added for UI animations
+  flutter_animate: ^4.5.1
+  image_picker: ^1.2.3
+  package_info_plus: ^10.2.1
+  device_info_plus: ^13.2.0
+  url_launcher: ^6.3.2
+  path_provider: ^2.1.6
+  signalr_netcore: ^1.4.4
+  connectivity_plus: ^7.3.1
+  geolocator: ^14.0.3
+  audioplayers: ^6.7.1
+  flutter_highlight: ^0.7.0
 
 dev_dependencies:
   flutter_test:
@@ -42,9 +58,14 @@ dev_dependencies:
 flutter:
 
   uses-material-design: true
+  generate: true
 
   assets:
     - assets/images/
+    # Băng ảnh động (pixel art) trên màn Trang chủ.
+    - assets/banners/
+    # Âm báo thông báo, lấy đúng 5 file của bản web.
+    - assets/sounds/
     - assets/images/backgrondH.jpg
     - .env
 
@@ -53,7 +74,10 @@ flutter:
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/images/logoApp.png"
+  # Nguồn icon nằm ở assets/icon/ (kèm bản .svg gốc để sửa về sau).
+  # Thư mục này KHÔNG khai trong mục assets ở trên nên không đóng gói vào app.
+  image_path: "assets/icon/app_icon.png"
   min_sdk_android: 21
-  adaptive_icon_background: "#1E90FF"
-  adaptive_icon_foreground: "assets/images/logoApp.png"
+  remove_alpha_ios: true
+  adaptive_icon_background: "#2563eb"
+  adaptive_icon_foreground: "assets/icon/app_icon_foreground.png"

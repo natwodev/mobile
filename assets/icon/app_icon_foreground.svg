@@ -1,0 +1,13 @@
+<svg width="1024" height="1024" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Trắc nghiệm trực tuyến">
+  <!-- Lớp trước của adaptive icon Android: nền trong suốt, hình canh giữa.
+       flutter_launcher_icons đã bọc drawable này trong inset 16% (xem
+       mipmap-anydpi-v26/launcher_icon.xml), nên ở đây KHÔNG thu nhỏ thêm —
+       thu hai lần là icon bé tí so với các app khác. Sau inset, bán kính xa
+       tâm nhất của hình là ~31,4dp, vẫn nằm trong vùng an toàn 33dp nên
+       launcher cắt tròn hay cắt vuông đều không xén. -->
+  <g transform="translate(-1.875 0)">
+    <path d="M15 45 L26 19 L37 45" fill="none" stroke="#ffffff" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M19.5 37 H32.5" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
+    <path d="M47 23 V35 M41 29 H53" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
+  </g>
+</svg>
