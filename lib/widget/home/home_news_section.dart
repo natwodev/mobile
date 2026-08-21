@@ -213,7 +213,17 @@ class _NewsTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.line),
+        // Cùng công thức với khung hai nút nhanh ở Trang chủ: màu chủ đạo hạ
+        // xuống 40% độ đục, dày nửa điểm ảnh logic.
+        //
+        // Thay cho `AppColors.line` dày 1.0 trước đây — màu xám trung tính đó
+        // đọc ra gần như đen khi đặt cạnh ảnh tin nhiều màu, và dày 1.0 trên
+        // màn 3x là ba điểm ảnh vật lý, đủ nặng để cái khung hút mắt hơn chính
+        // tấm ảnh nó bao.
+        border: Border.all(
+          color: AppColors.accent.withValues(alpha: 0.4),
+          width: 0.5,
+        ),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0D000000),

@@ -55,15 +55,27 @@ class _HomeNavigationState extends State<HomeNavigation> {
     super.dispose();
   }
 
-  // Thanh tab là một dải nền xanh trời đậm; tab đang chọn là viên thuốc cùng
-  // tông nhưng nhạt hơn một nấc. Cả hai nền đều là xanh trung nên chữ và icon
-  // dùng trắng, tab không chọn thì trắng ngả xanh cho dịu bớt.
+  // Dải nền ĐẬM, viên thuốc của tab đang chọn NHẠT hơn — cùng một tông xanh.
+  // Chữ và icon dùng trắng trên cả hai; tab không chọn thì trắng ngả xanh cho
+  // dịu bớt.
   static const Color _barColor = AppColors.barBg;
 
-  /// Độ đục của dải: đủ dày để chữ/icon còn đọc được, nhưng vẫn thấy nội dung
-  /// trôi qua phía sau khi cuộn.
-  static const double _barOpacity = 0.72;
-  static const Color _pillColor = Color(0xFF57C2FA);
+  /// Độ đục của dải.
+  ///
+  /// 0.95 chứ không phải 0.72 như trước. Ở mức 0.72, dải phủ lên nội dung
+  /// trắng phía sau nên SÁNG LÊN đáng kể — màu thật `#1E8BCF` đọc ra nhạt hơn
+  /// hẳn mã gốc, và dải trông nhạt hơn cả viên thuốc dù mã màu ngược lại. Nói
+  /// cách khác, chính độ đục mới quyết định đậm/nhạt ở đây, không phải mã màu.
+  /// 0.95 giữ được chút kính mờ mà màu vẫn gần đúng.
+  static const double _barOpacity = 0.95;
+
+  /// Viên thuốc: chính `barBg` pha thêm trắng ~30%.
+  ///
+  /// PHẢI dẫn xuất từ màu dải chứ không chọn rời. Trước đây dải và viên thuốc
+  /// là hai mã chọn độc lập (`#1E8BCF` và `#098CDD`) — mà tính ra hai màu đó
+  /// sáng gần y hệt nhau (121 và 118 trên thang 255), nên không tài nào ra được
+  /// tương phản đậm/nhạt: thứ duy nhất phân biệt chúng là độ đục.
+  static const Color _pillColor = Color(0xFF62AEDD);
   static const Color _activeColor = Colors.white;
   static const Color _inactiveColor = Color(0xFFE0F2FE);
 
@@ -206,11 +218,22 @@ class _HomeNavigationState extends State<HomeNavigation> {
                   ),
                   items: [
                     _navItem(HugeIcons.strokeRoundedHome01, l10n.homeNavHome),
+                    // CheckList thay cho Clock01: màn này là DANH SÁCH bài đã
+                    // làm kèm điểm, không phải thứ liên quan tới giờ giấc. Đồng
+                    // hồ đọc ra là "thời gian" hoặc "đang chờ" — sai nội dung.
+                    // Ở cỡ 22px thì danh sách có dấu tick cũng rõ hơn tờ giấy
+                    // có dấu tick nhỏ xíu bên trong.
                     _navItem(
-                      HugeIcons.strokeRoundedClock01,
+                      HugeIcons.strokeRoundedCheckList,
                       l10n.homeNavHistory,
                     ),
-                    _navItem(HugeIcons.strokeRoundedUser, l10n.homeNavAccount),
+                    // UserCircle thay cho User trơn: ở cỡ 22px, hình người nằm
+                    // trong vòng tròn có khối rõ hơn hẳn mấy nét rời, nhất là
+                    // khi đứng cạnh icon danh sách toàn nét ngang bên trái.
+                    _navItem(
+                      HugeIcons.strokeRoundedUserCircle,
+                      l10n.homeNavAccount,
+                    ),
                   ],
                 ),
               ),

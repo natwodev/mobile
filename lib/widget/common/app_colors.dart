@@ -23,7 +23,7 @@ class AppColors {
   /// Nền các thanh khung app — thanh tiêu đề (`AppBar`) và thanh tab dưới cùng
   /// dùng chung một tông xanh trời; đổi ở đây là đổi cả hai, không còn cảnh
   /// header một màu thanh tab một màu.
-  static const Color barBg = Color(0xFF0798E5);
+  static const Color barBg = Color(0xFF1E8BCF);
 
   static const Color danger = Color(0xFFDC2626);
 
