@@ -8,7 +8,10 @@ import '../l10n/generated/app_localizations.dart';
 import '../screens/auth/account_screen.dart';
 import '../screens/Exam/exam_history_screen.dart';
 import '../screens/home_screen.dart';
+import '../controller/notification_badge.dart';
 import '../widget/common/app_buttons.dart';
+import '../screens/notification/notification_screen.dart';
+import '../services/notification/push_service.dart';
 
 class HomeNavigation extends StatefulWidget {
   const HomeNavigation({super.key});
@@ -48,7 +51,48 @@ class _HomeNavigationState extends State<HomeNavigation> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+
+    // Nghe cú BẤM vào thông báo đẩy. `PushService` chỉ ghi lại dữ liệu của tin
+    // vừa bấm, không tự điều hướng — nó là tầng dịch vụ, không có Navigator.
+    // Đây là chỗ gần gốc cây widget nhất mà vẫn có Navigator, nên nối ở đây.
+    PushService.instance.lastTappedData.addListener(_onPushTapped);
+
+    // Bấm thông báo lúc app đã TẮT HẲN thì `getInitialMessage` đã chạy xong từ
+    // trong `main()`, tức giá trị được ghi TRƯỚC khi màn này tồn tại và sự kiện
+    // đổi giá trị đã trôi qua. Không đọc lại một lần ở đây thì đúng trường hợp
+    // đó lại rơi thẳng vào màn chính — mà nó chỉ lộ ra khi thử trên máy thật
+    // với app bị tắt hẳn, chạy debug thường không thấy.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _onPushTapped());
+
+    // Con số trên chuông: đọc bản lưu rồi hỏi lại máy chủ.
+    NotificationBadge.instance.load();
+  }
+
+  /// Mở màn chuông khi người dùng bấm vào một thông báo đẩy.
+  ///
+  /// Tin gửi hàng loạt KHÔNG kèm `notificationId` — multicast là một message
+  /// dùng chung cho nhiều token, mà mỗi người lại có id thư riêng. Nên ở đây
+  /// chỉ mở màn chuông và để nó tải lại danh sách; thư mới nhất nằm trên cùng.
+  Future<void> _onPushTapped() async {
+    final data = PushService.instance.lastTappedData.value;
+    if (data == null || !mounted) return;
+
+    // Xoá ngay để cú bấm không bị xử lý hai lần: listener bắn một lần, mà
+    // `addPostFrameCallback` ở trên cũng đọc chính giá trị này.
+    PushService.instance.lastTappedData.value = null;
+
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const NotificationScreen()),
+    );
+    await NotificationBadge.instance.refresh();
+  }
+
+  @override
   void dispose() {
+    PushService.instance.lastTappedData.removeListener(_onPushTapped);
     for (final controller in _scrollControllers) {
       controller.dispose();
     }
