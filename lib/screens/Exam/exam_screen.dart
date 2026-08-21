@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+
+import '../../widget/common/app_top_bar.dart';
 import 'package:hugeicons/hugeicons.dart';
 
 import '../../l10n/generated/app_localizations.dart';
@@ -1237,14 +1239,19 @@ class _ExamScreenState extends State<ExamScreen> {
       },
       child: Scaffold(
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          title: MarqueeText(
+        appBar: AppTopBar(
+          // Tên đề dài thì chạy ngang mới đọc hết, nên tiêu đề ở đây là widget
+          // chứ không phải một chuỗi.
+          titleWidget: MarqueeText(
             title,
-            style: const TextStyle(color: Colors.white),
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
           ),
-          centerTitle: true,
-          backgroundColor: AppColors.barBg,
-          automaticallyImplyLeading: false,
+          // Không có nút quay lại: đang trong ca thi, thoát phải đi qua hộp
+          // thoại xác nhận chứ không phải một cú bấm.
           actions: [
             if (!isUnlimitedTime)
               Container(

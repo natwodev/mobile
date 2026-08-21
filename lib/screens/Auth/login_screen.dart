@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+
+import '../../widget/common/app_inputs.dart';
 import '../../controller/user_controller.dart';
 import '../../component/HomeNavigation.dart';
 import '../../controller/session_controller.dart';
@@ -145,10 +147,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           decoration: InputDecoration(
                             labelText: l10n.authUsernameLabel,
                             hintText: l10n.authUsernameHint,
-                            prefixIcon: const HugeIcon(
-                              icon: HugeIcons.strokeRoundedUserCircle,
+                            prefixIcon: AppInputs.icon(
+                              HugeIcons.strokeRoundedUserCircle,
                             ),
-                            border: const OutlineInputBorder(),
                           ),
                           textInputAction: TextInputAction.next,
                           keyboardType: TextInputType.text,
@@ -173,12 +174,12 @@ class _LoginScreenState extends State<LoginScreen> {
                           decoration: InputDecoration(
                             labelText: l10n.authPasswordLabel,
                             hintText: l10n.authPasswordHint,
-                            prefixIcon: const HugeIcon(
-                              icon: HugeIcons.strokeRoundedSquareLock01,
+                            prefixIcon: AppInputs.icon(
+                              HugeIcons.strokeRoundedSquareLock01,
                             ),
                             suffixIcon: IconButton(
-                              icon: HugeIcon(
-                                icon: _obscurePassword
+                              icon: AppInputs.icon(
+                                _obscurePassword
                                     ? HugeIcons.strokeRoundedViewOff
                                     : HugeIcons.strokeRoundedView,
                               ),
@@ -188,7 +189,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                 });
                               },
                             ),
-                            border: const OutlineInputBorder(),
                           ),
                           textInputAction: TextInputAction.done,
                           keyboardType: TextInputType.text,

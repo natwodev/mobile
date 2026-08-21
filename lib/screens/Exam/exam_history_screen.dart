@@ -447,18 +447,13 @@ class _ExamHistoryScreenState extends State<ExamHistoryScreen> {
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.line),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.ink.withValues(alpha: 0.05),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+      // Viền và quầng sáng lấy theo MÀU ĐIỂM của chính bài đó — đỏ khi điểm
+      // thấp, xanh lá khi điểm cao. Nhờ vậy lướt mắt xuống danh sách là nhận
+      // ra ngay bài nào cần xem lại, không phải đọc từng con số.
+      //
+      // Trước đây viền xám trung tính, bóng đen 5%: mọi thẻ giống hệt nhau nên
+      // con số điểm là thứ DUY NHẤT phân biệt, mà nó lại nằm nép một góc.
+      decoration: AppSurfaces.card(tint: scoreColor, radius: 16, soft: true),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

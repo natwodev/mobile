@@ -1,5 +1,9 @@
 import 'package:hugeicons/hugeicons.dart';
 import 'package:flutter/material.dart';
+
+import '../../widget/common/app_top_bar.dart';
+
+import '../../widget/common/app_inputs.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
@@ -113,15 +117,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text(
-          l10n.authEditProfileTitle,
-          style: const TextStyle(fontSize: 20, color: Colors.white),
-        ),
-        backgroundColor: AppColors.barBg,
-        centerTitle: true,
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
+      appBar: AppTopBar(title: l10n.authEditProfileTitle, showBack: true),
       body: SafeArea(
         child: Form(
           key: _formKey,
@@ -139,8 +135,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 decoration: InputDecoration(
                   labelText: l10n.authFullNameLabel,
                   hintText: l10n.authFullNameHint,
-                  prefixIcon: const HugeIcon(icon: HugeIcons.strokeRoundedUser),
-                  border: const OutlineInputBorder(),
+                  prefixIcon: AppInputs.icon(HugeIcons.strokeRoundedUser),
                 ),
                 textInputAction: TextInputAction.next,
                 textCapitalization: TextCapitalization.words,
@@ -159,10 +154,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 decoration: InputDecoration(
                   labelText: l10n.authEmailLabel,
                   hintText: l10n.authEmailHint,
-                  prefixIcon: const HugeIcon(
-                    icon: HugeIcons.strokeRoundedMail01,
-                  ),
-                  border: const OutlineInputBorder(),
+                  prefixIcon: AppInputs.icon(HugeIcons.strokeRoundedMail01),
                 ),
                 keyboardType: TextInputType.emailAddress,
                 textInputAction: TextInputAction.next,
@@ -184,8 +176,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 decoration: InputDecoration(
                   labelText: l10n.authPhoneLabel,
                   hintText: l10n.authPhoneHint,
-                  prefixIcon: const HugeIcon(icon: HugeIcons.strokeRoundedCall),
-                  border: const OutlineInputBorder(),
+                  prefixIcon: AppInputs.icon(HugeIcons.strokeRoundedCall),
                 ),
                 keyboardType: TextInputType.phone,
                 textInputAction: TextInputAction.done,
@@ -241,12 +232,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       initialValue: value,
       readOnly: true,
       enabled: false,
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: const HugeIcon(icon: HugeIcons.strokeRoundedIdentityCard),
-        border: const OutlineInputBorder(),
-        filled: true,
-        fillColor: Colors.grey.shade100,
+      decoration: AppInputs.readOnly(
+        label: label,
+        prefixIcon: HugeIcons.strokeRoundedIdentityCard,
         helperText: AppLocalizations.of(context).authStudentIdHelper,
       ),
     );
@@ -263,8 +251,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       child: InputDecorator(
         decoration: InputDecoration(
           labelText: l10n.authDateOfBirthLabel,
-          prefixIcon: const HugeIcon(icon: HugeIcons.strokeRoundedCalendar03),
-          border: const OutlineInputBorder(),
+          prefixIcon: AppInputs.icon(HugeIcons.strokeRoundedCalendar03),
         ),
         child: Row(
           children: [
@@ -295,8 +282,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       isExpanded: true,
       decoration: InputDecoration(
         labelText: l10n.authGenderLabel,
-        prefixIcon: const HugeIcon(icon: HugeIcons.strokeRoundedUserAccount),
-        border: const OutlineInputBorder(),
+        prefixIcon: AppInputs.icon(HugeIcons.strokeRoundedUserAccount),
       ),
       items: [
         DropdownMenuItem<bool?>(

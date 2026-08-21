@@ -7,6 +7,7 @@ import '../../models/news_item.dart';
 import '../../services/news_cache.dart';
 import '../../services/news_service.dart';
 import '../common/app_colors.dart';
+import '../common/app_surfaces.dart';
 import '../common/app_toast.dart';
 
 /// Dải "Tin giáo dục" nằm dưới băng ảnh ở Trang chủ.
@@ -211,10 +212,7 @@ class HomeNewsSectionState extends State<HomeNewsSection> {
             foregroundColor: AppColors.accent,
             padding: const EdgeInsets.symmetric(vertical: 12),
             // Cùng công thức viền của cả app: màu chủ thể hạ 40% độ đục, 0.5px.
-            side: BorderSide(
-              color: AppColors.accent.withValues(alpha: 0.4),
-              width: 0.5,
-            ),
+            side: AppSurfaces.side(),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
@@ -279,10 +277,7 @@ class _NewsTile extends StatelessWidget {
         // đọc ra gần như đen khi đặt cạnh ảnh tin nhiều màu, và dày 1.0 trên
         // màn 3x là ba điểm ảnh vật lý, đủ nặng để cái khung hút mắt hơn chính
         // tấm ảnh nó bao.
-        border: Border.all(
-          color: AppColors.accent.withValues(alpha: 0.4),
-          width: 0.5,
-        ),
+        border: AppSurfaces.border(),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0D000000),
