@@ -218,10 +218,11 @@ class _ExamHistoryScreenState extends State<ExamHistoryScreen> {
 
   Future<void> _handleRefresh() async {
     await _loadHistory(showSpinner: false);
-    // _loadHistory đặt _error khi API trả thất bại; im lặng trong trường hợp
-    // đó, chứ kêu "thành công" lúc hỏng còn tệ hơn không báo gì.
-    if (!mounted || _error != null) return;
-    showRefreshDone(context);
+    if (!mounted) return;
+
+    // Ở màn này bám vào `_error` là ĐÚNG: `_loadHistory` đặt nó thẳng từ
+    // `result.success`, không có nhánh giữ bản đã lưu như màn Tài khoản.
+    _error == null ? showRefreshDone(context) : showRefreshFailed(context);
   }
 
   Widget _buildBody() {

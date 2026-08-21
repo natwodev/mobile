@@ -36,8 +36,11 @@ class HomeScreen extends StatelessWidget {
         edgeOffset: MediaQuery.paddingOf(context).top,
         onRefresh: () async {
           final bool ok = await _newsKey.currentState?.reload() ?? false;
-          if (!context.mounted || !ok) return;
-          showRefreshDone(context);
+          if (!context.mounted) return;
+          // Hỏng thì báo đỏ chứ KHÔNG im lặng: kéo xong mà màn hình y như cũ
+          // và không có phản hồi nào thì người dùng không biết mạng hỏng hay
+          // app đơ, nên kéo tiếp mấy lần nữa cho chắc.
+          ok ? showRefreshDone(context) : showRefreshFailed(context);
         },
         child: SingleChildScrollView(
           controller: scrollController,
@@ -136,6 +139,17 @@ class HomeScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
+                // Viền cùng màu với bóng mờ, nhưng nhạt hơn hẳn và chỉ 0.5px.
+                //
+                // Bóng toả rộng nên chỗ giáp mép thẻ đã loãng gần hết màu —
+                // thẻ trắng đặt trên băng ảnh sáng thì mất luôn đường bao. Viền
+                // này vẽ lại đúng cái mép đó. Cùng khuôn với viền thanh báo
+                // (`app_banner.dart`): cùng màu chủ thể, hạ độ đục xuống 40%,
+                // dày nửa điểm ảnh logic.
+                border: Border.all(
+                  color: AppColors.accent.withValues(alpha: 0.4),
+                  width: 0.5,
+                ),
                 boxShadow: [
                   BoxShadow(
                     // 0.28 thay vì 0.18: ở mức cũ, bóng toả tới 25px nên màu bị

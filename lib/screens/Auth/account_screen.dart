@@ -51,11 +51,16 @@ class _AccountScreenState extends State<AccountScreen> {
     _loadProfile();
   }
 
-  Future<void> _loadProfile() async {
+  /// Trả về true khi LẤY ĐƯỢC hồ sơ mới từ máy chủ.
+  ///
+  /// Khác với "màn hình có gì để hiện": hai thứ đó tách nhau vì hàm này cố ý
+  /// giữ bản đã lưu khi mạng hỏng. Người gọi nào cần biết cú gọi mạng có ăn hay
+  /// không thì phải nhìn giá trị trả về, không được suy từ `_error`.
+  Future<bool> _loadProfile() async {
     // Hiện bản đã lưu TRƯỚC: mở màn Tài khoản là thấy tên mình ngay, không
     // phải nhìn vòng quay chờ mạng mỗi lần.
     final cached = await _userService.getCachedProfile();
-    if (!mounted) return;
+    if (!mounted) return false;
 
     setState(() {
       if (cached != null) _student = cached;
@@ -64,7 +69,7 @@ class _AccountScreenState extends State<AccountScreen> {
     });
 
     final profile = await _userService.getProfile();
-    if (!mounted) return;
+    if (!mounted) return false;
 
     setState(() {
       if (profile != null) _student = profile;
@@ -75,6 +80,8 @@ class _AccountScreenState extends State<AccountScreen> {
           ? AppLocalizations.of(context).authProfileLoadFailedRetry
           : null;
     });
+
+    return profile != null;
   }
 
   Future<void> _openEditProfile() async {
@@ -352,11 +359,14 @@ class _AccountScreenState extends State<AccountScreen> {
   }
 
   Future<void> _handleRefresh() async {
-    await _loadProfile();
-    // _loadProfile giữ bản đã lưu khi mạng hỏng, và chỉ đặt _error lúc không
-    // còn gì để hiện. Bám vào đó nên không phải đổi chữ ký hàm.
-    if (!mounted || _error != null) return;
-    showRefreshDone(context);
+    final bool ok = await _loadProfile();
+    if (!mounted) return;
+
+    // KHÔNG bám vào `_error` để đoán thành bại ở đây. `_loadProfile` cố tình
+    // giữ bản đã lưu khi mạng hỏng và chỉ đặt `_error` lúc không còn gì để
+    // hiện — nên mất mạng mà máy đã có bản lưu thì `_error` vẫn null, và bám
+    // vào nó là báo "tải lại thành công" trong khi thực ra chẳng lấy được gì.
+    ok ? showRefreshDone(context) : showRefreshFailed(context);
   }
 
   Widget _buildBody() {

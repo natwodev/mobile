@@ -29,6 +29,40 @@ class NewsItem {
 
   final DateTime? publishedAt;
 
+  /// Đổi qua lại với JSON để cất vào máy.
+  ///
+  /// Cất bản ĐÃ XỬ LÝ chứ không cất nguyên chuỗi RSS: phần nặng nhất của việc
+  /// đọc tin là gỡ thẻ HTML và dò ngày tháng, làm sẵn một lần rồi cất kết quả
+  /// thì lần mở app sau khỏi làm lại.
+  Map<String, dynamic> toJson() => {
+    'title': title,
+    'summary': summary,
+    'link': link,
+    'imageUrl': imageUrl,
+    // ISO-8601 chứ không phải mốc mili-giây: đọc log ra còn hiểu được, mà
+    // DateTime.parse cũng nhận thẳng.
+    'publishedAt': publishedAt?.toIso8601String(),
+  };
+
+  static NewsItem? fromJson(Map<String, dynamic> json) {
+    final title = json['title'];
+    final link = json['link'];
+    // Cùng điều kiện với [fromRssItem]: thiếu tiêu đề hoặc link thì thẻ tin vô
+    // dụng. Bản lưu cũ từ phiên bản trước có thể thiếu trường, nên phải kiểm.
+    if (title is! String || link is! String || title.isEmpty || link.isEmpty) {
+      return null;
+    }
+
+    final rawDate = json['publishedAt'];
+    return NewsItem(
+      title: title,
+      summary: json['summary'] is String ? json['summary'] as String : '',
+      link: link,
+      imageUrl: json['imageUrl'] is String ? json['imageUrl'] as String : null,
+      publishedAt: rawDate is String ? DateTime.tryParse(rawDate) : null,
+    );
+  }
+
   /// Dựng một tin từ thẻ `<item>` của RSS.
   ///
   /// Trả về null khi thiếu tiêu đề hoặc link: thẻ tin không tiêu đề thì chẳng

@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../l10n/generated/app_localizations.dart';
 import '../../models/news_item.dart';
+import '../../services/news_cache.dart';
 import '../../services/news_service.dart';
 import '../common/app_colors.dart';
 import '../common/app_toast.dart';
@@ -45,9 +46,15 @@ class HomeNewsSectionState extends State<HomeNewsSection> {
   }
 
   Future<void> _load() async {
+    setState(() => _failed = false);
+
+    // Hiện bản đã lưu TRƯỚC, y như màn Tài khoản làm với hồ sơ: mở Trang chủ là
+    // có tin đọc ngay thay vì nhìn vòng quay chờ mạng mỗi lần.
+    final cached = await NewsCache.load();
+    if (!mounted) return;
     setState(() {
-      _loading = true;
-      _failed = false;
+      if (cached.isNotEmpty) _items = cached;
+      _loading = _items.isEmpty;
     });
 
     try {
@@ -57,10 +64,16 @@ class HomeNewsSectionState extends State<HomeNewsSection> {
         _items = items;
         _loading = false;
       });
+      await NewsCache.save(items);
     } catch (_) {
       if (!mounted) return;
-      // Nuốt lỗi thật và chỉ hiện nút thử lại: người dùng không làm được gì với
-      // "SocketException", còn nút bấm lại thì có.
+      // Mạng hỏng mà đã có bản lưu thì CỨ HIỆN BẢN LƯU — tin của một giờ trước
+      // vẫn đáng đọc hơn một màn trắng kèm nút "Thử lại". Chỉ khi không còn gì
+      // để hiện mới rơi vào trạng thái lỗi.
+      //
+      // `_failed` vẫn đặt true trong CẢ HAI trường hợp: nó trả lời câu hỏi "cú
+      // gọi mạng có ăn không", khác với câu "màn hình có gì để hiện". Trang chủ
+      // dựa vào nó để báo đỏ khi kéo tải lại hỏng.
       setState(() {
         _loading = false;
         _failed = true;
@@ -132,8 +145,15 @@ class HomeNewsSectionState extends State<HomeNewsSection> {
       );
     }
 
-    if (_failed) return _buildRetry(l10n, l10n.homeNewsError);
-    if (_items.isEmpty) return _buildRetry(l10n, l10n.homeNewsEmpty);
+    // Xét CÓ TIN ĐỂ HIỆN trước, xét `_failed` sau — thứ tự này quan trọng.
+    // Làm ngược lại thì mất mạng là nhảy thẳng vào màn "Thử lại" dù bản lưu còn
+    // nguyên, và cả phần cache thành vô dụng.
+    if (_items.isEmpty) {
+      return _buildRetry(
+        l10n,
+        _failed ? l10n.homeNewsError : l10n.homeNewsEmpty,
+      );
+    }
 
     // shrinkWrap + NeverScrollable: dải này nằm trong SingleChildScrollView của
     // Trang chủ. Để ListView tự cuộn là có hai vùng cuộn lồng nhau — ngón tay
