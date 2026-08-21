@@ -74,6 +74,33 @@ class AppLocalizationsVi extends AppLocalizations {
   String get authEditProfileTitle => 'Sửa thông tin cá nhân';
 
   @override
+  String get authEmailRequired => 'Vui lòng nhập email';
+
+  @override
+  String get authForgotPasswordTitle => 'Quên mật khẩu';
+
+  @override
+  String get authForgotPasswordLink => 'Quên mật khẩu?';
+
+  @override
+  String get authForgotPasswordMessage =>
+      'Nhập email đã đăng ký với nhà trường. Chúng tôi sẽ gửi đường dẫn đặt lại mật khẩu tới hòm thư đó.';
+
+  @override
+  String get authForgotPasswordSend => 'Gửi yêu cầu';
+
+  @override
+  String get authForgotPasswordFailed =>
+      'Không gửi được yêu cầu. Vui lòng thử lại.';
+
+  @override
+  String get authForgotPasswordSentTitle => 'Đã gửi yêu cầu';
+
+  @override
+  String get authForgotPasswordSentMessage =>
+      'Nếu email này có trong hệ thống, đường dẫn đặt lại mật khẩu sẽ tới trong vài phút. Nhớ xem cả hòm thư rác.';
+
+  @override
   String get authEmailHint => 'Nhập email...';
 
   @override
@@ -90,6 +117,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get authFullNameRequired => 'Vui lòng nhập họ và tên';
+
+  @override
+  String get authPickGender => 'Chọn giới tính';
 
   @override
   String get authGenderFemale => 'Nữ';
@@ -586,9 +616,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get examResultTitle => 'Kết quả bài thi';
-
-  @override
-  String get examSavingIndicator => 'Đang lưu...';
 
   @override
   String get examScoreCommentAverage => 'Trung bình!';
@@ -1268,7 +1295,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get questionFillBlankInstruction =>
-      'Nhấn vào từ, sau đó nhấn vào ô trống:';
+      'Kéo từ vào ô trống, hoặc nhấn từ rồi nhấn ô:';
 
   @override
   String get questionHighlightClear => 'Bỏ chọn hết';

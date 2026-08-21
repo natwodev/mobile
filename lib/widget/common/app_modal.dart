@@ -158,15 +158,22 @@ class AppModal extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border(top: BorderSide(color: Colors.grey.shade200)),
       ),
-      // OverflowBar (thứ AlertDialog vẫn dùng) tự xếp dọc các nút khi hàng
-      // ngang không đủ chỗ — nhãn dài hoặc cỡ chữ lớn thì không tràn ngang.
-      child: OverflowBar(
-        alignment: MainAxisAlignment.end,
-        overflowAlignment: OverflowBarAlignment.end,
-        spacing: 8,
-        overflowSpacing: 4,
-        children: actions,
-      ),
+      // MỘT nút thì kéo dài hết bề ngang. Nút đơn nép một góc đọc ra như hành
+      // động phụ, trong khi nó chính là việc người dùng mở hộp thoại ra để làm
+      // — bấm Đăng xuất rồi vẫn phải đi tìm nút Đăng xuất thứ hai ở góc.
+      //
+      // NHIỀU nút thì vẫn dùng OverflowBar (thứ AlertDialog vẫn dùng): nó tự
+      // xếp dọc khi hàng ngang không đủ chỗ, nên nhãn dài hoặc cỡ chữ lớn không
+      // làm tràn ngang. Kéo dài từng nút thì mất đúng khả năng đó.
+      child: actions.length == 1
+          ? SizedBox(width: double.infinity, child: actions.first)
+          : OverflowBar(
+              alignment: MainAxisAlignment.center,
+              overflowAlignment: OverflowBarAlignment.center,
+              spacing: 8,
+              overflowSpacing: 4,
+              children: actions,
+            ),
     );
   }
 }

@@ -59,6 +59,29 @@ class _AppSheetBody extends StatelessWidget {
   final Color accentColor;
   final List<Widget> actions;
 
+  /// Hàng nút cuối tấm.
+  ///
+  /// MỘT nút thì kéo dài hết bề ngang, giống nút "Sao chép thông tin" trong
+  /// chính tấm Thông tin thiết bị. Nút đơn nép một góc đọc ra như hành động
+  /// phụ, trong khi nó chính là việc người dùng mở tấm này ra để làm.
+  ///
+  /// NHIỀU nút thì chia đều, mỗi cái một phần bằng nhau. Không kéo dài từng
+  /// cái vì hai nút full-width xếp chồng lên nhau chiếm gần nửa tấm sheet.
+  Widget _buildActionBar() {
+    if (actions.length == 1) {
+      return SizedBox(width: double.infinity, child: actions.first);
+    }
+
+    return Row(
+      children: [
+        for (int i = 0; i < actions.length; i++) ...[
+          if (i > 0) const SizedBox(width: 10),
+          Expanded(child: actions[i]),
+        ],
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // Trần 85% chiều cao màn: cao hơn thì tấm sheet che gần hết nền và đọc ra
@@ -153,10 +176,7 @@ class _AppSheetBody extends StatelessWidget {
               if (actions.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: actions,
-                  ),
+                  child: _buildActionBar(),
                 ),
             ],
           ),

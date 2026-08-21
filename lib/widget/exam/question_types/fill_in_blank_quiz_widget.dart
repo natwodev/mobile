@@ -51,6 +51,10 @@ class _FillInBlankQuizWidgetState extends State<FillInBlankQuizWidget> {
   Map<int, String> filledBlanks = {};
   String? selectedWordId;
 
+  /// Từ đang được KÉO trên tay. Khác [selectedWordId] ở chỗ nó chỉ sống trong
+  /// lúc ngón tay còn chạm màn, dùng để làm sáng các ô trống còn nhận được.
+  String? draggingWordId;
+
   @override
   void initState() {
     super.initState();
@@ -127,14 +131,22 @@ class _FillInBlankQuizWidgetState extends State<FillInBlankQuizWidget> {
       });
       _notifyChange();
     } else if (selectedWordId != null) {
-      // Đặt từ được chọn vào ô trống này (xóa nó khỏi các ô trống khác nếu có)
-      setState(() {
-        filledBlanks.removeWhere((_, v) => v == selectedWordId);
-        filledBlanks[blankIndex] = selectedWordId!;
-        selectedWordId = null;
-      });
-      _notifyChange();
+      _placeWord(blankIndex, selectedWordId!);
     }
+  }
+
+  /// Đặt một từ vào ô trống. Dùng chung cho cả hai lối: chạm-rồi-chạm và
+  /// kéo-thả.
+  void _placeWord(int blankIndex, String wordId) {
+    if (widget.submitted) return;
+
+    setState(() {
+      // Gỡ từ này khỏi ô cũ nếu nó đang nằm đâu đó: một từ chỉ được ở một chỗ.
+      filledBlanks.removeWhere((_, v) => v == wordId);
+      filledBlanks[blankIndex] = wordId;
+      selectedWordId = null;
+    });
+    _notifyChange();
   }
 
   String _cleanWordContent(String content) {
@@ -282,14 +294,51 @@ class _FillInBlankQuizWidgetState extends State<FillInBlankQuizWidget> {
 
     final l10n = AppLocalizations.of(context);
 
+    // Bọc ô trống thành CHỖ THẢ. `onWillAcceptWithDetails` từ chối khi đã nộp
+    // bài, nhờ vậy ô không sáng lên mời gọi một thao tác không còn tác dụng.
+    return DragTarget<String>(
+      onWillAcceptWithDetails: (_) => !widget.submitted,
+      onAcceptWithDetails: (details) {
+        HapticFeedback.selectionClick();
+        _placeWord(blankNum, details.data);
+      },
+      builder: (context, candidateData, rejectedData) {
+        // Ngón tay đang lơ lửng ngay trên ô này: viền sáng đậm hơn mức "có từ
+        // trên tay" bên dưới, để biết thả ra bây giờ là rơi vào ĐÚNG ô nào.
+        final bool isHovered = candidateData.isNotEmpty;
+
+        return _buildSlotBody(
+          blankNum,
+          slotMaxWidth,
+          filledText,
+          l10n,
+          isHovered,
+        );
+      },
+    );
+  }
+
+  Widget _buildSlotBody(
+    int blankNum,
+    double slotMaxWidth,
+    String? filledText,
+    AppLocalizations l10n,
+    bool isHovered,
+  ) {
     return QuizBlankSlot(
       number: blankNum,
       // Trước đây ô trống chỉ là một gạch chân câm: nhìn thì hiểu, nhưng trình
       // đọc màn hình không đọc được gì cả. Nay ô mang nhãn "Ô trống n".
       emptyHint: l10n.questionBlankLabel(blankNum),
-      // Đã cầm sẵn một từ trên tay: mọi ô còn trống sáng lên để chỉ chỗ thả.
+      // Đã cầm sẵn một từ trên tay — chọn bằng cách chạm HOẶC đang kéo — thì
+      // mọi ô còn trống sáng lên để chỉ chỗ thả. Ô đang bị ngón tay lơ lửng
+      // ngay trên thì sáng bất kể đang trống hay đã có từ, vì thả vào ô đã có
+      // từ là THAY từ cũ chứ không phải thao tác vô hiệu.
       isFocused:
-          selectedWordId != null && filledText == null && !widget.submitted,
+          isHovered ||
+          ((selectedWordId != null || draggingWordId != null) &&
+              filledText == null &&
+              !widget.submitted),
       isDisabled: widget.submitted,
       maxWidth: slotMaxWidth,
       onTap: () => _onBlankTap(blankNum),
@@ -330,6 +379,74 @@ class _FillInBlankQuizWidgetState extends State<FillInBlankQuizWidget> {
   }
 
   Widget _buildWordTile(AnswerDto ans, int position, Set<String> usedIds) {
+    final Widget tile = _buildWordTileBody(ans, position, usedIds);
+
+    // Từ đã đặt vào ô, hoặc bài đã nộp: không kéo được nữa. Cho kéo một từ đã
+    // dùng thì phải xử lý chuyện nó rời ô cũ giữa chừng, mà gỡ từ ra đã có sẵn
+    // dấu X trong ô rồi.
+    if (usedIds.contains(ans.answerId) || widget.submitted) return tile;
+
+    // LongPressDraggable chứ KHÔNG phải Draggable: thẻ từ nằm trong một cột
+    // cuộn dọc, mà `Draggable` cướp cử chỉ kéo ngay từ pixel đầu — vuốt để cuộn
+    // trang sẽ thành nhấc thẻ lên. Nhấn giữ tách hẳn hai cử chỉ ra.
+    //
+    // Rút thời gian giữ xuống 180ms thay vì 500ms mặc định: nửa giây là đủ lâu
+    // để người dùng tưởng thẻ không kéo được rồi bỏ cuộc.
+    return LongPressDraggable<String>(
+      data: ans.answerId,
+      delay: const Duration(milliseconds: 180),
+      onDragStarted: () {
+        HapticFeedback.selectionClick();
+        setState(() => draggingWordId = ans.answerId);
+      },
+      onDragEnd: (_) => setState(() => draggingWordId = null),
+      onDraggableCanceled: (_, _) => setState(() => draggingWordId = null),
+      feedback: _buildDragFeedback(ans),
+      // Thẻ gốc mờ đi chứ không biến mất: mất hẳn thì cả cột nhảy lên một nấc
+      // ngay giữa lúc đang kéo, và chỗ định thả cũng trôi theo.
+      childWhenDragging: Opacity(opacity: 0.3, child: tile),
+      child: tile,
+    );
+  }
+
+  /// Thẻ bay theo ngón tay trong lúc kéo.
+  ///
+  /// PHẢI bọc [Material]: widget này vẽ trên lớp overlay của Navigator, ngoài
+  /// cây widget của màn — không có Material tổ tiên thì chữ hiện ra với gạch
+  /// chân vàng của trạng thái "chưa có kiểu chữ".
+  Widget _buildDragFeedback(AnswerDto ans) {
+    return Material(
+      color: Colors.transparent,
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: QuizSpacing.md,
+          vertical: QuizSpacing.sm,
+        ),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(QuizRadius.card),
+          border: Border.all(color: QuizColors.accent, width: 1.5),
+          boxShadow: [
+            BoxShadow(
+              color: QuizColors.accent.withValues(alpha: 0.35),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Text(
+          _cleanWordContent(ans.answerContent),
+          style: const TextStyle(
+            fontSize: QuizFont.option,
+            fontWeight: FontWeight.w700,
+            color: QuizColors.accent,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWordTileBody(AnswerDto ans, int position, Set<String> usedIds) {
     final bool isUsed = usedIds.contains(ans.answerId);
     final bool isSelected = selectedWordId == ans.answerId;
     final bool isLocked = isUsed || widget.submitted;

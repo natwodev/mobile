@@ -98,6 +98,25 @@ class AppInputs {
     );
   }
 
+  /// Tấm danh sách xổ ra của một `DropdownButtonFormField`.
+  ///
+  /// PHẢI tô tại chỗ gọi chứ không cắm được vào theme: `DropdownButtonFormField`
+  /// dựng danh sách bằng route riêng của nó, không đọc `dropdownMenuTheme`
+  /// (theme đó dành cho widget `DropdownMenu` mới). Gom mấy tham số vào đây để
+  /// chỗ gọi khỏi nhớ, và để lần sau thêm ô chọn thứ hai thì không lệch.
+  static const Color dropdownColor = Colors.white;
+  static const double dropdownRadius = AppInputMetrics.radius;
+
+  /// Mũi tên xổ xuống, cùng cỡ và cùng màu với icon đầu ô.
+  ///
+  /// Mặc định của Material là tam giác đặc màu xám đậm — nặng hơn hẳn nét mảnh
+  /// của HugeIcons dùng khắp app, đứng cạnh icon đầu ô là lộ ra hai bộ icon.
+  static Widget get dropdownIcon => const HugeIcon(
+    icon: HugeIcons.strokeRoundedArrowDown01,
+    color: AppColors.inkMuted,
+    size: AppInputMetrics.iconSize,
+  );
+
   /// Ô CHỈ ĐỌC: nền xám, không cho gõ.
   ///
   /// Dùng cho mã số sinh viên — thứ hiện ra để đối chiếu chứ không phải để sửa.
@@ -205,6 +224,46 @@ ThemeData appInputThemes(ThemeData base) {
         if (states.contains(WidgetState.disabled)) return AppColors.disabledInk;
         return AppColors.inkMuted;
       }),
+    ),
+
+    // Hộp thoại chọn NGÀY. Mặc định Material 3 lạc hẳn khỏi app: nó pha màu
+    // chủ đạo lên nền theo `surfaceTint` nên tấm lịch trắng ngả tím, bo góc
+    // theo hệ riêng, và ngày đang chọn tô bằng sắc độ mà `fromSeed` tự sinh ra
+    // chứ không phải màu nhấn của app.
+    datePickerTheme: DatePickerThemeData(
+      backgroundColor: Colors.white,
+      surfaceTintColor: Colors.transparent,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      headerBackgroundColor: AppColors.accent,
+      headerForegroundColor: Colors.white,
+      dayForegroundColor: WidgetStateColor.resolveWith(
+        (states) => states.contains(WidgetState.selected)
+            ? Colors.white
+            : AppColors.ink,
+      ),
+      dayBackgroundColor: WidgetStateColor.resolveWith(
+        (states) => states.contains(WidgetState.selected)
+            ? AppColors.accent
+            : Colors.transparent,
+      ),
+      // Vòng tròn quanh NGÀY HÔM NAY: chỉ là đường viền, không tô đặc — tô đặc
+      // thì nó tranh chấp với ngày đang chọn, nhìn ra hai ngày cùng được chọn.
+      todayForegroundColor: WidgetStateColor.resolveWith(
+        (states) => states.contains(WidgetState.selected)
+            ? Colors.white
+            : AppColors.accent,
+      ),
+      todayBorder: const BorderSide(color: AppColors.accent, width: 1),
+      yearForegroundColor: WidgetStateColor.resolveWith(
+        (states) => states.contains(WidgetState.selected)
+            ? Colors.white
+            : AppColors.ink,
+      ),
+      yearBackgroundColor: WidgetStateColor.resolveWith(
+        (states) => states.contains(WidgetState.selected)
+            ? AppColors.accent
+            : Colors.transparent,
+      ),
     ),
   );
 }

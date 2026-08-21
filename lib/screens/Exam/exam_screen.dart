@@ -22,6 +22,7 @@ import '../../widget/exam/question_card.dart';
 import '../../widget/exam/pinned_questions_store.dart';
 import '../../widget/exam/answers_serializer.dart';
 import '../../widget/exam/question_navigator.dart';
+import '../../widget/exam/floating_exam_timer.dart';
 import '../../widget/exam/quiz_theme.dart';
 import 'exam_result_screen.dart';
 
@@ -427,9 +428,6 @@ class _ExamScreenState extends State<ExamScreen> {
       _answerSaveStates[status.questionId] = status.state;
     });
   }
-
-  bool get _hasSaveInFlight =>
-      _answerSaveStates.values.any((state) => state == AnswerSaveState.saving);
 
   /// Id câu CẤP 1 có ít nhất một đáp án chưa lưu được lên máy chủ.
   Set<String> _unsavedQuestionIds(ExamProgress progress) {
@@ -1252,42 +1250,9 @@ class _ExamScreenState extends State<ExamScreen> {
           ),
           // Không có nút quay lại: đang trong ca thi, thoát phải đi qua hộp
           // thoại xác nhận chứ không phải một cú bấm.
-          actions: [
-            if (!isUnlimitedTime)
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-                margin: const EdgeInsets.only(right: 16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    // Web dùng Clock01Icon cho đồng hồ (QuizHeader.tsx:63);
-                    // hết giờ thì đổi sang Alert01 — cùng bộ icon cảnh báo.
-                    HugeIcon(
-                      icon: _timeExpired
-                          ? HugeIcons.strokeRoundedAlert01
-                          : HugeIcons.strokeRoundedClock01,
-                      color: timerColor,
-                      size: 20.0,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      _formatTime(_secondsLeft),
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: timerColor,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-          ],
+          //
+          // Đồng hồ KHÔNG còn nằm ở đây nữa — nó đã thành thẻ nổi kéo được đè
+          // lên nội dung, xem `FloatingExamTimer` trong phần `body`.
         ),
         body: Stack(
           children: [
@@ -1301,6 +1266,21 @@ class _ExamScreenState extends State<ExamScreen> {
                 child: _buildBody(examData),
               ),
             ),
+            // Đồng hồ nổi, kéo đặt được ở bất cứ đâu trong lòng màn.
+            //
+            // Đặt trong `SafeArea` để không kéo lên nằm dưới thanh trạng thái,
+            // và đặt TRƯỚC lớp phủ lúc gửi bài — đang gửi thì lớp phủ che hết,
+            // đồng hồ nổi lên trên đó chỉ tổ rối.
+            if (!isUnlimitedTime)
+              Positioned.fill(
+                child: SafeArea(
+                  child: FloatingExamTimer(
+                    label: _formatTime(_secondsLeft),
+                    color: timerColor,
+                  ),
+                ),
+              ),
+
             if (_isSubmitting)
               Positioned.fill(child: _buildSubmitOverlay(l10n)),
           ],
@@ -1447,30 +1427,22 @@ class _ExamScreenState extends State<ExamScreen> {
                   color: AppColors.accent,
                 ),
               ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (_hasSaveInFlight) ...[
-                    const SizedBox(
-                      width: 12,
-                      height: 12,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      l10n.examSavingIndicator,
-                      style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-                    ),
-                    const SizedBox(width: 10),
-                  ],
-                  Text(
-                    l10n.examAnsweredProgress(
-                      progress.answeredCount,
-                      progress.total,
-                    ),
-                    style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-                  ),
-                ],
+              // KHÔNG hiện vòng quay "đang lưu" ở đây nữa.
+              //
+              // Lưu đáp án chạy ngầm sau mỗi lần chọn, tức vòng quay này nhấp
+              // nháy liên tục suốt buổi thi ngay cạnh con số tiến độ — thành ra
+              // nó kéo mắt về đúng chỗ không có tin gì đáng đọc, trong lúc người
+              // ta đang cần tập trung làm bài.
+              //
+              // Bỏ đi KHÔNG mất tín hiệu nào: câu nào lưu hỏng thật thì đã có
+              // dải cảnh báo riêng phía trên (`_buildUnsavedBanner`), và đó mới
+              // là thứ người dùng cần biết.
+              Text(
+                l10n.examAnsweredProgress(
+                  progress.answeredCount,
+                  progress.total,
+                ),
+                style: TextStyle(fontSize: 12, color: Colors.grey[700]),
               ),
             ],
           ),

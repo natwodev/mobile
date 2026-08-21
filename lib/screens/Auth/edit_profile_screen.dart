@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import '../../widget/common/app_top_bar.dart';
 
 import '../../widget/common/app_inputs.dart';
+import '../../widget/common/app_sheet.dart';
+import '../../widget/common/app_surfaces.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
@@ -61,17 +63,39 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Future<void> _pickDateOfBirth() async {
     final l10n = AppLocalizations.of(context);
     final now = DateTime.now();
-    final picked = await showDatePicker(
+
+    // KHÔNG dùng `showDatePicker`: nó dựng nguyên một hộp thoại của Material
+    // kèm dải tiêu đề riêng, nút Huỷ/Chọn riêng và nút chuyển sang gõ tay. Tô
+    // màu thì được (đã có `datePickerTheme`), nhưng cái khung thì không đổi
+    // được — đứng cạnh các tấm trượt lên khác của app là lạc hẳn.
+    //
+    // `CalendarDatePicker` là RUỘT của hộp thoại đó, dùng riêng được. Nhờ vậy
+    // lịch nằm trong đúng khung `AppSheet` như chọn Giới tính và Ngôn ngữ, mà
+    // vẫn ăn trọn `datePickerTheme` đã cắm.
+    final DateTime? picked = await showAppSheet<DateTime>(
       context: context,
-      initialDate: _dateOfBirth ?? DateTime(now.year - 20),
-      firstDate: DateTime(1950),
-      lastDate: now,
-      helpText: l10n.authPickDateOfBirth,
-      cancelText: l10n.commonCancel,
-      confirmText: l10n.authSelect,
+      title: l10n.authPickDateOfBirth,
+      icon: HugeIcons.strokeRoundedCalendar03,
+      children: [
+        SizedBox(
+          // `CalendarDatePicker` đòi chiều cao có giới hạn; đặt trong vùng cuộn
+          // của tấm sheet mà không ghim chiều cao là nó ném lỗi ràng buộc.
+          height: 340,
+          child: CalendarDatePicker(
+            initialDate: _dateOfBirth ?? DateTime(now.year - 20),
+            firstDate: DateTime(1950),
+            lastDate: now,
+            // Mở thẳng ở chế độ chọn NĂM. Ngày sinh thường cách hiện tại hai
+            // mươi năm — mở ở chế độ tháng thì người dùng phải bấm mũi tên hai
+            // trăm mấy lần, hoặc phải tự mò ra là bấm vào tiêu đề để đổi chế độ.
+            initialCalendarMode: DatePickerMode.year,
+            onDateChanged: (value) => Navigator.pop(context, value),
+          ),
+        ),
+      ],
     );
 
-    if (picked != null) {
+    if (picked != null && mounted) {
       setState(() => _dateOfBirth = picked);
     }
   }
@@ -258,16 +282,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             Expanded(
               child: Text(
                 text,
+                // Cùng cỡ và cùng màu với ô chọn Giới tính ngay dưới: hai hàng
+                // này trông y hệt nhau nên chữ lệch cỡ là nhận ra ngay.
                 style: TextStyle(
-                  fontSize: 16,
-                  color: _dateOfBirth != null ? Colors.black87 : Colors.grey,
+                  fontSize: 15,
+                  color: _dateOfBirth != null
+                      ? AppColors.ink
+                      : AppColors.disabledInk,
                 ),
               ),
             ),
-            const HugeIcon(
-              icon: HugeIcons.strokeRoundedArrowDown01,
-              color: Colors.grey,
-            ),
+            AppInputs.dropdownIcon,
           ],
         ),
       ),
@@ -277,25 +302,119 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget _buildGenderField() {
     final l10n = AppLocalizations.of(context);
 
-    return DropdownButtonFormField<bool?>(
-      initialValue: _gender,
-      isExpanded: true,
-      decoration: InputDecoration(
-        labelText: l10n.authGenderLabel,
-        prefixIcon: AppInputs.icon(HugeIcons.strokeRoundedUserAccount),
+    // BỎ `DropdownButtonFormField`: tấm danh sách nó xổ ra không tô theo app
+    // được. Widget đó chỉ mở ra `dropdownColor`, `borderRadius` và `elevation`
+    // — không có chỗ nào đặt viền mảnh hay quầng sáng như mọi mặt nổi khác,
+    // nên tấm menu luôn là bóng xám trung tính của Material.
+    //
+    // Thay bằng chính mẫu tấm trượt lên đang dùng cho chọn Ngôn ngữ. Được thêm
+    // một thứ nữa: hàng này giờ hành xử y hệt hàng Ngày sinh ngay trên — chạm
+    // vào là mở một tấm chọn. Trước đây một cái mở lịch, một cái xổ menu, hai
+    // hàng trông giống hệt nhau mà bấm vào lại ra hai kiểu.
+    return InkWell(
+      onTap: _pickGender,
+      child: InputDecorator(
+        decoration: InputDecoration(
+          labelText: l10n.authGenderLabel,
+          prefixIcon: AppInputs.icon(HugeIcons.strokeRoundedUserAccount),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                _genderLabel(l10n),
+                style: TextStyle(
+                  fontSize: 15,
+                  color: _gender == null
+                      ? AppColors.disabledInk
+                      : AppColors.ink,
+                ),
+              ),
+            ),
+            AppInputs.dropdownIcon,
+          ],
+        ),
       ),
-      items: [
-        DropdownMenuItem<bool?>(
-          value: null,
-          child: Text(l10n.commonNotUpdated),
-        ),
-        DropdownMenuItem<bool?>(value: true, child: Text(l10n.authGenderMale)),
-        DropdownMenuItem<bool?>(
-          value: false,
-          child: Text(l10n.authGenderFemale),
-        ),
-      ],
-      onChanged: (value) => setState(() => _gender = value),
     );
   }
+
+  String _genderLabel(AppLocalizations l10n) {
+    return switch (_gender) {
+      true => l10n.authGenderMale,
+      false => l10n.authGenderFemale,
+      null => l10n.commonNotUpdated,
+    };
+  }
+
+  Future<void> _pickGender() async {
+    final l10n = AppLocalizations.of(context);
+
+    // Bọc trong `_GenderChoice` thay vì dùng thẳng `bool?`: giá trị `null` là
+    // một lựa chọn HỢP LỆ ("Chưa cập nhật"), nên `showAppSheet<bool?>` trả về
+    // null thì không phân biệt được là người dùng chọn "Chưa cập nhật" hay đã
+    // đóng tấm mà không chọn gì.
+    final _GenderChoice? picked = await showAppSheet<_GenderChoice>(
+      context: context,
+      title: l10n.authPickGender,
+      icon: HugeIcons.strokeRoundedUserAccount,
+      children: [
+        _buildGenderOption(null, l10n.commonNotUpdated),
+        const SizedBox(height: 8),
+        _buildGenderOption(true, l10n.authGenderMale),
+        const SizedBox(height: 8),
+        _buildGenderOption(false, l10n.authGenderFemale),
+      ],
+    );
+
+    if (picked == null || !mounted) return;
+    setState(() => _gender = picked.value);
+  }
+
+  Widget _buildGenderOption(bool? value, String label) {
+    final bool isSelected = _gender == value;
+
+    return InkWell(
+      onTap: () => Navigator.pop(context, _GenderChoice(value)),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        // Mục đang chọn có nền và viền riêng, không chỉ mỗi dấu tích: trên tấm
+        // chỉ có ba dòng thì dấu tích nhỏ ở mép phải rất dễ lướt qua.
+        decoration: isSelected
+            ? AppSurfaces.card(color: AppColors.accentBg, soft: true)
+            : AppSurfaces.card(tint: AppColors.disabledInk, shadow: false),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  color: isSelected ? AppColors.accent : AppColors.ink,
+                ),
+              ),
+            ),
+            if (isSelected)
+              const HugeIcon(
+                icon: HugeIcons.strokeRoundedTick01,
+                color: AppColors.accent,
+                size: 20,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Bọc giá trị giới tính để trả về từ tấm chọn.
+///
+/// Cần lớp bọc vì `null` là một lựa chọn HỢP LỆ ("Chưa cập nhật"): trả thẳng
+/// `bool?` thì `showAppSheet` trả về null không phân biệt được người dùng chọn
+/// "Chưa cập nhật" hay đã đóng tấm mà không chọn gì.
+class _GenderChoice {
+  const _GenderChoice(this.value);
+
+  final bool? value;
 }

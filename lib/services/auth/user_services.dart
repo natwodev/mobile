@@ -802,6 +802,42 @@ class UserService extends BaseService {
   }
 
   // Đổi mật khẩu (PATCH api/user/password)
+  /// Xin máy chủ gửi email khôi phục mật khẩu.
+  ///
+  /// Dùng endpoint RIÊNG của sinh viên (`students/password/forgot`) chứ không
+  /// phải `password/forgot` chung: hai bên tra trên hai bảng khác nhau, gọi
+  /// nhầm là email của sinh viên bị coi như không tồn tại.
+  ///
+  /// Không cần token — endpoint để `AllowAnonymous`, đúng vậy mới hợp lý vì
+  /// người đang quên mật khẩu thì chưa đăng nhập được.
+  ///
+  /// App CHỈ làm bước xin gửi email. Bước đặt lại mật khẩu cần mã trong đường
+  /// dẫn của email nên diễn ra trên web, app không đụng vào.
+  Future<ProfileUpdateResult> forgotPassword(String email) async {
+    try {
+      final response = await post('api/auth/students/password/forgot', {
+        'email': email,
+      });
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200 && data['success'] == true) {
+        return ProfileUpdateResult(success: true);
+      }
+
+      return ProfileUpdateResult(
+        success: false,
+        error: _errorMessage(data, AppL10n.current.authForgotPasswordFailed),
+      );
+    } catch (e) {
+      print('Lỗi forgotPassword: $e');
+      return ProfileUpdateResult(
+        success: false,
+        error: AppL10n.current.msgServerUnreachable,
+      );
+    }
+  }
+
   Future<ProfileUpdateResult> changePassword({
     required String currentPassword,
     required String newPassword,

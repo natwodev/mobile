@@ -224,6 +224,54 @@ abstract class AppLocalizations {
   /// **'Sửa thông tin cá nhân'**
   String get authEditProfileTitle;
 
+  /// No description provided for @authEmailRequired.
+  ///
+  /// In vi, this message translates to:
+  /// **'Vui lòng nhập email'**
+  String get authEmailRequired;
+
+  /// No description provided for @authForgotPasswordTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Quên mật khẩu'**
+  String get authForgotPasswordTitle;
+
+  /// No description provided for @authForgotPasswordLink.
+  ///
+  /// In vi, this message translates to:
+  /// **'Quên mật khẩu?'**
+  String get authForgotPasswordLink;
+
+  /// No description provided for @authForgotPasswordMessage.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhập email đã đăng ký với nhà trường. Chúng tôi sẽ gửi đường dẫn đặt lại mật khẩu tới hòm thư đó.'**
+  String get authForgotPasswordMessage;
+
+  /// No description provided for @authForgotPasswordSend.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gửi yêu cầu'**
+  String get authForgotPasswordSend;
+
+  /// No description provided for @authForgotPasswordFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không gửi được yêu cầu. Vui lòng thử lại.'**
+  String get authForgotPasswordFailed;
+
+  /// No description provided for @authForgotPasswordSentTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã gửi yêu cầu'**
+  String get authForgotPasswordSentTitle;
+
+  /// No description provided for @authForgotPasswordSentMessage.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nếu email này có trong hệ thống, đường dẫn đặt lại mật khẩu sẽ tới trong vài phút. Nhớ xem cả hòm thư rác.'**
+  String get authForgotPasswordSentMessage;
+
   /// No description provided for @authEmailHint.
   ///
   /// In vi, this message translates to:
@@ -259,6 +307,12 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Vui lòng nhập họ và tên'**
   String get authFullNameRequired;
+
+  /// No description provided for @authPickGender.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn giới tính'**
+  String get authPickGender;
 
   /// No description provided for @authGenderFemale.
   ///
@@ -1147,12 +1201,6 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Kết quả bài thi'**
   String get examResultTitle;
-
-  /// No description provided for @examSavingIndicator.
-  ///
-  /// In vi, this message translates to:
-  /// **'Đang lưu...'**
-  String get examSavingIndicator;
 
   /// No description provided for @examScoreCommentAverage.
   ///
@@ -2333,7 +2381,7 @@ abstract class AppLocalizations {
   /// No description provided for @questionFillBlankInstruction.
   ///
   /// In vi, this message translates to:
-  /// **'Nhấn vào từ, sau đó nhấn vào ô trống:'**
+  /// **'Kéo từ vào ô trống, hoặc nhấn từ rồi nhấn ô:'**
   String get questionFillBlankInstruction;
 
   /// No description provided for @questionHighlightClear.
