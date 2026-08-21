@@ -1,7 +1,25 @@
 import 'package:animated_app_bar/animated_app_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
 
 import 'app_colors.dart';
+
+/// Tab đang đứng, dùng để chọn icon rải làm nền thanh tiêu đề.
+///
+/// Icon lấy ĐÚNG icon của tab đó dưới thanh điều hướng
+/// (`HomeNavigation.dart`). Rải một hình khác là người dùng phải học thêm một
+/// biểu tượng nữa cho cùng một chỗ đứng.
+///
+/// Không có mục cho Trang chủ vì màn đó không dùng thanh tiêu đề.
+enum AppTopBarTab {
+  history(HugeIcons.strokeRoundedTaskDone01),
+  account(HugeIcons.strokeRoundedUserCircle);
+
+  const AppTopBarTab(this.icon);
+
+  /// Dữ liệu icon của HugeIcons — là JSON đường vẽ, không phải `IconData`.
+  final List<List<dynamic>> icon;
+}
 
 /// Thanh tiêu đề dùng chung cho các màn tab.
 ///
@@ -13,17 +31,48 @@ import 'app_colors.dart';
 /// cỡ chữ là chuyện riêng của app, còn cách dựng thanh là chuyện chung. Có lớp
 /// này thì đổi màu app chỉ sửa MỘT chỗ, và các màn không phải biết tới gói.
 class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
-  const AppTopBar({super.key, required this.title});
+  const AppTopBar({super.key, required this.title, this.tab});
+
+  /// Cạnh ô chứa mỗi icon nền. Tách hằng vì phải khớp với `size` của chính
+  /// `HugeIcon` bên trong: lệch nhau thì icon bị cắt hoặc lọt thỏm trong ô.
+  static const double _driftIconSize = 34;
 
   final String title;
+
+  /// Tab đang đứng. Bỏ trống thì thanh chỉ có dải màu, không rải icon.
+  final AppTopBarTab? tab;
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 
   @override
   Widget build(BuildContext context) {
+    final AppTopBarTab? currentTab = tab;
+
     return AnimatedAppBar.gradientColors(
       title: title,
+      iconDrift: currentTab == null
+          ? null
+          : AppBarIconDrift(
+              icon: HugeIcon(
+                // Key theo tab: thiếu nó thì Flutter coi icon cũ và icon mới là
+                // cùng một widget nên thay thẳng, đổi tab thấy icon nhảy cái
+                // rụp thay vì mờ chồng.
+                key: ValueKey(currentTab),
+                icon: currentTab.icon,
+                color: Colors.white,
+                size: _driftIconSize,
+              ),
+              size: _driftIconSize,
+              // Mờ 0.14 trên nền xanh đậm: đủ thấy là có hình chuyển động,
+              // nhưng không tranh chấp với chữ tiêu đề màu trắng nằm đè lên.
+              opacity: 0.14,
+              // 26 giây một vòng. Người dùng đứng ở màn tab chừng vài chục
+              // giây, nên chậm cỡ này thì mỗi lần nhìn lại icon đã ở một chỗ
+              // khác, mà không lúc nào thấy nó "chạy".
+              period: const Duration(seconds: 26),
+              count: 6,
+            ),
       // Đúng cặp màu của thẻ thống kê ở màn Lịch sử
       // (`exam_history_screen.dart`), để hai mảng xanh lớn nhất của app nói
       // cùng một ngôn ngữ.

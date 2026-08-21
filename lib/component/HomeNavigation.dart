@@ -224,7 +224,7 @@ class _HomeNavigationState extends State<HomeNavigation> {
                     // Ở cỡ 22px thì danh sách có dấu tick cũng rõ hơn tờ giấy
                     // có dấu tick nhỏ xíu bên trong.
                     _navItem(
-                      HugeIcons.strokeRoundedCheckList,
+                      HugeIcons.strokeRoundedTaskDone01,
                       l10n.homeNavHistory,
                     ),
                     // UserCircle thay cho User trơn: ở cỡ 22px, hình người nằm
