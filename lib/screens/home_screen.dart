@@ -8,29 +8,54 @@ import '../l10n/generated/app_localizations.dart';
 import '../widget/common/app_buttons.dart';
 import '../widget/home/home_banner_carousel.dart';
 import '../widget/home/home_news_section.dart';
+import '../widget/common/refresh_feedback.dart';
 import '../widget/home/quiz_answer_banner.dart';
 
 class HomeScreen extends StatelessWidget {
-  HomeScreen({super.key});
+  HomeScreen({super.key, this.scrollController});
+
+  /// Do [HomeNavigation] giữ, để bấm nút tab là cuộn màn này về đầu.
+  final ScrollController? scrollController;
+
+  /// Chìa để với tới dải tin mà bảo nó tải lại.
+  ///
+  /// Trang chủ chỉ có DUY NHẤT dải tin là lấy dữ liệu từ mạng — băng ảnh và
+  /// hai nút nhanh đều nằm sẵn trong app. Nên "kéo tải lại cả trang" thực chất
+  /// là tải lại đúng phần này.
+  final GlobalKey<HomeNewsSectionState> _newsKey =
+      GlobalKey<HomeNewsSectionState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        // Thanh tab nổi đè lên nội dung, nên phần cuối màn phải chừa đúng chỗ
-        // nó chiếm (giá trị do HomeNavigation bơm vào MediaQuery) — không thì
-        // cuộn hết cỡ vẫn còn một mẩu nằm khuất dưới thanh.
-        padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom),
-        child: Column(
-          children: [
-            // Header với Banner + 3 nút nhanh
-            _buildHeader(context),
-            _buildBannerCarousel(),
-            // Dải tin dưới băng ảnh — phần lấp chỗ trống nửa dưới màn hình và
-            // là lý do Trang chủ có gì để cuộn.
-            const HomeNewsSection(),
-          ],
+      body: RefreshIndicator(
+        color: AppColors.accent,
+        onRefresh: () async {
+          final bool ok = await _newsKey.currentState?.reload() ?? false;
+          if (!context.mounted || !ok) return;
+          showRefreshDone(context);
+        },
+        child: SingleChildScrollView(
+          controller: scrollController,
+          // AlwaysScrollable: thiếu dòng này thì hôm nào tin ngắn, nội dung
+          // không cao quá màn hình, là RefreshIndicator không bắt được cử chỉ
+          // kéo — kéo mãi không ra gì mà chẳng hiểu vì sao.
+          physics: const AlwaysScrollableScrollPhysics(),
+          // Thanh tab nổi đè lên nội dung, nên phần cuối màn phải chừa đúng chỗ
+          // nó chiếm (giá trị do HomeNavigation bơm vào MediaQuery) — không thì
+          // cuộn hết cỡ vẫn còn một mẩu nằm khuất dưới thanh.
+          padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom),
+          child: Column(
+            children: [
+              // Header với Banner + 3 nút nhanh
+              _buildHeader(context),
+              _buildBannerCarousel(),
+              // Dải tin dưới băng ảnh — phần lấp chỗ trống nửa dưới màn hình và
+              // là lý do Trang chủ có gì để cuộn.
+              HomeNewsSection(key: _newsKey),
+            ],
+          ),
         ),
       ),
     );

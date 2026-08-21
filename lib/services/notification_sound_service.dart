@@ -3,7 +3,18 @@ import 'package:flutter/foundation.dart';
 
 /// Loại âm báo, đặt trùng tên với bản web
 /// (`frontend_manage/src/utils/toast.tsx:11-46`) để hai bên kêu giống nhau.
-enum NotificationSound { success, error, warning, multiline, promise }
+enum NotificationSound {
+  success,
+  error,
+  warning,
+  multiline,
+  promise,
+
+  /// Tiếng chuông báo kéo-để-tải-lại xong. Tách khỏi [success] vì đây là phản
+  /// hồi thao tác của chính người dùng, không phải tin từ hệ thống — dùng
+  /// chung một tiếng thì kéo tải lại nghe y hệt lúc giám thị nhắn.
+  refresh,
+}
 
 /// Phát âm báo kèm thông báo.
 ///
@@ -20,6 +31,7 @@ class NotificationSoundService {
     NotificationSound.warning: 'sounds/toast-warning.mp3',
     NotificationSound.multiline: 'sounds/toast-multiline.mp3',
     NotificationSound.promise: 'sounds/toast-promise.mp3',
+    NotificationSound.refresh: 'sounds/refresh-success.mp3',
   };
 
   /// Một player dùng lại cho mọi lần phát: mỗi lần `AudioPlayer()` mới là một

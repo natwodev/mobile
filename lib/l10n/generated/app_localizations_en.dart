@@ -246,6 +246,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonNotUpdated => 'Not updated';
 
   @override
+  String get commonReloadSuccess => 'Data reloaded successfully';
+
+  @override
   String get commonRetry => 'Retry';
 
   @override

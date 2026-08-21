@@ -8,6 +8,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../widget/common/app_buttons.dart';
 import '../../widget/common/app_modal.dart';
 import '../../widget/common/app_toast.dart';
+import '../../widget/common/refresh_feedback.dart';
 import '../../l10n/locale_controller.dart';
 import '../../models/student.dart';
 import '../../services/auth/user_services.dart';
@@ -21,7 +22,10 @@ import 'feedback_screen.dart';
 import 'support_contact_sheet.dart';
 
 class AccountScreen extends StatefulWidget {
-  const AccountScreen({super.key});
+  const AccountScreen({super.key, this.scrollController});
+
+  /// Do [HomeNavigation] giữ, để bấm nút tab là cuộn màn này về đầu.
+  final ScrollController? scrollController;
 
   @override
   State<AccountScreen> createState() => _AccountScreenState();
@@ -346,8 +350,15 @@ class _AccountScreenState extends State<AccountScreen> {
     final student = _student!;
 
     return RefreshIndicator(
-      onRefresh: _loadProfile,
+      onRefresh: () async {
+        await _loadProfile();
+        // _loadProfile giữ bản đã lưu khi mạng hỏng, và chỉ đặt _error lúc
+        // không còn gì để hiện. Bám vào đó nên không phải đổi chữ ký hàm.
+        if (!mounted || _error != null) return;
+        showRefreshDone(context);
+      },
       child: ListView(
+        controller: widget.scrollController,
         padding: EdgeInsets.fromLTRB(
           16,
           16,

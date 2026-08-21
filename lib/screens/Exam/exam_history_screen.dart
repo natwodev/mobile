@@ -9,6 +9,7 @@ import '../../models/exam_history_item.dart';
 import '../../services/auth/user_services.dart';
 import '../../widget/common/app_buttons.dart';
 import '../../widget/common/app_toast.dart';
+import '../../widget/common/refresh_feedback.dart';
 
 /// Màn "Lịch sử làm bài" — tab giữa của thanh điều hướng.
 ///
@@ -22,11 +23,14 @@ import '../../widget/common/app_toast.dart';
 /// trước xếp tất cả thành dòng "nhãn — giá trị" nên điểm số chìm nghỉm giữa
 /// bốn dòng chữ cùng cỡ.
 class ExamHistoryScreen extends StatefulWidget {
-  const ExamHistoryScreen({super.key, this.userService});
+  const ExamHistoryScreen({super.key, this.userService, this.scrollController});
 
   /// Cửa để test cắm bản giả. Màn hình gọi mạng ngay trong `initState` nên nếu
   /// không thay được service thì mọi test bố cục đều treo chờ một request thật.
   final UserService? userService;
+
+  /// Do [HomeNavigation] giữ, để bấm nút tab là cuộn màn này về đầu.
+  final ScrollController? scrollController;
 
   @override
   State<ExamHistoryScreen> createState() => _ExamHistoryScreenState();
@@ -231,9 +235,16 @@ class _ExamHistoryScreenState extends State<ExamHistoryScreen> {
     final l10n = AppLocalizations.of(context);
 
     return RefreshIndicator(
-      onRefresh: () => _loadHistory(showSpinner: false),
+      onRefresh: () async {
+        await _loadHistory(showSpinner: false);
+        // _loadHistory đặt _error khi API trả thất bại; im lặng trong trường
+        // hợp đó, chứ kêu "thành công" lúc hỏng còn tệ hơn không báo gì.
+        if (!mounted || _error != null) return;
+        showRefreshDone(context);
+      },
       color: AppColors.accent,
       child: ListView(
+        controller: widget.scrollController,
         padding: EdgeInsets.fromLTRB(
           16,
           12,
@@ -262,10 +273,20 @@ class _ExamHistoryScreenState extends State<ExamHistoryScreen> {
   /// muốn kéo để thử lại nhất.
   Widget _buildRefreshable({required Widget child}) {
     return RefreshIndicator(
-      onRefresh: () => _loadHistory(showSpinner: false),
+      onRefresh: () async {
+        await _loadHistory(showSpinner: false);
+        // _loadHistory đặt _error khi API trả thất bại; im lặng trong trường
+        // hợp đó, chứ kêu "thành công" lúc hỏng còn tệ hơn không báo gì.
+        if (!mounted || _error != null) return;
+        showRefreshDone(context);
+      },
       color: AppColors.accent,
       child: LayoutBuilder(
         builder: (context, constraints) => SingleChildScrollView(
+          // Dùng CHUNG controller với ListView ở nhánh có dữ liệu: hai vùng
+          // cuộn này là hai trạng thái loại trừ nhau, không bao giờ cùng tồn
+          // tại — nếu cùng lúc thì Flutter ném lỗi gắn trùng controller.
+          controller: widget.scrollController,
           physics: const AlwaysScrollableScrollPhysics(),
           child: ConstrainedBox(
             constraints: BoxConstraints(minHeight: constraints.maxHeight),

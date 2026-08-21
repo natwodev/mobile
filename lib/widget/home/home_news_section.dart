@@ -16,10 +16,12 @@ class HomeNewsSection extends StatefulWidget {
   const HomeNewsSection({super.key});
 
   @override
-  State<HomeNewsSection> createState() => _HomeNewsSectionState();
+  State<HomeNewsSection> createState() => HomeNewsSectionState();
 }
 
-class _HomeNewsSectionState extends State<HomeNewsSection> {
+/// State để CÔNG KHAI (không có gạch dưới) vì Trang chủ cần cầm `GlobalKey`
+/// tới nó mà gọi [reload] khi người dùng kéo tải lại cả trang.
+class HomeNewsSectionState extends State<HomeNewsSection> {
   static const NewsService _service = NewsService();
 
   List<NewsItem> _items = const [];
@@ -30,6 +32,16 @@ class _HomeNewsSectionState extends State<HomeNewsSection> {
   void initState() {
     super.initState();
     _load();
+  }
+
+  /// Tải lại cho cú kéo-để-tải-lại của Trang chủ.
+  ///
+  /// Trả về true khi lấy được tin. Trang chủ dựa vào đó để quyết định có báo
+  /// "tải lại thành công" hay không — hỏng mạng mà vẫn báo thành công thì tệ
+  /// hơn hẳn im lặng.
+  Future<bool> reload() async {
+    await _load();
+    return !_failed;
   }
 
   Future<void> _load() async {
