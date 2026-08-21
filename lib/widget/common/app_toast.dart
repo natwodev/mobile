@@ -288,6 +288,12 @@ class AppToast {
         AppToastKind.error => NotificationSound.error,
         AppToastKind.warning => NotificationSound.warning,
         AppToastKind.promise => NotificationSound.promise,
+        // `dark` và `themed` từng rơi vào nhánh bao quát bên dưới và kêu tiếng
+        // của `multiline`. Web có âm riêng cho hai kiểu này, mà đây lại đúng
+        // hai kiểu giám thị chọn được khi gửi thông báo giữa phiên thi — kêu
+        // sai tiếng là sinh viên nghe một đằng, giám thị tưởng một nẻo.
+        AppToastKind.dark => NotificationSound.dark,
+        AppToastKind.themed => NotificationSound.themed,
         _ => NotificationSound.multiline,
       };
 }

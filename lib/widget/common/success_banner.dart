@@ -138,13 +138,17 @@ class _RefreshBannerState extends State<_RefreshBanner>
       // Trùng lề ngang với dải tab để hai thanh thẳng cột với nhau.
       left: 12,
       right: 12,
-      // Mép dưới thanh báo đặt ĐÚNG vào mép trên dải tab, không chừa khe.
+      // Mép dưới thanh báo nằm ngay trên dải tab, chừa đúng một khe rất mảnh.
       //
       // `bottomInset` là phần chừa mà HomeNavigation bơm vào MediaQuery, và nó
-      // đã gồm cả `barMarginTop` — khoảng hở giữa nội dung và dải tab. Cộng
-      // thêm như trước là để lại một khe cho nội dung trang lọt qua giữa hai
-      // thanh; trừ đi thì thanh báo nằm sát dải tab thành một khối liền.
-      bottom: widget.bottomInset - HomeNavigation.barMarginTop,
+      // đã gồm cả `barMarginTop` — khoảng hở giữa nội dung và dải tab. Không
+      // trừ ra thì khe rộng tới 16px, đủ để nội dung trang lọt qua giữa hai
+      // thanh và nhìn thành hai mảnh rời.
+      //
+      // Nhưng trừ hết sạch thì hai thanh dính liền, mất luôn ranh giới giữa
+      // thanh báo và thanh điều hướng. Cộng lại 1.5px: đủ thành một đường chỉ
+      // tách bạch, chưa đủ để hở ra nội dung phía sau.
+      bottom: widget.bottomInset - HomeNavigation.barMarginTop + 1.5,
       child: SlideTransition(
         // Từ PHẢI qua trái. 1.08 thay vì 1.0 để thanh báo bắt đầu từ ngoài hẳn
         // mép màn, kể cả phần đổ bóng cũng không ló ra ở khung hình đầu tiên.
@@ -154,14 +158,44 @@ class _RefreshBannerState extends State<_RefreshBanner>
         ).animate(CurvedAnimation(parent: _slide, curve: Curves.easeOutCubic)),
         child: FadeTransition(
           opacity: _slide,
-          child: Material(
-            color: Colors.white,
-            elevation: 6,
-            borderRadius: BorderRadius.circular(12),
-            clipBehavior: Clip.antiAlias,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [_buildRow(), _buildTimeBar()],
+          // Bóng XANH toả quanh, cùng ngôn ngữ với thẻ hai nút nhanh ở Trang
+          // chủ (`home_screen.dart`) — bóng màu chủ đạo chứ không phải xám đen,
+          // nên thanh báo trông như phát sáng thay vì bị dán đè lên màn.
+          //
+          // Khác thẻ nút nhanh ở hai điểm, đều có lý do:
+          //   • blurRadius 14 thay vì 25 — mỏng hơn. Thanh báo chỉ cao 58px,
+          //     bóng toả 25px làm nó trông như chìm trong sương.
+          //   • alpha 0.28 thay vì 0.18 — đậm hơn, bù lại cho việc toả hẹp.
+          //
+          // Và offset lệch LÊN chứ không xuống: dải tab nằm sát ngay bên dưới,
+          // bóng đổ xuống là rơi thẳng lên nó thành một vệt bẩn đúng chỗ hai
+          // thanh giáp nhau. Đây cũng là lý do không dùng `elevation` của
+          // Material — elevation toả đều bốn phía, không chọn hướng được.
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.accent.withValues(alpha: 0.30),
+                  // Độ lệch lên ĐÚNG BẰNG độ toả. Bóng toả ra mọi phía chừng
+                  // `blurRadius`, nên đẩy lên đúng chừng ấy thì mép dưới của
+                  // bóng dừng lại ngay ở đáy thanh báo — không còn pixel nào
+                  // rơi xuống dải tab. Lệch ít hơn (ví dụ -4) là vẫn rớt vài
+                  // pixel xuống, thành vệt xám mờ đúng chỗ hai thanh giáp nhau.
+                  blurRadius: 10,
+                  offset: const Offset(0, -10),
+                ),
+              ],
+            ),
+            child: Material(
+              color: Colors.white,
+              elevation: 0,
+              borderRadius: BorderRadius.circular(12),
+              clipBehavior: Clip.antiAlias,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [_buildRow(), _buildTimeBar()],
+              ),
             ),
           ),
         ),

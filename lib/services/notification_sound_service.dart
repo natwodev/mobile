@@ -10,6 +10,12 @@ enum NotificationSound {
   multiline,
   promise,
 
+  /// Hai kiểu giám thị chọn được trong bảng cấu hình toast, thêm sau bộ năm
+  /// ban đầu. Trước khi có chúng, app gộp cả hai vào âm `multiline` — giám thị
+  /// gửi thông báo kiểu "dark" mà máy sinh viên kêu tiếng của kiểu khác.
+  dark,
+  themed,
+
   /// Tiếng chuông báo kéo-để-tải-lại xong. Tách khỏi [success] vì đây là phản
   /// hồi thao tác của chính người dùng, không phải tin từ hệ thống — dùng
   /// chung một tiếng thì kéo tải lại nghe y hệt lúc giám thị nhắn.
@@ -31,6 +37,14 @@ class NotificationSoundService {
     NotificationSound.warning: 'sounds/toast-warning.mp3',
     NotificationSound.multiline: 'sounds/toast-multiline.mp3',
     NotificationSound.promise: 'sounds/toast-promise.mp3',
+    // Tải từ đúng hai URL web đang dùng (`utils/toast.tsx`) rồi đóng gói sẵn,
+    // cùng lý do với năm file kia: đang thi mà mạng chập chờn thì tiếng báo là
+    // thứ mất đầu tiên, đúng lúc cần nghe nhất.
+    //
+    // LƯU Ý: toast-dark dài khoảng 12 giây, gấp mười lần các âm còn lại. Đây là
+    // đúng file web đang phát, không phải tải nhầm.
+    NotificationSound.dark: 'sounds/toast-dark.mp3',
+    NotificationSound.themed: 'sounds/toast-themed.mp3',
     NotificationSound.refresh: 'sounds/refresh-success.mp3',
   };
 
