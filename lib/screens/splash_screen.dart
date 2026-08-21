@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'auth/login_screen.dart';
 import '../component/HomeNavigation.dart';
 import '../controller/user_controller.dart';
@@ -65,7 +66,11 @@ class _SplashScreenState extends State<SplashScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // Logo hoặc icon
-              const Icon(Icons.school, size: 100, color: Colors.white),
+              const HugeIcon(
+                icon: HugeIcons.strokeRoundedMortarboard02,
+                size: 100,
+                color: Colors.white,
+              ),
               const SizedBox(height: 20),
 
               // Tên app

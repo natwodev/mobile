@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../l10n/generated/app_localizations.dart';
@@ -25,9 +26,17 @@ class HomeNewsSection extends StatefulWidget {
 class HomeNewsSectionState extends State<HomeNewsSection> {
   static const NewsService _service = NewsService();
 
+  /// Số tin hiện mỗi lần bấm "tải thêm", cũng là số tin hiện lúc đầu.
+  static const int _pageSize = 10;
+
   List<NewsItem> _items = const [];
   bool _loading = true;
   bool _failed = false;
+
+  /// Số tin đang hiện. Nguồn RSS trả về CẢ MẺ trong một request, nên "tải thêm"
+  /// chỉ là hiện thêm phần đã có sẵn trong bộ nhớ — bấm là ra ngay, không chờ
+  /// mạng, và vẫn bấm được khi offline vì bản lưu cũng giữ đủ chừng ấy tin.
+  int _visibleCount = _pageSize;
 
   @override
   void initState() {
@@ -46,7 +55,12 @@ class HomeNewsSectionState extends State<HomeNewsSection> {
   }
 
   Future<void> _load() async {
-    setState(() => _failed = false);
+    setState(() {
+      _failed = false;
+      // Tải lại thì thu về trang đầu: người dùng kéo để xem TIN MỚI, giữ
+      // nguyên 30 tin đang mở là họ phải cuộn ngược lên tận đầu mới thấy.
+      _visibleCount = _pageSize;
+    });
 
     // Hiện bản đã lưu TRƯỚC, y như màn Tài khoản làm với hồ sơ: mở Trang chủ là
     // có tin đọc ngay thay vì nhìn vòng quay chờ mạng mỗi lần.
@@ -159,13 +173,58 @@ class HomeNewsSectionState extends State<HomeNewsSection> {
     // Trang chủ. Để ListView tự cuộn là có hai vùng cuộn lồng nhau — ngón tay
     // đặt trúng danh sách thì cả trang đứng im, đúng thứ người dùng chửi là
     // "app đơ".
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      padding: EdgeInsets.zero,
-      itemCount: _items.length,
-      itemBuilder: (context, index) =>
-          _NewsTile(item: _items[index], onTap: () => _open(_items[index])),
+    final int shown = _visibleCount.clamp(0, _items.length);
+
+    return Column(
+      children: [
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: EdgeInsets.zero,
+          itemCount: shown,
+          itemBuilder: (context, index) =>
+              _NewsTile(item: _items[index], onTap: () => _open(_items[index])),
+        ),
+        if (shown < _items.length) _buildLoadMore(l10n, _items.length - shown),
+      ],
+    );
+  }
+
+  /// Nút hiện thêm tin.
+  ///
+  /// Ghi luôn số tin còn lại vào nhãn: "Tải thêm tin (20)" nói rõ bấm xong được
+  /// gì và còn bao nhiêu, khác hẳn một nút trơn mà người dùng không biết bấm
+  /// mấy lần nữa mới hết.
+  Widget _buildLoadMore(AppLocalizations l10n, int remaining) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: SizedBox(
+        width: double.infinity,
+        child: OutlinedButton(
+          onPressed: () => setState(
+            () => _visibleCount = (_visibleCount + _pageSize).clamp(
+              0,
+              _items.length,
+            ),
+          ),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.accent,
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            // Cùng công thức viền của cả app: màu chủ thể hạ 40% độ đục, 0.5px.
+            side: BorderSide(
+              color: AppColors.accent.withValues(alpha: 0.4),
+              width: 0.5,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          child: Text(
+            '${l10n.homeNewsLoadMore} ($remaining)',
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+          ),
+        ),
+      ),
     );
   }
 
@@ -271,8 +330,8 @@ class _NewsTile extends StatelessWidget {
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      const Icon(
-                        Icons.person_outline,
+                      const HugeIcon(
+                        icon: HugeIcons.strokeRoundedUser,
                         size: 16,
                         color: AppColors.disabledInk,
                       ),
@@ -287,8 +346,8 @@ class _NewsTile extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 16),
-                      const Icon(
-                        Icons.access_time_outlined,
+                      const HugeIcon(
+                        icon: HugeIcons.strokeRoundedClock01,
                         size: 16,
                         color: AppColors.disabledInk,
                       ),

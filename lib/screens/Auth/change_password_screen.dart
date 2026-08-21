@@ -1,3 +1,4 @@
+import 'package:hugeicons/hugeicons.dart';
 import 'package:flutter/material.dart';
 
 import '../../l10n/generated/app_localizations.dart';
@@ -183,9 +184,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        prefixIcon: const Icon(Icons.lock_outline),
+        prefixIcon: const HugeIcon(icon: HugeIcons.strokeRoundedSquareLock01),
         suffixIcon: IconButton(
-          icon: Icon(obscure ? Icons.visibility_off : Icons.visibility),
+          icon: HugeIcon(
+            icon: obscure
+                ? HugeIcons.strokeRoundedViewOff
+                : HugeIcons.strokeRoundedView,
+          ),
           onPressed: onToggle,
         ),
         border: const OutlineInputBorder(),

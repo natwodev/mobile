@@ -46,7 +46,10 @@ Future<void> showLanguagePicker(BuildContext context) async {
                   ),
                 ),
                 if (isSelected)
-                  const Icon(Icons.check, color: AppColors.accent),
+                  const HugeIcon(
+                    icon: HugeIcons.strokeRoundedTick01,
+                    color: AppColors.accent,
+                  ),
               ],
             ),
           ),
@@ -70,7 +73,11 @@ class LanguageToggleButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextButton.icon(
       onPressed: () => showLanguagePicker(context),
-      icon: Icon(Icons.language, size: 20, color: color),
+      icon: HugeIcon(
+        icon: HugeIcons.strokeRoundedGlobal,
+        size: 20,
+        color: color,
+      ),
       // Không tự khai `TextStyle` cho nhãn nữa: cỡ chữ và độ đậm để
       // [AppButtons.quiet] lo (đã cắm sẵn qua `textButtonTheme`), còn màu thì
       // vẫn phải là [color] vì widget này nhận màu từ NGOÀI vào — nó nằm trên

@@ -1,3 +1,4 @@
+import 'package:hugeicons/hugeicons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -192,8 +193,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(
-                    Icons.info_outline,
+                  const HugeIcon(
+                    icon: HugeIcons.strokeRoundedInformationCircle,
                     size: 18,
                     color: AppColors.accent,
                   ),

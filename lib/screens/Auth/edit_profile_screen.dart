@@ -1,3 +1,4 @@
+import 'package:hugeicons/hugeicons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -138,7 +139,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 decoration: InputDecoration(
                   labelText: l10n.authFullNameLabel,
                   hintText: l10n.authFullNameHint,
-                  prefixIcon: const Icon(Icons.person_outline),
+                  prefixIcon: const HugeIcon(icon: HugeIcons.strokeRoundedUser),
                   border: const OutlineInputBorder(),
                 ),
                 textInputAction: TextInputAction.next,
@@ -158,7 +159,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 decoration: InputDecoration(
                   labelText: l10n.authEmailLabel,
                   hintText: l10n.authEmailHint,
-                  prefixIcon: const Icon(Icons.mail_outline),
+                  prefixIcon: const HugeIcon(
+                    icon: HugeIcons.strokeRoundedMail01,
+                  ),
                   border: const OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.emailAddress,
@@ -181,7 +184,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 decoration: InputDecoration(
                   labelText: l10n.authPhoneLabel,
                   hintText: l10n.authPhoneHint,
-                  prefixIcon: const Icon(Icons.phone_outlined),
+                  prefixIcon: const HugeIcon(icon: HugeIcons.strokeRoundedCall),
                   border: const OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.phone,
@@ -240,7 +243,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       enabled: false,
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: const Icon(Icons.badge_outlined),
+        prefixIcon: const HugeIcon(icon: HugeIcons.strokeRoundedIdentityCard),
         border: const OutlineInputBorder(),
         filled: true,
         fillColor: Colors.grey.shade100,
@@ -260,7 +263,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       child: InputDecorator(
         decoration: InputDecoration(
           labelText: l10n.authDateOfBirthLabel,
-          prefixIcon: const Icon(Icons.calendar_today_outlined),
+          prefixIcon: const HugeIcon(icon: HugeIcons.strokeRoundedCalendar03),
           border: const OutlineInputBorder(),
         ),
         child: Row(
@@ -274,7 +277,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
               ),
             ),
-            const Icon(Icons.arrow_drop_down, color: Colors.grey),
+            const HugeIcon(
+              icon: HugeIcons.strokeRoundedArrowDown01,
+              color: Colors.grey,
+            ),
           ],
         ),
       ),
@@ -289,7 +295,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       isExpanded: true,
       decoration: InputDecoration(
         labelText: l10n.authGenderLabel,
-        prefixIcon: const Icon(Icons.wc_outlined),
+        prefixIcon: const HugeIcon(icon: HugeIcons.strokeRoundedUserAccount),
         border: const OutlineInputBorder(),
       ),
       items: [
