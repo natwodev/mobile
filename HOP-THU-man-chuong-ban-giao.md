@@ -86,6 +86,36 @@ Sắp xếp sẵn theo `createdAt` giảm dần — tin mới nhất ở đầu 
 { "success": true, "code": "NOTIFICATION_MARK_ALL_READ_SUCCESS" }
 ```
 
+### `DELETE /api/notification/{id}`
+
+Sinh viên tự gỡ một thư khỏi chuông của mình — dùng cho thao tác vuốt-để-xoá.
+
+```json
+{ "success": true, "code": "NOTIFICATION_DELETE_SUCCESS", "data": { "deletedCount": 1 } }
+```
+
+Xoá thư của người khác → **403 body rỗng**, y như `PATCH {id}/read`. Thư đã gỡ rồi mà
+gọi lại → **404**.
+
+### `DELETE /api/notification/all`
+
+Dọn sạch chuông của chính mình.
+
+```json
+{ "success": true, "code": "NOTIFICATION_DELETE_ALL_SUCCESS", "data": { "deletedCount": 7 } }
+```
+
+### ⚠️ "Xoá" ở đây là gỡ khỏi chuông, không phải xoá khỏi hệ thống
+
+Máy chủ đánh dấu `HiddenByRecipient` chứ không xoá dòng. Sinh viên không còn thấy nó ở
+bất kỳ đâu — danh sách, số chưa đọc, đánh dấu đã đọc đều bỏ qua — nhưng giám thị vẫn
+thấy trong trang quản lí kèm nhãn "Người nhận đã gỡ".
+
+Cố ý như vậy: nếu xoá hẳn thì sinh viên sửa được lịch sử gửi của giám thị, con số
+"đã gửi cho 603 người" sẽ tụt dần mỗi lần có người dọn hộp thư.
+
+App **không cần biết** cờ này — API đã lọc sẵn, cứ gọi rồi tải lại danh sách.
+
 ---
 
 ## 3. Các trường trong một thông báo
@@ -133,6 +163,9 @@ File hiện là cái vỏ rỗng. Comment trong đó ghi *"Backend chưa có end
 Cần: danh sách phân trang, kéo để tải lại, phân biệt đã đọc/chưa đọc, bấm vào thì gọi
 `PATCH {id}/read` rồi cập nhật tại chỗ. Giữ nguyên khung `Scaffold` + `AppBar` sẵn có,
 và giữ trạng thái rỗng hiện tại cho trường hợp thật sự không có thư.
+
+Thêm vuốt-để-xoá (`Dismissible`) gọi `DELETE {id}`, và một nút "dọn tất cả" trên AppBar
+gọi `DELETE /all`. Gỡ xong nhớ cập nhật badge — số chưa đọc đổi theo.
 
 ### 5.2. Badge trên nút chuông
 
@@ -216,6 +249,16 @@ JWT của sinh viên có `NameIdentifier` = **StudentId**. Cùng một id đó �
 
 ## 9. Trạng thái backend
 
-Đã merge vào `main` và đang chạy. Đã kiểm bằng lệnh gửi thật: 2 thư lưu đúng, 1 id rác bị
-loại, 1 thiết bị Android nhận được push, 1 sinh viên không có máy vẫn có thư. Dữ liệu test
-đã xoá.
+Đã merge vào `main` và đang chạy. Toàn bộ đã kiểm bằng lệnh thật trên bản đang chạy:
+
+- Gửi: 2 thư lưu đúng, 1 id rác bị loại, 1 thiết bị Android nhận push, 1 sinh viên không
+  có máy vẫn có thư.
+- Đọc: gọi bằng token, ra 200 kèm danh sách (trước đây sinh viên bị 403).
+- Tự gỡ: xoá 1 thư → hộp thư 2 còn 1, số chưa đọc giảm theo; `DELETE /all` → về 0;
+  gỡ thư người khác → 403 và thư đó không hề bị đụng.
+
+Dữ liệu test đã xoá.
+
+Phía web còn có trang quản lí (gom theo lượt gửi, đếm đã đọc, thu hồi cả lượt) nằm trong
+Danh sách sinh viên → nút chuông. App không cần quan tâm, chỉ cần biết một lượt gửi bị
+thu hồi thì thư biến khỏi `GET /api/notification` — nên đừng cache vĩnh viễn.
