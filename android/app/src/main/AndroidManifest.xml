@@ -13,7 +13,7 @@
     <!-- Không có quyền này thì user khởi động lại máy là bay sạch lịch đã đặt. -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <application
-        android:label="Trắc nghiệm trực tuyến"
+        android:label="Trắc nghiệm"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon"
         android:usesCleartextTraffic="true">
@@ -61,6 +61,20 @@
                 <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
             </intent-filter>
         </receiver>
+
+        <!-- Màn cắt ảnh của image_cropper (thư viện uCrop). Gói image_cropper
+             KHÔNG tự khai activity này trong manifest của nó (kiểm chứng:
+             android/src/main/AndroidManifest.xml của gói rỗng), nên thiếu khối
+             dưới là lệnh cắt ảnh không tìm thấy activity. Khi đó plugin trả lời
+             về Dart một lần qua đường báo lỗi, rồi Android vẫn gửi tiếp kết quả
+             HUỶ cho mã yêu cầu 69 khiến plugin trả lời lần hai — "Reply already
+             submitted" — và app văng ra ngoài.
+             Theme bắt buộc thuộc họ AppCompat vì UCropActivity kế thừa
+             AppCompatActivity; đặt theme khác là nó ném lỗi ngay lúc mở. -->
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
     </application>
     <uses-permission android:name="android.permission.INTERNET"/>
     <!-- Required to query activities that can process text, see:

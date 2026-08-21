@@ -1,8 +1,17 @@
 {
   "@@locale": "vi",
-  "appTitle": "HUTECH Campus Info",
+  "appTitle": "Trắc nghiệm",
   "authAccountTitle": "Tài khoản",
   "authAvatarChangeTitle": "Ảnh đại diện",
+  "authAvatarCropTitle": "Cắt ảnh đại diện",
+  "authAvatarTooLarge": "Ảnh quá lớn, tối đa {mb}MB.",
+  "@authAvatarTooLarge": {
+    "placeholders": {
+      "mb": {
+        "type": "int"
+      }
+    }
+  },
   "authAvatarFromCamera": "Chụp ảnh mới",
   "authAvatarFromGallery": "Chọn từ thư viện",
   "authAvatarUpdateSuccess": "Đã cập nhật ảnh đại diện.",
@@ -416,6 +425,7 @@
   "homeNavHome": "Trang chủ",
   "homeNewsEmpty": "Chưa có tin nào.",
   "homeNewsError": "Không tải được tin giáo dục.",
+  "homeNewsLoadMore": "Tải thêm tin",
   "homeNewsOpenFailed": "Không mở được bài viết.",
   "homeNewsRetry": "Thử lại",
   "homeNewsSource": "Nguồn: VnExpress",

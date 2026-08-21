@@ -22,9 +22,9 @@ class NewsCache {
 
   static const String _key = 'education_news';
 
-  /// Số tin cất tối đa. Bằng đúng số tin một lần tải về — cất nhiều hơn cũng
-  /// không hiện thêm được, mà `SharedPreferences` thì đọc/ghi cả chuỗi một lần.
-  static const int _limit = 12;
+  /// Số tin cất tối đa, bằng đúng số tin một lần tải về — cũng là toàn bộ mẻ
+  /// RSS trả về (60 tin). Cất đủ thì "tải thêm" chạy được hết cả khi offline.
+  static const int _limit = 60;
 
   /// Bản đang giữ trong RAM, tránh đọc đĩa nhiều lần trong một phiên.
   static List<NewsItem>? _memory;

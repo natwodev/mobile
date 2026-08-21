@@ -26,7 +26,7 @@ class NewsService {
   ///
   /// Ném lỗi khi tải/đọc hỏng — phần giao diện bắt lấy để hiện nút "thử lại",
   /// vì tin tức hỏng KHÔNG được phép làm hỏng cả Trang chủ.
-  Future<List<NewsItem>> fetchEducationNews({int limit = 12}) async {
+  Future<List<NewsItem>> fetchEducationNews({int limit = 60}) async {
     final response = await http.get(Uri.parse(feedUrl)).timeout(timeout);
 
     if (response.statusCode != 200) {

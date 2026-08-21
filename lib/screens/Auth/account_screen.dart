@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
@@ -111,6 +112,66 @@ class _AccountScreenState extends State<AccountScreen> {
     }
   }
 
+  /// Cạnh ảnh đại diện sau khi cắt, tính bằng điểm ảnh.
+  ///
+  /// 512 để KHỚP BẢN WEB (`frontend_manage/.../AvatarCropModal.tsx` cũng xuất
+  /// đúng 512x512). Hai bên cùng một con số thì ảnh tải lên từ web hay từ app
+  /// đều như nhau, máy chủ không phải đoán.
+  static const int _avatarSize = 512;
+
+  /// Trần dung lượng tệp NGUỒN người dùng chọn.
+  ///
+  /// Đây là trần của máy chủ. Ảnh sau khi cắt luôn nhỏ hơn nhiều (512x512 JPEG
+  /// chỉ chừng 50-100KB), nên mức này chỉ để chặn tệp gốc quá nặng trước khi
+  /// đưa vào bộ cắt.
+  static const int _maxAvatarBytes = 10 * 1024 * 1024;
+
+  /// Mở màn cắt ảnh VUÔNG, khung xem hình tròn.
+  ///
+  /// Vuông vì ảnh đại diện hiển thị trong khung tròn ở mọi nơi — để người dùng
+  /// cắt chữ nhật thì lúc hiện lên bị xén hai bên, mặt lệch khỏi khung.
+  /// `lockAspectRatio` chặn luôn khả năng kéo lệch tỉ lệ.
+  Future<CroppedFile?> _cropSquare(String sourcePath) async {
+    final l10n = AppLocalizations.of(context);
+
+    try {
+      return await ImageCropper().cropImage(
+        sourcePath: sourcePath,
+        aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
+        maxWidth: _avatarSize,
+        maxHeight: _avatarSize,
+        compressFormat: ImageCompressFormat.jpg,
+        compressQuality: 90,
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: l10n.authAvatarCropTitle,
+            toolbarColor: AppColors.barBg,
+            toolbarWidgetColor: Colors.white,
+            backgroundColor: Colors.black,
+            activeControlsWidgetColor: AppColors.accent,
+            // Khung xem hình tròn cho khớp chỗ ảnh sẽ hiện.
+            cropStyle: CropStyle.circle,
+            lockAspectRatio: true,
+            // Giấu hàng nút tỉ lệ: đã khoá vuông thì mấy nút đó bấm vào không
+            // đổi được gì, để lại chỉ tổ người dùng bấm rồi thắc mắc.
+            hideBottomControls: true,
+          ),
+          IOSUiSettings(
+            title: l10n.authAvatarCropTitle,
+            cropStyle: CropStyle.circle,
+            aspectRatioLockEnabled: true,
+            resetAspectRatioEnabled: false,
+          ),
+        ],
+      );
+    } catch (e) {
+      debugPrint('Lỗi cắt ảnh đại diện: $e');
+      if (!mounted) return null;
+      _showError(AppLocalizations.of(context).msgAvatarUploadFailed);
+      return null;
+    }
+  }
+
   /// Hỏi nguồn ảnh rồi tải lên.
   ///
   /// Tách "chọn nguồn" thành một bảng riêng thay vì mở thẳng thư viện: máy
@@ -174,12 +235,13 @@ class _AccountScreenState extends State<AccountScreen> {
     try {
       picked = await ImagePicker().pickImage(
         source: source,
-        // Thu ảnh ngay lúc chọn: máy 50MP xuất ra tệp 8-12MB, vượt trần 10MB
-        // của máy chủ mà chẳng để làm gì — ảnh đại diện lớn nhất chỉ hiển thị
-        // ở 70px. Thu ở đây cũng đỡ được cả thời gian tải lên qua 4G.
-        maxWidth: 1024,
-        maxHeight: 1024,
-        imageQuality: 85,
+        // Thu bớt ngay lúc chọn, nhưng KHÔNG thu về 512 luôn: người dùng còn
+        // phải cắt, mà cắt trên ảnh đã nhỏ sẵn thì phần giữ lại còn nhỏ hơn
+        // nữa và vỡ hạt. 2048 đủ rộng để cắt thoải mái, vẫn chặn được ảnh
+        // 50MP nguyên bản.
+        maxWidth: 2048,
+        maxHeight: 2048,
+        imageQuality: 90,
       );
     } catch (e) {
       // Người dùng từ chối quyền máy ảnh/thư viện thì plugin ném lỗi chứ không
@@ -192,8 +254,25 @@ class _AccountScreenState extends State<AccountScreen> {
 
     if (picked == null || !mounted) return;
 
+    // Chặn tệp quá nặng NGAY, trước khi mở màn cắt: máy 50MP xuất ra tệp
+    // 8-12MB, đưa thẳng vào bộ cắt là nó phải giải nén cả tấm vào RAM và máy
+    // yếu dễ bị hệ điều hành thu hồi. Báo sớm vẫn hơn treo rồi chết.
+    final int bytes = await picked.length();
+    if (!mounted) return;
+    if (bytes > _maxAvatarBytes) {
+      _showError(
+        AppLocalizations.of(
+          context,
+        ).authAvatarTooLarge(_maxAvatarBytes ~/ (1024 * 1024)),
+      );
+      return;
+    }
+
+    final CroppedFile? cropped = await _cropSquare(picked.path);
+    if (cropped == null || !mounted) return;
+
     setState(() => _uploadingAvatar = true);
-    final result = await _userService.uploadAvatar(picked.path);
+    final result = await _userService.uploadAvatar(cropped.path);
     if (!mounted) return;
     setState(() => _uploadingAvatar = false);
 
@@ -430,7 +509,7 @@ class _AccountScreenState extends State<AccountScreen> {
             const SizedBox(height: 20),
             ElevatedButton.icon(
               onPressed: _loadProfile,
-              icon: const Icon(Icons.refresh),
+              icon: const HugeIcon(icon: HugeIcons.strokeRoundedRefresh),
               label: Text(l10n.commonRetry),
             ),
             const SizedBox(height: 12),
@@ -583,7 +662,7 @@ class _AccountScreenState extends State<AccountScreen> {
       title: l10n.authPersonalInfoTitle,
       action: TextButton.icon(
         onPressed: _openEditProfile,
-        icon: const Icon(Icons.edit_outlined, size: 18),
+        icon: const HugeIcon(icon: HugeIcons.strokeRoundedEdit02, size: 18),
         label: Text(l10n.authEdit),
         style: TextButton.styleFrom(foregroundColor: AppColors.accent),
       ),
@@ -643,7 +722,10 @@ class _AccountScreenState extends State<AccountScreen> {
                     isLast: true,
                   ),
                 ),
-                const Icon(Icons.chevron_right, color: Colors.grey),
+                const HugeIcon(
+                  icon: HugeIcons.strokeRoundedArrowRight01,
+                  color: Colors.grey,
+                ),
               ],
             ),
           ),
@@ -732,7 +814,10 @@ class _AccountScreenState extends State<AccountScreen> {
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: Colors.grey),
+            const HugeIcon(
+              icon: HugeIcons.strokeRoundedArrowRight01,
+              color: Colors.grey,
+            ),
           ],
         ),
       ),
@@ -833,7 +918,7 @@ class _AccountScreenState extends State<AccountScreen> {
       width: double.infinity,
       child: OutlinedButton.icon(
         onPressed: _openChangePassword,
-        icon: const Icon(Icons.lock_outline),
+        icon: const HugeIcon(icon: HugeIcons.strokeRoundedSquareLock01),
         label: Text(AppLocalizations.of(context).authChangePasswordTitle),
       ),
     );
