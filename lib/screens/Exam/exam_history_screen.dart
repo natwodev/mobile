@@ -208,7 +208,10 @@ class _ExamHistoryScreenState extends State<ExamHistoryScreen> {
       onRefresh: _handleRefresh,
       child: Scaffold(
         backgroundColor: Colors.white,
-        appBar: AppTopBar(title: AppLocalizations.of(context).historyTitle),
+        appBar: AppTopBar(
+          title: AppLocalizations.of(context).historyTitle,
+          tab: AppTopBarTab.history,
+        ),
         // `bottom: false` để danh sách chạy tiếp xuống dưới dải tab kính mờ —
         // khoảng chừa cho dải đã nằm trong padding cuối của `ListView`.
         body: SafeArea(bottom: false, child: _buildBody()),

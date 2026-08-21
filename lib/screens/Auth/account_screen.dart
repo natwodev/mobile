@@ -429,7 +429,10 @@ class _AccountScreenState extends State<AccountScreen> {
       onRefresh: _handleRefresh,
       child: Scaffold(
         backgroundColor: Colors.white,
-        appBar: AppTopBar(title: AppLocalizations.of(context).authAccountTitle),
+        appBar: AppTopBar(
+          title: AppLocalizations.of(context).authAccountTitle,
+          tab: AppTopBarTab.account,
+        ),
         // `bottom: false` để danh sách chạy tiếp xuống dưới dải tab kính mờ —
         // khoảng chừa cho dải đã nằm trong padding cuối của `ListView`.
         body: SafeArea(bottom: false, child: _buildBody()),
