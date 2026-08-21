@@ -3,6 +3,10 @@ plugins {
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+    // Phải đứng SAU com.android.application. KHÔNG cần thêm firebase-bom hay
+    // firebase-analytics như trang hướng dẫn gợi ý: các gói FlutterFire
+    // (firebase_core, firebase_messaging) đã tự kéo phần native của chúng.
+    id("com.google.gms.google-services")
 }
 
 android {
