@@ -67,6 +67,20 @@ class PushService {
 
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
+    // CHỈ bản debug: in token ra để dán vào Firebase Console → Cloud Messaging
+    // → "Send test message". Nhờ đó thử được đường dây FCM mà không cần backend
+    // và không cần đăng nhập — bước cô lập lỗi hữu ích nhất khi mới gắn Firebase.
+    //
+    // Không in ở bản phát hành: ai đọc được token là gửi thông báo tới đúng máy
+    // đó được.
+    if (kDebugMode) {
+      try {
+        debugPrint('[push] FCM token: ${await _fcm!.getToken()}');
+      } catch (error) {
+        debugPrint('[push] không lấy được token: $error');
+      }
+    }
+
     // App ĐANG MỞ: hệ điều hành giao thẳng dữ liệu cho app và KHÔNG tự vẽ gì.
     // Không tự gọi local ở đây thì người dùng đang mở app sẽ chẳng thấy thông
     // báo nào — và đây là điều hay bị tưởng nhầm là lỗi cấu hình.

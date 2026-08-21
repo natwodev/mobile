@@ -21,7 +21,15 @@ const AndroidNotificationChannel kExamChannel = AndroidNotificationChannel(
   'Thông báo kỳ thi',
   description: 'Nhắc lịch thi, kết quả và thông báo từ giám thị',
   importance: Importance.high,
+  sound: kExamSound,
 );
+
+/// Âm báo riêng, nằm ở `android/app/src/main/res/raw/notification_sound.mp3`.
+///
+/// Tên tài nguyên KHÔNG kèm đuôi `.mp3`, và tên file phải toàn chữ thường kèm
+/// gạch dưới — aapt từ chối biên dịch res có gạch ngang hay chữ hoa.
+const RawResourceAndroidNotificationSound kExamSound =
+    RawResourceAndroidNotificationSound('notification_sound');
 
 /// Chi tiết dùng chung cho mọi thông báo của app, để một chỗ cho khỏi trôi dạt.
 const NotificationDetails kExamNotificationDetails = NotificationDetails(
@@ -31,6 +39,9 @@ const NotificationDetails kExamNotificationDetails = NotificationDetails(
     channelDescription: 'Nhắc lịch thi, kết quả và thông báo từ giám thị',
     importance: Importance.high,
     priority: Priority.high,
+    // Nhắc lại cho Android 7 trở xuống: bản cũ chưa có khái niệm kênh nên âm
+    // báo phải khai ở từng thông báo, không thừa.
+    sound: kExamSound,
   ),
   iOS: DarwinNotificationDetails(),
 );

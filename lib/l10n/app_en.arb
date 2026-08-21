@@ -94,6 +94,7 @@
   "commonConfirm": "Confirm",
   "commonLoading": "Loading...",
   "commonNotUpdated": "Not updated",
+  "commonReloadSuccess": "Data reloaded successfully",
   "commonRetry": "Retry",
   "commonSave": "Save",
   "contactCopied": "Copied {value}",

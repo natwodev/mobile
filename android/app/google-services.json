@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "593705302528",
+    "project_id": "tracnghiem-a237d",
+    "storage_bucket": "tracnghiem-a237d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:593705302528:android:b7e01a4d5e55d47040b6e5",
+        "android_client_info": {
+          "package_name": "com.natwodev1.quizzmobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBdWKakeZwwzcqZ3GTZlGZA_nQr0OwxJNs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

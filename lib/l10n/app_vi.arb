@@ -101,6 +101,7 @@
   "commonConfirm": "Xác nhận",
   "commonLoading": "Đang tải...",
   "commonNotUpdated": "Chưa cập nhật",
+  "commonReloadSuccess": "Tải lại dữ liệu thành công",
   "commonRetry": "Thử lại",
   "commonSave": "Lưu",
   "contactCopied": "Đã sao chép {value}",
