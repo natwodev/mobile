@@ -8,8 +8,9 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../widget/common/app_buttons.dart';
 import '../../widget/common/app_modal.dart';
 import '../../widget/common/app_toast.dart';
+import '../../widget/common/app_top_bar.dart';
 import '../../widget/common/app_refresh_indicator.dart';
-import '../../widget/common/refresh_feedback.dart';
+import '../../widget/common/success_banner.dart';
 import '../../l10n/locale_controller.dart';
 import '../../models/student.dart';
 import '../../services/auth/user_services.dart';
@@ -204,8 +205,14 @@ class _AccountScreenState extends State<AccountScreen> {
     AppToast.show(context, kind: AppToastKind.error, title: message);
   }
 
+  /// Xác nhận một việc người dùng vừa làm xong: lưu hồ sơ, đổi mật khẩu, đổi
+  /// ảnh đại diện.
+  ///
+  /// Dùng thanh báo chung chứ không dùng [AppToast]: cả ba đều là phản hồi cho
+  /// thao tác của chính người dùng, cùng loại với "tải lại xong" — nên phải
+  /// hiện cùng một kiểu. Toast để dành cho tin từ hệ thống.
   void _showMessage(String message) {
-    AppToast.show(context, kind: AppToastKind.success, title: message);
+    showSuccessBanner(context, message);
   }
 
   Future<void> _confirmLogout() async {
@@ -320,21 +327,30 @@ class _AccountScreenState extends State<AccountScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text(
-          AppLocalizations.of(context).authAccountTitle,
-          style: const TextStyle(fontSize: 22, color: Colors.white),
-        ),
-        backgroundColor: AppColors.barBg,
-        centerTitle: true,
-        automaticallyImplyLeading: false,
+    // AppRefreshIndicator bọc NGOÀI Scaffold chứ không nằm trong body: vòng
+    // xoay là con của widget nào thì vẽ theo thứ tự của widget đó, đặt trong
+    // body là AppBar luôn vẽ đè lên và vòng xoay bị che mất. Bọc ngoài thì nó
+    // nổi trên cả AppBar, rơi ngay dưới thanh trạng thái — giống hệt Trang chủ
+    // vốn không có AppBar.
+    return AppRefreshIndicator(
+      edgeOffset: MediaQuery.paddingOf(context).top,
+      onRefresh: _handleRefresh,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppTopBar(title: AppLocalizations.of(context).authAccountTitle),
+        // `bottom: false` để danh sách chạy tiếp xuống dưới dải tab kính mờ —
+        // khoảng chừa cho dải đã nằm trong padding cuối của `ListView`.
+        body: SafeArea(bottom: false, child: _buildBody()),
       ),
-      // `bottom: false` để danh sách chạy tiếp xuống dưới dải tab kính mờ —
-      // khoảng chừa cho dải đã nằm trong padding cuối của `ListView`.
-      body: SafeArea(bottom: false, child: _buildBody()),
     );
+  }
+
+  Future<void> _handleRefresh() async {
+    await _loadProfile();
+    // _loadProfile giữ bản đã lưu khi mạng hỏng, và chỉ đặt _error lúc không
+    // còn gì để hiện. Bám vào đó nên không phải đổi chữ ký hàm.
+    if (!mounted || _error != null) return;
+    showRefreshDone(context);
   }
 
   Widget _buildBody() {
@@ -350,37 +366,28 @@ class _AccountScreenState extends State<AccountScreen> {
 
     final student = _student!;
 
-    return AppRefreshIndicator(
-      onRefresh: () async {
-        await _loadProfile();
-        // _loadProfile giữ bản đã lưu khi mạng hỏng, và chỉ đặt _error lúc
-        // không còn gì để hiện. Bám vào đó nên không phải đổi chữ ký hàm.
-        if (!mounted || _error != null) return;
-        showRefreshDone(context);
-      },
-      child: ListView(
-        controller: widget.scrollController,
-        padding: EdgeInsets.fromLTRB(
-          16,
-          16,
-          16,
-          16 + MediaQuery.paddingOf(context).bottom,
-        ),
-        children: [
-          _buildHeaderCard(student),
-          const SizedBox(height: 16),
-          _buildPersonalInfoCard(student),
-          const SizedBox(height: 16),
-          _buildSettingsCard(),
-          const SizedBox(height: 16),
-          _buildSupportCard(),
-          const SizedBox(height: 24),
-          _buildChangePasswordButton(),
-          const SizedBox(height: 12),
-          _buildLogoutButton(),
-          const SizedBox(height: 16),
-        ],
+    return ListView(
+      controller: widget.scrollController,
+      padding: EdgeInsets.fromLTRB(
+        16,
+        16,
+        16,
+        16 + MediaQuery.paddingOf(context).bottom,
       ),
+      children: [
+        _buildHeaderCard(student),
+        const SizedBox(height: 16),
+        _buildPersonalInfoCard(student),
+        const SizedBox(height: 16),
+        _buildSettingsCard(),
+        const SizedBox(height: 16),
+        _buildSupportCard(),
+        const SizedBox(height: 24),
+        _buildChangePasswordButton(),
+        const SizedBox(height: 12),
+        _buildLogoutButton(),
+        const SizedBox(height: 16),
+      ],
     );
   }
 

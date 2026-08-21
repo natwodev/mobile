@@ -9,8 +9,9 @@ import '../../models/exam_history_item.dart';
 import '../../services/auth/user_services.dart';
 import '../../widget/common/app_buttons.dart';
 import '../../widget/common/app_toast.dart';
+import '../../widget/common/app_top_bar.dart';
 import '../../widget/common/app_refresh_indicator.dart';
-import '../../widget/common/refresh_feedback.dart';
+import '../../widget/common/success_banner.dart';
 
 /// Màn "Lịch sử làm bài" — tab giữa của thanh điều hướng.
 ///
@@ -199,23 +200,28 @@ class _ExamHistoryScreenState extends State<ExamHistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text(
-          AppLocalizations.of(context).historyTitle,
-          style: const TextStyle(fontSize: 22, color: Colors.white),
-        ),
-        backgroundColor: AppColors.barBg,
-        centerTitle: true,
-        // Đây là một tab, không phải màn được đẩy chồng lên: có nút quay lại
-        // thì bấm vào chẳng đi đâu được.
-        automaticallyImplyLeading: false,
+    // Bọc NGOÀI Scaffold để vòng xoay nổi trên cả AppBar — xem ghi chú cùng
+    // kiểu ở account_screen. Bọc một lần ở đây cũng thay luôn hai
+    // AppRefreshIndicator rời trước kia (một cho danh sách, một cho màn rỗng).
+    return AppRefreshIndicator(
+      edgeOffset: MediaQuery.paddingOf(context).top,
+      onRefresh: _handleRefresh,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppTopBar(title: AppLocalizations.of(context).historyTitle),
+        // `bottom: false` để danh sách chạy tiếp xuống dưới dải tab kính mờ —
+        // khoảng chừa cho dải đã nằm trong padding cuối của `ListView`.
+        body: SafeArea(bottom: false, child: _buildBody()),
       ),
-      // `bottom: false` để danh sách chạy tiếp xuống dưới dải tab kính mờ —
-      // khoảng chừa cho dải đã nằm trong padding cuối của `ListView`.
-      body: SafeArea(bottom: false, child: _buildBody()),
     );
+  }
+
+  Future<void> _handleRefresh() async {
+    await _loadHistory(showSpinner: false);
+    // _loadHistory đặt _error khi API trả thất bại; im lặng trong trường hợp
+    // đó, chứ kêu "thành công" lúc hỏng còn tệ hơn không báo gì.
+    if (!mounted || _error != null) return;
+    showRefreshDone(context);
   }
 
   Widget _buildBody() {
@@ -235,33 +241,24 @@ class _ExamHistoryScreenState extends State<ExamHistoryScreen> {
 
     final l10n = AppLocalizations.of(context);
 
-    return AppRefreshIndicator(
-      onRefresh: () async {
-        await _loadHistory(showSpinner: false);
-        // _loadHistory đặt _error khi API trả thất bại; im lặng trong trường
-        // hợp đó, chứ kêu "thành công" lúc hỏng còn tệ hơn không báo gì.
-        if (!mounted || _error != null) return;
-        showRefreshDone(context);
-      },
-      child: ListView(
-        controller: widget.scrollController,
-        padding: EdgeInsets.fromLTRB(
-          16,
-          12,
-          16,
-          24 + MediaQuery.paddingOf(context).bottom,
-        ),
-        children: [
-          Text(
-            l10n.historySubtitle,
-            style: const TextStyle(fontSize: 13, color: AppColors.inkMuted),
-          ),
-          const SizedBox(height: 14),
-          _buildSummary(l10n),
-          const SizedBox(height: 18),
-          for (final item in _items) _buildExamCard(l10n, item),
-        ],
+    return ListView(
+      controller: widget.scrollController,
+      padding: EdgeInsets.fromLTRB(
+        16,
+        12,
+        16,
+        24 + MediaQuery.paddingOf(context).bottom,
       ),
+      children: [
+        Text(
+          l10n.historySubtitle,
+          style: const TextStyle(fontSize: 13, color: AppColors.inkMuted),
+        ),
+        const SizedBox(height: 14),
+        _buildSummary(l10n),
+        const SizedBox(height: 18),
+        for (final item in _items) _buildExamCard(l10n, item),
+      ],
     );
   }
 
@@ -272,25 +269,16 @@ class _ExamHistoryScreenState extends State<ExamHistoryScreen> {
   /// không bắt được cử chỉ — trong khi màn rỗng lại chính là chỗ người dùng
   /// muốn kéo để thử lại nhất.
   Widget _buildRefreshable({required Widget child}) {
-    return AppRefreshIndicator(
-      onRefresh: () async {
-        await _loadHistory(showSpinner: false);
-        // _loadHistory đặt _error khi API trả thất bại; im lặng trong trường
-        // hợp đó, chứ kêu "thành công" lúc hỏng còn tệ hơn không báo gì.
-        if (!mounted || _error != null) return;
-        showRefreshDone(context);
-      },
-      child: LayoutBuilder(
-        builder: (context, constraints) => SingleChildScrollView(
-          // Dùng CHUNG controller với ListView ở nhánh có dữ liệu: hai vùng
-          // cuộn này là hai trạng thái loại trừ nhau, không bao giờ cùng tồn
-          // tại — nếu cùng lúc thì Flutter ném lỗi gắn trùng controller.
-          controller: widget.scrollController,
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: constraints.maxHeight),
-            child: Center(child: child),
-          ),
+    return LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        // Dùng CHUNG controller với ListView ở nhánh có dữ liệu: hai vùng
+        // cuộn này là hai trạng thái loại trừ nhau, không bao giờ cùng tồn
+        // tại — nếu cùng lúc thì Flutter ném lỗi gắn trùng controller.
+        controller: widget.scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: constraints.maxHeight),
+          child: Center(child: child),
         ),
       ),
     );

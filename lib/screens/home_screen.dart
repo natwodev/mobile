@@ -9,7 +9,7 @@ import '../widget/common/app_buttons.dart';
 import '../widget/home/home_banner_carousel.dart';
 import '../widget/home/home_news_section.dart';
 import '../widget/common/app_refresh_indicator.dart';
-import '../widget/common/refresh_feedback.dart';
+import '../widget/common/success_banner.dart';
 import '../widget/home/quiz_answer_banner.dart';
 
 class HomeScreen extends StatelessWidget {
