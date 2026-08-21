@@ -4,6 +4,7 @@ import 'package:hugeicons/hugeicons.dart';
 import '../screens/Exam/quick_exam_code_screen.dart';
 import '../screens/notification/notification_screen.dart';
 import '../screens/scan_qr/scan_exam_qr_screen.dart';
+import '../controller/notification_badge.dart';
 import '../l10n/generated/app_localizations.dart';
 import '../widget/common/app_buttons.dart';
 import '../widget/home/home_banner_carousel.dart';
@@ -153,35 +154,8 @@ class HomeScreen extends StatelessWidget {
             right: 16,
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                // Viền cùng màu với bóng mờ, nhưng nhạt hơn hẳn và chỉ 0.5px.
-                //
-                // Bóng toả rộng nên chỗ giáp mép thẻ đã loãng gần hết màu —
-                // thẻ trắng đặt trên băng ảnh sáng thì mất luôn đường bao. Viền
-                // này vẽ lại đúng cái mép đó. Cùng khuôn với viền thanh báo
-                // (`app_banner.dart`): cùng màu chủ thể, hạ độ đục xuống 40%,
-                // dày nửa điểm ảnh logic.
-                border: Border.all(
-                  color: AppColors.accent.withValues(alpha: 0.4),
-                  width: 0.5,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    // Bóng MỎNG mà ĐẬM, thay cho rộng mà nhạt như trước
-                    // (25px @ 18%). Toả 25px làm màu bị dàn mỏng đến mức đặt
-                    // trên băng ảnh nhiều màu là gần như mất hút, thẻ trông
-                    // như dán phẳng lên. Thu về 12px rồi nâng độ đục lên 38%
-                    // thì viền sáng bám sát mép thẻ, đọc ra là "nổi lên" rõ
-                    // ràng mà không loang ra nền.
-                    color: AppColors.accent.withValues(alpha: 0.42),
-                    blurRadius: 8,
-                    offset: Offset(0, 3),
-                    spreadRadius: 0,
-                  ),
-                ],
-              ),
+              // Cùng viền và bóng với nút chuông phía trên — xem `AppSurfaces`.
+              decoration: AppSurfaces.card(radius: 20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -235,31 +209,80 @@ class HomeScreen extends StatelessWidget {
   Widget _buildNotificationButton(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
-    return Material(
-      color: Colors.white,
-      shape: const CircleBorder(),
-      clipBehavior: Clip.antiAlias,
-      elevation: 2,
+    final Widget button = Container(
+      // Cùng viền và bóng với thẻ 2 nút nhanh ngay bên dưới — xem `AppSurfaces`.
+      // Trước đây nút này dùng `elevation: 2` của Material, cho bóng xám trung
+      // tính không ăn nhập với mảng xanh còn lại.
+      decoration: AppSurfaces.circle(),
       child: IconButton(
         tooltip: l10n.notificationsTitle,
         // Siết đệm và vùng chạm tối thiểu: mặc định IconButton là 48x48 kèm
         // đệm 8 mỗi bên, để nguyên thì vòng trắng phình thành một mảng to
         // trên banner thay vì ôm sát cái chuông.
-        padding: const EdgeInsets.all(8),
-        constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+        padding: const EdgeInsets.all(7),
+        constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
         visualDensity: VisualDensity.compact,
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          await Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const NotificationScreen()),
           );
+          // Hỏi lại lúc quay ra: người dùng vừa đọc thư trong đó, con số trên
+          // chuông phải khớp ngay chứ không đợi tới lần mở app sau.
+          await NotificationBadge.instance.refresh();
         },
         icon: HugeIcon(
           icon: HugeIcons.strokeRoundedNotification02,
           color: AppColors.accent,
-          size: 22,
+          size: 20,
         ),
       ),
+    );
+
+    // Con số thư chưa đọc. Nghe thẳng bộ đếm dùng chung nên đọc thư ở màn
+    // chuông là chỗ này đổi theo, khỏi phải truyền trạng thái qua lại.
+    return AnimatedBuilder(
+      animation: NotificationBadge.instance,
+      builder: (context, _) {
+        final int count = NotificationBadge.instance.count;
+        if (count <= 0) return button;
+
+        return Stack(
+          // Cho phép con số nhô ra ngoài vòng tròn: gói gọn bên trong thì nó
+          // đè lên chính cái chuông.
+          clipBehavior: Clip.none,
+          children: [
+            button,
+            Positioned(
+              right: -2,
+              top: -2,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                constraints: const BoxConstraints(minWidth: 18),
+                decoration: BoxDecoration(
+                  color: AppColors.danger,
+                  borderRadius: BorderRadius.circular(9),
+                  // Viền trắng tách con số khỏi cái chuông ngay phía dưới,
+                  // không thì hai hình dính vào nhau thành một khối đỏ nhoè.
+                  border: Border.all(color: Colors.white, width: 1.5),
+                ),
+                child: Text(
+                  // Quá 99 thì rút gọn: con số bốn chữ số kéo dài cái badge
+                  // ngang bằng cả nút chuông.
+                  count > 99 ? '99+' : '$count',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    height: 1.2,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 

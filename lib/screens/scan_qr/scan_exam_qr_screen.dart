@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../widget/common/app_top_bar.dart';
+
 import '../../l10n/generated/app_localizations.dart';
-import '../../widget/common/app_buttons.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'utils/qr_validator.dart';
 import 'widgets/qr_scanner_overlay.dart';
@@ -137,10 +138,9 @@ class _ScanExamQrScreenState extends State<ScanExamQrScreen> {
     );
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context).homeQrScanTitle),
-        backgroundColor: AppColors.barBg,
-        foregroundColor: Colors.white,
+      appBar: AppTopBar(
+        title: AppLocalizations.of(context).homeQrScanTitle,
+        showBack: true,
       ),
       body: Stack(
         children: [

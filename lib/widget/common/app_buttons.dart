@@ -6,6 +6,10 @@ import 'app_colors.dart';
 // hai đường import cho một việc.
 export 'app_colors.dart';
 
+// Xuất lại luôn bộ mặt nổi, cùng lý do: một đường import cho cả bảng màu, bộ
+// nút và kiểu thẻ dùng chung.
+export 'app_surfaces.dart';
+
 /// BỘ NÚT DÙNG CHUNG cho toàn app.
 ///
 /// Trước file này, mỗi nút tự khai kiểu dáng tại chỗ và không chỗ nào giống

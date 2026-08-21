@@ -606,9 +606,10 @@ class _AccountScreenState extends State<AccountScreen> {
 
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
+      // Thẻ đầu trang: cùng viền và bóng với ba thẻ dưới, chỉ khác màu nền.
+      decoration: AppSurfaces.card(
         color: const Color.fromARGB(79, 161, 234, 253),
-        borderRadius: BorderRadius.circular(12),
+        soft: true,
       ),
       child: Row(
         children: [
@@ -833,11 +834,7 @@ class _AccountScreenState extends State<AccountScreen> {
     Widget? action,
   }) {
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
+      decoration: AppSurfaces.card(soft: true),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

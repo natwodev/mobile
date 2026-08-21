@@ -21,26 +21,57 @@ enum AppTopBarTab {
   final List<List<dynamic>> icon;
 }
 
-/// Thanh tiêu đề dùng chung cho các màn tab.
+/// Thanh tiêu đề dùng chung cho MỌI màn có thanh tiêu đề.
 ///
-/// Chỉ còn là một lớp mỏng đặt sẵn cấu hình cho [AnimatedAppBar] — gói nằm
-/// cùng workspace (`../animated_app_bar`). Phần dựng thanh, đổ màu chuyển sắc
-/// và mấy cái bẫy của Flutter đã nằm hết trong gói.
+/// Chỉ là một lớp mỏng đặt sẵn cấu hình cho [AnimatedAppBar] — gói nằm cùng
+/// workspace (`../animated_app_bar`). Phần dựng thanh, đổ màu chuyển sắc và
+/// mấy cái bẫy của Flutter đã nằm hết trong gói.
 ///
 /// Giữ lại lớp này thay vì gọi thẳng [AnimatedAppBar] ở từng màn: bảng màu và
 /// cỡ chữ là chuyện riêng của app, còn cách dựng thanh là chuyện chung. Có lớp
 /// này thì đổi màu app chỉ sửa MỘT chỗ, và các màn không phải biết tới gói.
+///
+/// Trước đây chỉ hai màn tab dùng lớp này, chín màn còn lại tự dựng `AppBar`
+/// thô. Mỗi màn một kiểu: Quét mã không căn giữa tiêu đề lại để cỡ chữ mặc
+/// định 22 in đậm, Kết quả bài thi dùng hẳn `Colors.blue` thay vì màu của app,
+/// bảy màn kia nền phẳng cỡ 20. Giờ tất cả đi qua đây.
 class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
-  const AppTopBar({super.key, required this.title, this.tab});
+  const AppTopBar({
+    super.key,
+    this.title,
+    this.titleWidget,
+    this.tab,
+    this.showBack = false,
+    this.actions,
+  }) : assert(
+         title != null || titleWidget != null,
+         'Phải có title hoặc titleWidget.',
+       );
 
   /// Cạnh ô chứa mỗi icon nền. Tách hằng vì phải khớp với `size` của chính
   /// `HugeIcon` bên trong: lệch nhau thì icon bị cắt hoặc lọt thỏm trong ô.
   static const double _driftIconSize = 34;
 
-  final String title;
+  final String? title;
+
+  /// Tiêu đề tự dựng, cho màn cần chữ chạy ngang khi tên đề quá dài.
+  final Widget? titleWidget;
 
   /// Tab đang đứng. Bỏ trống thì thanh chỉ có dải màu, không rải icon.
+  ///
+  /// Chỉ màn TAB mới rải icon. Màn con là nơi người dùng vào làm đúng một việc
+  /// — đổi mật khẩu, xem kết quả — nên nền động ở đó chỉ tổ tranh chỗ với nội
+  /// dung, nhất là khi bên phải còn đồng hồ đếm ngược.
   final AppTopBarTab? tab;
+
+  /// Hiện nút quay lại. Bật cho màn được đẩy chồng lên.
+  ///
+  /// Mặc định `false` vì màn tab là nơi lớp này ra đời: ở đó có nút quay lại
+  /// thì bấm vào chẳng đi đâu được, không có gì trong ngăn xếp để quay về.
+  final bool showBack;
+
+  /// Nút phụ bên phải, ví dụ đồng hồ đếm ngược ở màn làm bài.
+  final List<Widget>? actions;
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -51,6 +82,8 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
 
     return AnimatedAppBar.gradientColors(
       title: title,
+      titleWidget: titleWidget,
+      actions: actions,
       iconDrift: currentTab == null
           ? null
           : AppBarIconDrift(
@@ -93,9 +126,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
         color: Colors.white,
         letterSpacing: 0.2,
       ),
-      // Đây là các màn TAB, không phải màn được đẩy chồng lên: có nút quay lại
-      // thì bấm vào chẳng đi đâu được.
-      automaticallyImplyLeading: false,
+      automaticallyImplyLeading: showBack,
     );
   }
 }

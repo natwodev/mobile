@@ -1116,6 +1116,19 @@ class AppLocalizationsVi extends AppLocalizations {
   String get msgValidationUsernameDuplicated => 'Tên đăng nhập đã tồn tại.';
 
   @override
+  String get notificationsError => 'Không tải được thông báo';
+
+  @override
+  String get notificationsErrorHint =>
+      'Kiểm tra kết nối mạng rồi kéo xuống để thử lại.';
+
+  @override
+  String get notificationsLoadMore => 'Tải thêm';
+
+  @override
+  String get notificationsMarkAllRead => 'Đọc tất cả';
+
+  @override
   String get notificationsEmptyMessage =>
       'Thông báo về ca thi, điểm và nhắc nhở của giáo viên sẽ hiện ở đây.';
 

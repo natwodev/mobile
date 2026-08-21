@@ -1,6 +1,10 @@
 import 'package:hugeicons/hugeicons.dart';
 import 'package:flutter/material.dart';
 
+import '../../widget/common/app_top_bar.dart';
+
+import '../../widget/common/app_inputs.dart';
+
 import '../../l10n/generated/app_localizations.dart';
 import '../../services/auth/user_services.dart';
 import '../../widget/common/app_buttons.dart';
@@ -70,15 +74,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text(
-          l10n.authChangePasswordTitle,
-          style: const TextStyle(fontSize: 20, color: Colors.white),
-        ),
-        backgroundColor: AppColors.barBg,
-        centerTitle: true,
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
+      appBar: AppTopBar(title: l10n.authChangePasswordTitle, showBack: true),
       body: SafeArea(
         child: Form(
           key: _formKey,
@@ -184,16 +180,15 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        prefixIcon: const HugeIcon(icon: HugeIcons.strokeRoundedSquareLock01),
+        prefixIcon: AppInputs.icon(HugeIcons.strokeRoundedSquareLock01),
         suffixIcon: IconButton(
-          icon: HugeIcon(
-            icon: obscure
+          icon: AppInputs.icon(
+            obscure
                 ? HugeIcons.strokeRoundedViewOff
                 : HugeIcons.strokeRoundedView,
           ),
           onPressed: onToggle,
         ),
-        border: const OutlineInputBorder(),
       ),
       validator: validator,
     );

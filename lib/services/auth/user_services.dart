@@ -7,6 +7,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../l10n/app_l10n.dart';
 import '../base_service.dart';
+import '../../controller/notification_badge.dart';
+import '../notification/notification_cache.dart';
 import '../profile_cache.dart';
 import '../../models/login.dart';
 import '../../models/api_result.dart';
@@ -550,6 +552,10 @@ class UserService extends BaseService {
     // Xoá hồ sơ đã lưu: máy dùng chung mà giữ lại là người sau đăng nhập vẫn
     // thấy tên người trước cho tới khi mạng trả về hồ sơ mới.
     await ProfileCache.clear();
+    // Hộp thư cũng vậy, và còn quan trọng hơn: đây là thư RIÊNG của một sinh
+    // viên, để lại là người đăng nhập sau mở chuông ra đọc được thư người trước.
+    await NotificationCache.clear();
+    NotificationBadge.instance.clear();
   }
 
   // Kiểm tra đã đăng nhập

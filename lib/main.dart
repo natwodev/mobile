@@ -6,6 +6,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'l10n/generated/app_localizations.dart';
 import 'l10n/locale_controller.dart';
 import 'widget/common/app_buttons.dart';
+import 'widget/common/app_inputs.dart';
 import 'component/HomeNavigation.dart';
 import 'controller/session_controller.dart';
 import 'services/notification/local_notification_service.dart';
@@ -67,38 +68,44 @@ void main() async {
 /// Tách khỏi thân [HutechCampusApp] để bộ test dựng được ĐÚNG theme thật thay
 /// vì một bản chép tay dễ lệch.
 ThemeData buildAppTheme() {
-  // appButtonThemes: cắm bộ nút dùng chung (xem `widget/common/app_buttons.dart`).
+  // appButtonThemes / appInputThemes: cắm bộ nút và bộ ô nhập dùng chung (xem
+  // `widget/common/app_buttons.dart` và `widget/common/app_inputs.dart`).
   //
   // Đây là chỗ sửa MỘT lần ăn cả app. Trước đây theme không khai
   // ElevatedButtonThemeData nào, nên nút không tự tô style rơi về mặc định
   // Material 3 — nền tím nhạt, chữ mờ, bo tròn hoàn toàn — còn nút có tô thì
   // mỗi chỗ tô một kiểu. Kết quả là 9 biến thể nút và 3 tông xanh khác nhau
   // cho cùng vai trò "hành động chính".
-  return appButtonThemes(
-    ThemeData(
-      // colorScheme thay cho `primarySwatch: Colors.blue`: primarySwatch giữ
-      // `colorScheme.primary` ở xanh Material #2196F3, nên mọi thứ ăn theo
-      // primary mà KHÔNG phải nút — con trỏ ô nhập, vòng quay chờ, công tắc —
-      // vẫn ra một tông xanh khác với nút. copyWith(primary:) để màu nhấn đúng
-      // bằng #2563EB chứ không phải sắc độ mà fromSeed tự sinh ra.
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: AppColors.accent,
-      ).copyWith(primary: AppColors.accent),
-      // Nút back của AppBar do Flutter TỰ CHÈN ([BackButton]) — không màn nào
-      // trong app đặt `leading` bằng tay, nên muốn đổi icon thì phải đổi ở đây.
-      // Sửa từng màn vừa sót vừa hỏng lại ngay khi thêm màn mới.
-      actionIconTheme: ActionIconThemeData(
-        backButtonIconBuilder: (context) {
-          // HugeIcon vẽ bằng SVG nên KHÔNG ăn màu của [IconTheme] như [Icon]:
-          // phải đọc màu đang hiệu lực ra rồi truyền thẳng vào `color`. Bỏ qua
-          // bước này thì mũi tên đen trên AppBar xanh — coi như mất nút back.
-          final iconTheme = IconTheme.of(context);
-          return HugeIcon(
-            icon: HugeIcons.strokeRoundedArrowLeft01,
-            color: iconTheme.color ?? Colors.white,
-            size: iconTheme.size ?? 24,
-          );
-        },
+  //
+  // Ô nhập cũng đúng câu chuyện đó: không khai InputDecorationThemeData nào nên
+  // mọi ô rơi về bo góc 4 của Material, còn màn nào tự tô thì tô một kiểu khác.
+  return appInputThemes(
+    appButtonThemes(
+      ThemeData(
+        // colorScheme thay cho `primarySwatch: Colors.blue`: primarySwatch giữ
+        // `colorScheme.primary` ở xanh Material #2196F3, nên mọi thứ ăn theo
+        // primary mà KHÔNG phải nút — con trỏ ô nhập, vòng quay chờ, công tắc —
+        // vẫn ra một tông xanh khác với nút. copyWith(primary:) để màu nhấn đúng
+        // bằng #2563EB chứ không phải sắc độ mà fromSeed tự sinh ra.
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppColors.accent,
+        ).copyWith(primary: AppColors.accent),
+        // Nút back của AppBar do Flutter TỰ CHÈN ([BackButton]) — không màn nào
+        // trong app đặt `leading` bằng tay, nên muốn đổi icon thì phải đổi ở đây.
+        // Sửa từng màn vừa sót vừa hỏng lại ngay khi thêm màn mới.
+        actionIconTheme: ActionIconThemeData(
+          backButtonIconBuilder: (context) {
+            // HugeIcon vẽ bằng SVG nên KHÔNG ăn màu của [IconTheme] như [Icon]:
+            // phải đọc màu đang hiệu lực ra rồi truyền thẳng vào `color`. Bỏ qua
+            // bước này thì mũi tên đen trên AppBar xanh — coi như mất nút back.
+            final iconTheme = IconTheme.of(context);
+            return HugeIcon(
+              icon: HugeIcons.strokeRoundedArrowLeft01,
+              color: iconTheme.color ?? Colors.white,
+              size: iconTheme.size ?? 24,
+            );
+          },
+        ),
       ),
     ),
   );

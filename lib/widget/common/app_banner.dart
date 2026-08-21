@@ -5,6 +5,7 @@ import '../../component/HomeNavigation.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../services/notification_sound_service.dart';
 import 'app_colors.dart';
+import 'app_surfaces.dart';
 
 /// Thanh báo đang hiện, giữ ở đây để cú kéo sau dẹp được cú kéo trước.
 ///
@@ -33,7 +34,7 @@ extension _BannerStyle on AppBannerKind {
   Color get color => switch (this) {
     AppBannerKind.success => const Color(0xFF16A34A),
     AppBannerKind.error => AppColors.danger,
-    AppBannerKind.warning => const Color(0xFFF59E0B),
+    AppBannerKind.warning => AppColors.warning,
     AppBannerKind.info => AppColors.accent,
   };
 
@@ -269,7 +270,10 @@ class _AppBannerState extends State<_AppBanner> with TickerProviderStateMixin {
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.accent.withValues(alpha: 0.30),
+                  // Màu theo TRẠNG THÁI, không cố định xanh. Trước đây viền lấy
+                  // theo `kind.color` còn bóng thì luôn `accent`, nên thanh báo
+                  // lỗi viền đỏ mà toả sáng xanh.
+                  color: widget.kind.color.withValues(alpha: 0.30),
                   // Độ lệch lên LUÔN BẰNG độ toả. Bóng lan ra mọi phía chừng
                   // `blurRadius`, nên đẩy lên đúng chừng ấy thì mép dưới của
                   // bóng dừng lại ngay ở đáy thanh báo — không còn pixel nào
@@ -297,10 +301,7 @@ class _AppBannerState extends State<_AppBanner> with TickerProviderStateMixin {
               // của nó chỉ là tách thanh báo khỏi nền trắng phía sau.
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
-                side: BorderSide(
-                  color: widget.kind.color.withValues(alpha: 0.4),
-                  width: 0.5,
-                ),
+                side: AppSurfaces.side(tint: widget.kind.color),
               ),
               clipBehavior: Clip.antiAlias,
               child: Column(
@@ -389,10 +390,7 @@ class _AppBannerState extends State<_AppBanner> with TickerProviderStateMixin {
             // chạm sát viền, nhìn ra là chật chứ không phải một nút tròn.
             style: IconButton.styleFrom(
               shape: CircleBorder(
-                side: BorderSide(
-                  color: widget.kind.color.withValues(alpha: 0.4),
-                  width: 0.5,
-                ),
+                side: AppSurfaces.side(tint: widget.kind.color),
               ),
             ),
             // Ghim kích thước lại: IconButton mặc định cao 40px, lớn hơn cả

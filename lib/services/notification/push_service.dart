@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -5,6 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../controller/notification_badge.dart';
 import '../../controller/session_controller.dart';
 import '../base_service.dart';
 import '../device_report_service.dart';
@@ -50,6 +52,21 @@ class PushService {
   /// Payload `data` của thông báo người dùng vừa bấm, để tầng UI điều hướng.
   final ValueNotifier<Map<String, dynamic>?> lastTappedData =
       ValueNotifier<Map<String, dynamic>?>(null);
+
+  /// Đếm số thư đã tới trong lúc app ĐANG MỞ. Tăng một sau mỗi tin.
+  ///
+  /// Là tín hiệu để màn chuông biết mà tải lại danh sách. Không có nó thì đang
+  /// mở màn chuông mà thư mới tới, danh sách vẫn y nguyên — người dùng phải tự
+  /// kéo tải lại mới thấy, trong khi thông báo vừa hiện ngay trên đầu máy.
+  ///
+  /// Dùng bộ ĐẾM chứ không phải nội dung tin: tin push cố tình không mang đủ
+  /// dữ liệu để dựng một dòng trong danh sách (gửi hàng loạt còn không có cả
+  /// `notificationId`). Ở đây chỉ cần biết "có cái mới" rồi đi hỏi máy chủ.
+  ///
+  /// Cũng chỉ dùng được lúc app đang mở. App ở nền hay đã tắt thì hệ điều hành
+  /// xử lý trọn, không dòng mã nào của app chạy — nhưng khi đó cũng chẳng có
+  /// màn chuông nào đang mở để mà tải lại.
+  final ValueNotifier<int> incoming = ValueNotifier<int>(0);
 
   /// Gọi trong `main()`, SAU [LocalNotificationService.init].
   Future<void> init() async {
@@ -111,6 +128,14 @@ class PushService {
   Future<void> _showWhileForeground(RemoteMessage message) async {
     final notification = message.notification;
     if (notification == null) return;
+
+    // Thư mới tới thì con số trên nút chuông phải đổi NGAY. Không chờ kết quả:
+    // vẽ thông báo mới là việc chính, con số chỉ là chuyện phụ và không được
+    // phép làm chậm nó.
+    unawaited(NotificationBadge.instance.refresh());
+
+    // Báo cho màn chuông (nếu đang mở) biết mà tải lại danh sách.
+    incoming.value++;
 
     await LocalNotificationService.instance.show(
       // hashCode của message làm id: mỗi tin một thông báo riêng, tin tới sau

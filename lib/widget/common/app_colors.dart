@@ -27,6 +27,13 @@ class AppColors {
 
   static const Color danger = Color(0xFFDC2626);
 
+  /// Vàng cảnh báo.
+  ///
+  /// Bằng đúng màu thanh báo kiểu warning trong `app_banner.dart` — cùng một ý
+  /// nghĩa thì phải cùng một màu, và đặt tên ở đây để lần sau khỏi ai chép lại
+  /// mã hex lần thứ ba.
+  static const Color warning = Color(0xFFF59E0B);
+
   static const Color ink = Color(0xFF1E293B);
   static const Color inkMuted = Color(0xFF64748B);
 

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../../widget/common/app_top_bar.dart';
 import 'package:flutter/services.dart';
 import 'package:hugeicons/hugeicons.dart';
 
@@ -82,15 +84,7 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text(
-          l10n.deviceInfoTitle,
-          style: const TextStyle(fontSize: 20, color: Colors.white),
-        ),
-        backgroundColor: AppColors.barBg,
-        centerTitle: true,
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
+      appBar: AppTopBar(title: l10n.deviceInfoTitle, showBack: true),
       body: SafeArea(child: _buildBody(l10n)),
     );
   }

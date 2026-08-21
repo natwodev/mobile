@@ -1,5 +1,7 @@
 import 'package:hugeicons/hugeicons.dart';
 import 'package:flutter/material.dart';
+
+import '../../widget/common/app_top_bar.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -117,15 +119,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text(
-          l10n.feedbackTitle,
-          style: const TextStyle(fontSize: 20, color: Colors.white),
-        ),
-        backgroundColor: AppColors.barBg,
-        centerTitle: true,
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
+      appBar: AppTopBar(title: l10n.feedbackTitle, showBack: true),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),
@@ -162,9 +156,6 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
               decoration: InputDecoration(
                 hintText: l10n.feedbackContentHint,
                 errorText: _contentError,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
               ),
             ),
             const SizedBox(height: 16),
@@ -175,12 +166,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
             const SizedBox(height: 8),
             TextField(
               controller: _contact,
-              decoration: InputDecoration(
-                hintText: l10n.feedbackContactHint,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
+              decoration: InputDecoration(hintText: l10n.feedbackContactHint),
             ),
             const SizedBox(height: 16),
             Container(

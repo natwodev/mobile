@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../../widget/common/app_top_bar.dart';
 import 'package:flutter/services.dart';
 import 'package:hugeicons/hugeicons.dart';
 
@@ -337,19 +339,7 @@ class _QuickExamCodeScreenState extends State<QuickExamCodeScreen> {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: Text(
-          l10n.examCodeAppBarTitle,
-          // Cùng cỡ 20 không in đậm như Sửa hồ sơ / Đổi mật khẩu. Trước đây
-          // để mặc định (22) lại thêm bold nên riêng màn này chữ header to và
-          // nặng hơn hẳn các màn khác.
-          style: const TextStyle(fontSize: 20, color: Colors.white),
-        ),
-        centerTitle: true,
-        backgroundColor: AppColors.barBg,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
+      appBar: AppTopBar(title: l10n.examCodeAppBarTitle, showBack: true),
       body: Stack(
         children: [
           SingleChildScrollView(

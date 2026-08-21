@@ -2072,6 +2072,30 @@ abstract class AppLocalizations {
   /// **'Tên đăng nhập đã tồn tại.'**
   String get msgValidationUsernameDuplicated;
 
+  /// No description provided for @notificationsError.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không tải được thông báo'**
+  String get notificationsError;
+
+  /// No description provided for @notificationsErrorHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Kiểm tra kết nối mạng rồi kéo xuống để thử lại.'**
+  String get notificationsErrorHint;
+
+  /// No description provided for @notificationsLoadMore.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tải thêm'**
+  String get notificationsLoadMore;
+
+  /// No description provided for @notificationsMarkAllRead.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đọc tất cả'**
+  String get notificationsMarkAllRead;
+
   /// No description provided for @notificationsEmptyMessage.
   ///
   /// In vi, this message translates to:

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../../widget/common/app_top_bar.dart';
 import 'package:hugeicons/hugeicons.dart';
 
 import '../../helpers/exam_result_helper.dart';
@@ -56,15 +58,7 @@ class ExamResultScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: ExamResultHelper.slate50,
-      appBar: AppBar(
-        title: Text(
-          l10n.examResultTitle,
-          style: const TextStyle(fontSize: 20, color: Colors.white),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.blue,
-        automaticallyImplyLeading: false,
-      ),
+      appBar: AppTopBar(title: l10n.examResultTitle),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),

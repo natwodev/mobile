@@ -1132,6 +1132,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get msgValidationUsernameDuplicated => 'This username already exists.';
 
   @override
+  String get notificationsError => 'Could not load notifications';
+
+  @override
+  String get notificationsErrorHint =>
+      'Check your connection, then pull down to try again.';
+
+  @override
+  String get notificationsLoadMore => 'Load more';
+
+  @override
+  String get notificationsMarkAllRead => 'Read all';
+
+  @override
   String get notificationsEmptyMessage =>
       'Notices about exam sessions, results and reminders from your teacher will show up here.';
 
