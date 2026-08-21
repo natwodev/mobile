@@ -315,33 +315,9 @@ class _NewsTile extends StatelessWidget {
 
   /// Ảnh chạy hết bề ngang thẻ theo tỉ lệ 16:9.
   Widget _buildThumb() {
-    if (item.imageUrl == null) return const SizedBox.shrink();
-
-    return AspectRatio(
-      aspectRatio: 16 / 9,
-      child: SizedBox(
-        width: double.infinity,
-        child: Image.network(
-          item.imageUrl!,
-          fit: BoxFit.cover,
-          // VnExpress chỉ phát ảnh ở w=1200 — tham số `w` nằm trong chữ
-          // ký `s=` của URL nên sửa nhỏ lại là CDN trả 401. Không giảm
-          // được lượng tải, nhưng giảm được chỗ ảnh chiếm trong RAM.
-          //
-          // 900 chứ không phải 300 như hồi ảnh còn là ô nhỏ 92px: giờ ảnh
-          // chạy hết bề ngang thẻ, trên máy 1080px mà giải nén ở 300 là
-          // nhìn rõ vỡ hạt.
-          cacheWidth: 900,
-          // Ảnh hỏng/mạng chậm chỉ được phép để lại một ô xám, tuyệt đối
-          // không nhả exception làm đỏ cả thẻ tin.
-          errorBuilder: (_, _, _) =>
-              const ColoredBox(color: AppColors.surfaceMuted),
-          loadingBuilder: (context, child, progress) => progress == null
-              ? child
-              : const ColoredBox(color: AppColors.surfaceMuted),
-        ),
-      ),
-    );
+    final String? url = item.imageUrl;
+    if (url == null) return const SizedBox.shrink();
+    return _NewsThumb(url: url);
   }
 
   /// "Vừa xong / 5 phút trước / 3 giờ trước / 2 ngày trước".
@@ -359,5 +335,64 @@ class _NewsTile extends StatelessWidget {
 
     String two(int value) => value.toString().padLeft(2, '0');
     return '${two(moment.day)}/${two(moment.month)}/${moment.year}';
+  }
+}
+
+/// Ảnh của thẻ tin, TỰ THU LẠI khi không tải được.
+///
+/// Phải là widget có state chứ không thể chỉ dùng `errorBuilder`: `errorBuilder`
+/// chạy bên trong `AspectRatio` nên dù trả về `SizedBox.shrink()` thì khung
+/// 16:9 vẫn đã chiếm chỗ rồi. Kết quả là mỗi thẻ đội thêm một khối xám trống
+/// cao chừng 450px — offline thì cả màn hình chỉ còn thấy được một tin, mà
+/// khối xám ấy chẳng nói lên điều gì.
+///
+/// Đây đúng là cảnh thường gặp: bản lưu chỉ giữ ĐƯỜNG DẪN ảnh chứ không giữ dữ
+/// liệu ảnh, nên mất mạng là mọi thẻ đều hỏng ảnh cùng lúc.
+class _NewsThumb extends StatefulWidget {
+  const _NewsThumb({required this.url});
+
+  final String url;
+
+  @override
+  State<_NewsThumb> createState() => _NewsThumbState();
+}
+
+class _NewsThumbState extends State<_NewsThumb> {
+  bool _failed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    // Hỏng rồi thì biến mất hẳn, thẻ tin thu về đúng phần chữ.
+    if (_failed) return const SizedBox.shrink();
+
+    return AspectRatio(
+      aspectRatio: 16 / 9,
+      child: SizedBox(
+        width: double.infinity,
+        child: Image.network(
+          widget.url,
+          fit: BoxFit.cover,
+          // VnExpress chỉ phát ảnh ở w=1200 — tham số `w` nằm trong chữ ký `s=`
+          // của URL nên sửa nhỏ lại là CDN trả 401. Không giảm được lượng tải,
+          // nhưng giảm được chỗ ảnh chiếm trong RAM.
+          //
+          // 900 chứ không phải 300 như hồi ảnh còn là ô nhỏ 92px: giờ ảnh chạy
+          // hết bề ngang thẻ, trên máy 1080px mà giải nén ở 300 là nhìn rõ vỡ.
+          cacheWidth: 900,
+          errorBuilder: (_, _, _) {
+            // KHÔNG gọi setState ngay trong lúc dựng — Flutter ném lỗi
+            // "setState() called during build". Hoãn sang khung hình kế tiếp.
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) setState(() => _failed = true);
+            });
+            // Khung này vẫn phải trả về gì đó; ô xám chỉ sống đúng một nhịp.
+            return const ColoredBox(color: AppColors.surfaceMuted);
+          },
+          loadingBuilder: (context, child, progress) => progress == null
+              ? child
+              : const ColoredBox(color: AppColors.surfaceMuted),
+        ),
+      ),
+    );
   }
 }
