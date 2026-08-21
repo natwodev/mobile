@@ -98,25 +98,17 @@ class _HomeNewsSectionState extends State<HomeNewsSection> {
     );
   }
 
+  /// Tiêu đề mục. KHÔNG còn dòng "Nguồn: VnExpress" ở đây nữa: từ khi mỗi thẻ
+  /// tin tự ghi nguồn, để thêm ở đây là lặp lại đúng một chữ ba lần trên cùng
+  /// một khung hình.
   Widget _buildHeader(AppLocalizations l10n) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Expanded(
-          child: Text(
-            l10n.homeNewsTitle,
-            style: const TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.w700,
-              color: AppColors.ink,
-            ),
-          ),
-        ),
-        Text(
-          l10n.homeNewsSource,
-          style: const TextStyle(fontSize: 12, color: AppColors.inkMuted),
-        ),
-      ],
+    return Text(
+      l10n.homeNewsTitle,
+      style: const TextStyle(
+        fontSize: 17,
+        fontWeight: FontWeight.w700,
+        color: AppColors.ink,
+      ),
     );
   }
 
@@ -135,20 +127,13 @@ class _HomeNewsSectionState extends State<HomeNewsSection> {
     // Trang chủ. Để ListView tự cuộn là có hai vùng cuộn lồng nhau — ngón tay
     // đặt trúng danh sách thì cả trang đứng im, đúng thứ người dùng chửi là
     // "app đơ".
-    return ListView.separated(
+    return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       padding: EdgeInsets.zero,
       itemCount: _items.length,
-      separatorBuilder: (_, _) => const Divider(
-        height: 20,
-        thickness: 1,
-        color: AppColors.line,
-      ),
-      itemBuilder: (context, index) => _NewsTile(
-        item: _items[index],
-        onTap: () => _open(_items[index]),
-      ),
+      itemBuilder: (context, index) =>
+          _NewsTile(item: _items[index], onTap: () => _open(_items[index])),
     );
   }
 
@@ -176,7 +161,11 @@ class _HomeNewsSectionState extends State<HomeNewsSection> {
   }
 }
 
-/// Một thẻ tin: ảnh vuông bên trái, tiêu đề và mốc thời gian bên phải.
+/// Một thẻ tin: ảnh, tiêu đề, tóm tắt ba dòng, rồi hàng nguồn và ngày đăng.
+///
+/// Bản trước chỉ có ảnh nhỏ bên trái kèm tiêu đề — đọc lướt qua thì không biết
+/// tin nói gì cho tới khi bấm vào. Nay hiện luôn phần tóm tắt để người dùng
+/// quyết định có mở hay không ngay trên Trang chủ.
 class _NewsTile extends StatelessWidget {
   const _NewsTile({required this.item, required this.onTap});
 
@@ -187,72 +176,128 @@ class _NewsTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(10),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildThumb(),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item.title,
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    height: 1.35,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.ink,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  _relativeTime(l10n, item.publishedAt),
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.inkMuted,
-                  ),
-                ),
-              ],
-            ),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.line),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0D000000),
+            blurRadius: 8,
+            offset: Offset(0, 2),
           ),
         ],
+      ),
+      // clipBehavior để ảnh trong thẻ bo theo góc thẻ; thiếu nó thì ảnh vuông
+      // góc thò ra ngoài đúng bốn góc bo.
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildThumb(),
+            Padding(
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      height: 1.3,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.ink,
+                    ),
+                  ),
+                  if (item.summary.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      item.summary,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        height: 1.5,
+                        color: AppColors.inkMuted,
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.person_outline,
+                        size: 16,
+                        color: AppColors.disabledInk,
+                      ),
+                      const SizedBox(width: 4),
+                      // Tên riêng, không dịch — nên để thẳng thay vì đẻ thêm
+                      // một khoá l10n mà cả bốn ngôn ngữ đều ghi giống hệt.
+                      const Text(
+                        'VnExpress',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppColors.disabledInk,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      const Icon(
+                        Icons.access_time_outlined,
+                        size: 16,
+                        color: AppColors.disabledInk,
+                      ),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          _relativeTime(l10n, item.publishedAt),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: AppColors.disabledInk,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
+  /// Ảnh chạy hết bề ngang thẻ theo tỉ lệ 16:9.
   Widget _buildThumb() {
-    const double size = 92;
+    if (item.imageUrl == null) return const SizedBox.shrink();
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(10),
+    return AspectRatio(
+      aspectRatio: 16 / 9,
       child: SizedBox(
-        width: size,
-        height: size * 0.78,
-        child: item.imageUrl == null
-            ? const ColoredBox(color: AppColors.surfaceMuted)
-            : Image.network(
-                item.imageUrl!,
-                fit: BoxFit.cover,
-                // VnExpress chỉ phát ảnh ở w=1200 — tham số `w` nằm trong chữ
-                // ký `s=` của URL nên sửa nhỏ lại là CDN trả 401. Không giảm
-                // được lượng tải, nhưng giảm được chỗ ảnh chiếm trong RAM:
-                // không có cacheWidth thì mỗi tấm giải nén full 1200px ≈ 3,8 MB
-                // bitmap cho một ô rộng 92px, mười mấy tin là hàng chục MB.
-                cacheWidth: 300,
-                // Ảnh hỏng/mạng chậm chỉ được phép để lại một ô xám, tuyệt đối
-                // không nhả exception làm đỏ cả thẻ tin.
-                errorBuilder: (_, _, _) =>
-                    const ColoredBox(color: AppColors.surfaceMuted),
-                loadingBuilder: (context, child, progress) => progress == null
-                    ? child
-                    : const ColoredBox(color: AppColors.surfaceMuted),
-              ),
+        width: double.infinity,
+        child: Image.network(
+          item.imageUrl!,
+          fit: BoxFit.cover,
+          // VnExpress chỉ phát ảnh ở w=1200 — tham số `w` nằm trong chữ
+          // ký `s=` của URL nên sửa nhỏ lại là CDN trả 401. Không giảm
+          // được lượng tải, nhưng giảm được chỗ ảnh chiếm trong RAM.
+          //
+          // 900 chứ không phải 300 như hồi ảnh còn là ô nhỏ 92px: giờ ảnh
+          // chạy hết bề ngang thẻ, trên máy 1080px mà giải nén ở 300 là
+          // nhìn rõ vỡ hạt.
+          cacheWidth: 900,
+          // Ảnh hỏng/mạng chậm chỉ được phép để lại một ô xám, tuyệt đối
+          // không nhả exception làm đỏ cả thẻ tin.
+          errorBuilder: (_, _, _) =>
+              const ColoredBox(color: AppColors.surfaceMuted),
+          loadingBuilder: (context, child, progress) => progress == null
+              ? child
+              : const ColoredBox(color: AppColors.surfaceMuted),
+        ),
       ),
     );
   }
