@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../widget/common/app_top_bar.dart';
+import '../../widget/common/app_sheet.dart';
 import 'package:flutter/services.dart';
 import 'package:hugeicons/hugeicons.dart';
 
@@ -8,13 +8,33 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../l10n/locale_controller.dart';
 import '../../services/device_report_service.dart';
 import '../../widget/common/app_buttons.dart';
+import '../../widget/common/app_surfaces.dart';
 import '../../widget/common/app_toast.dart';
 import '../../widget/language_selector.dart';
 
-/// Màn "Thông tin thiết bị": phiên bản app, kiểu máy, hệ điều hành, màn hình.
+/// Mở tấm "Thông tin thiết bị" trượt lên từ đáy.
+///
+/// Trước đây đây là một TRANG riêng. Đẩy nguyên một trang chồng lên để hiện
+/// mươi dòng chỉ-đọc là quá tay: người dùng mất ngữ cảnh đang đứng ở đâu, và
+/// phải bấm nút quay lại mới thoát. Tấm sheet thì trượt xuống là xong, mà nền
+/// phía sau vẫn thấy.
+Future<void> showDeviceInfoSheet(BuildContext context) {
+  return showAppSheet<void>(
+    context: context,
+    title: AppLocalizations.of(context).deviceInfoTitle,
+    icon: HugeIcons.strokeRoundedSmartPhone01,
+    children: const [DeviceInfoScreen()],
+  );
+}
+
+/// Nội dung "Thông tin thiết bị": phiên bản app, kiểu máy, hệ điều hành, màn
+/// hình.
 ///
 /// Có nút sao chép toàn bộ để người dùng dán thẳng vào tin nhắn cho bộ phận
 /// hỗ trợ — hỏi từng dòng qua điện thoại rất mất thời gian.
+///
+/// Giữ tên cũ dù giờ không còn là một màn: đổi tên lớp là đụng vào mọi chỗ
+/// import, mà việc nó làm thì không đổi.
 class DeviceInfoScreen extends StatefulWidget {
   const DeviceInfoScreen({super.key});
 
@@ -82,17 +102,19 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppTopBar(title: l10n.deviceInfoTitle, showBack: true),
-      body: SafeArea(child: _buildBody(l10n)),
-    );
+    // Không còn `Scaffold` với AppBar: tiêu đề và nút đóng do `AppSheet` lo.
+    return _buildBody(l10n);
   }
 
   Widget _buildBody(AppLocalizations l10n) {
     if (_loading) {
-      return const Center(
-        child: CircularProgressIndicator(color: AppColors.accent),
+      // Chừa sẵn chiều cao: bên trong tấm sheet, một vòng quay không kích thước
+      // làm tấm co lại rồi bung ra khi dữ liệu về — giật một cái rất khó chịu.
+      return const SizedBox(
+        height: 160,
+        child: Center(
+          child: CircularProgressIndicator(color: AppColors.accent),
+        ),
       );
     }
 
@@ -110,8 +132,11 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
       );
     }
 
-    return ListView(
-      padding: const EdgeInsets.all(16),
+    // `Column` chứ không phải `ListView`: tấm sheet đã tự cuộn, lồng thêm một
+    // vùng cuộn nữa là hai thứ tranh nhau cử chỉ kéo.
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
       children: [
         _buildSection(
           title: l10n.deviceInfoAppSection,
@@ -169,11 +194,7 @@ class _DeviceInfoScreenState extends State<DeviceInfoScreen> {
     required List<List<String>> rows,
   }) {
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
+      decoration: AppSurfaces.card(soft: true),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

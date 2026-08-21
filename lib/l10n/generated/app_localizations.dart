@@ -518,6 +518,42 @@ abstract class AppLocalizations {
   /// **'Xoá bộ nhớ đệm'**
   String get clearCacheTitle;
 
+  /// No description provided for @examScheduleTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lịch thi'**
+  String get examScheduleTitle;
+
+  /// No description provided for @examScheduleEmptyTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sắp có'**
+  String get examScheduleEmptyTitle;
+
+  /// No description provided for @examScheduleEmptyMessage.
+  ///
+  /// In vi, this message translates to:
+  /// **'Các ca thi sắp tới của bạn sẽ hiện ở đây kèm môn học, giờ thi và phòng thi. Tính năng đang được xây dựng.'**
+  String get examScheduleEmptyMessage;
+
+  /// No description provided for @classroomTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lớp học'**
+  String get classroomTitle;
+
+  /// No description provided for @classroomEmptyTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sắp có'**
+  String get classroomEmptyTitle;
+
+  /// No description provided for @classroomEmptyMessage.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lớp học, tài liệu và bài tập của bạn sẽ hiện ở đây. Tính năng đang được xây dựng.'**
+  String get classroomEmptyMessage;
+
   /// No description provided for @commonCancel.
   ///
   /// In vi, this message translates to:
@@ -1556,6 +1592,18 @@ abstract class AppLocalizations {
   /// **'Tài khoản'**
   String get homeNavAccount;
 
+  /// No description provided for @homeNavSchedule.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lịch thi'**
+  String get homeNavSchedule;
+
+  /// No description provided for @homeNavClassroom.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lớp học'**
+  String get homeNavClassroom;
+
   /// No description provided for @homeNavHistory.
   ///
   /// In vi, this message translates to:
@@ -2071,6 +2119,36 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Tên đăng nhập đã tồn tại.'**
   String get msgValidationUsernameDuplicated;
+
+  /// No description provided for @notificationsDelete.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xoá'**
+  String get notificationsDelete;
+
+  /// No description provided for @notificationsDeleteAll.
+  ///
+  /// In vi, this message translates to:
+  /// **'Dọn tất cả'**
+  String get notificationsDeleteAll;
+
+  /// No description provided for @notificationsDeleteAllTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Dọn sạch hộp thư?'**
+  String get notificationsDeleteAllTitle;
+
+  /// No description provided for @notificationsDeleteAllMessage.
+  ///
+  /// In vi, this message translates to:
+  /// **'Toàn bộ thông báo sẽ bị gỡ khỏi máy và khỏi tài khoản của bạn. Thao tác này không lùi lại được.'**
+  String get notificationsDeleteAllMessage;
+
+  /// No description provided for @notificationsDeleteAllConfirm.
+  ///
+  /// In vi, this message translates to:
+  /// **'Dọn sạch'**
+  String get notificationsDeleteAllConfirm;
 
   /// No description provided for @notificationsError.
   ///

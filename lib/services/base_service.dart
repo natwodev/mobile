@@ -85,6 +85,23 @@ class BaseService {
     );
   }
 
+  // ===== DELETE =====
+  //
+  // Không nhận thân yêu cầu: theo chuẩn HTTP thì DELETE mang thân là hợp lệ
+  // nhưng nhiều tầng trung gian bỏ qua nó, mà mấy endpoint xoá của backend cũng
+  // chỉ cần id nằm trên đường dẫn.
+  Future<http.Response> delete(String endpoint) async {
+    final token = await getToken();
+
+    return await http.delete(
+      Uri.parse('$baseUrl/$endpoint'),
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      },
+    );
+  }
+
   // ===== POST MULTIPART (TẢI TỆP LÊN) =====
   //
   // Tách riêng khỏi [postForm] vì `http.post` với `body` là Map chỉ sinh ra

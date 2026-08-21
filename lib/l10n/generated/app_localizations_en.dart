@@ -239,6 +239,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clearCacheTitle => 'Clear cache';
 
   @override
+  String get examScheduleTitle => 'Exam schedule';
+
+  @override
+  String get examScheduleEmptyTitle => 'Coming soon';
+
+  @override
+  String get examScheduleEmptyMessage =>
+      'Your upcoming exam sessions will appear here with subject, time and room. This feature is being built.';
+
+  @override
+  String get classroomTitle => 'Classroom';
+
+  @override
+  String get classroomEmptyTitle => 'Coming soon';
+
+  @override
+  String get classroomEmptyMessage =>
+      'Your classes, materials and assignments will appear here. This feature is being built.';
+
+  @override
   String get commonCancel => 'Cancel';
 
   @override
@@ -830,6 +850,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeNavAccount => 'Account';
 
   @override
+  String get homeNavSchedule => 'Schedule';
+
+  @override
+  String get homeNavClassroom => 'Classroom';
+
+  @override
   String get homeNavHistory => 'History';
 
   @override
@@ -1130,6 +1156,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get msgValidationUsernameDuplicated => 'This username already exists.';
+
+  @override
+  String get notificationsDelete => 'Delete';
+
+  @override
+  String get notificationsDeleteAll => 'Clear all';
+
+  @override
+  String get notificationsDeleteAllTitle => 'Clear all notifications?';
+
+  @override
+  String get notificationsDeleteAllMessage =>
+      'Every notification will be removed from this device and from your account. This cannot be undone.';
+
+  @override
+  String get notificationsDeleteAllConfirm => 'Clear all';
 
   @override
   String get notificationsError => 'Could not load notifications';

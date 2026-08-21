@@ -13,6 +13,8 @@ import 'app_colors.dart';
 /// Không có mục cho Trang chủ vì màn đó không dùng thanh tiêu đề.
 enum AppTopBarTab {
   history(HugeIcons.strokeRoundedTaskDone01),
+  schedule(HugeIcons.strokeRoundedCalendarCheckIn01),
+  classroom(HugeIcons.strokeRoundedCourse),
   account(HugeIcons.strokeRoundedUserCircle);
 
   const AppTopBarTab(this.icon);
