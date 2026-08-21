@@ -24,14 +24,28 @@ class HomeNavigation extends StatefulWidget {
 class _HomeNavigationState extends State<HomeNavigation> {
   int _currentIndex = 0;
 
+  /// Mỗi tab một bộ điều khiển cuộn riêng, để bấm vào nút tab là cuộn ĐÚNG màn
+  /// đang mở về đầu. Dùng chung một bộ cho cả ba là không được: một
+  /// `ScrollController` chỉ gắn được vào một vùng cuộn tại một thời điểm.
+  final List<ScrollController> _scrollControllers =
+      List<ScrollController>.generate(3, (_) => ScrollController());
+
   /// PHẢI cùng thứ tự với danh sách `items` của thanh tab bên dưới — hai danh
   /// sách này chỉ khớp nhau bằng chỉ số, thêm tab vào giữa mà quên một bên là
   /// bấm "Lịch sử" ra màn "Tài khoản".
-  final List<Widget> _screens = [
-    HomeScreen(),
-    ExamHistoryScreen(),
-    AccountScreen(),
+  late final List<Widget> _screens = [
+    HomeScreen(scrollController: _scrollControllers[0]),
+    ExamHistoryScreen(scrollController: _scrollControllers[1]),
+    AccountScreen(scrollController: _scrollControllers[2]),
   ];
+
+  @override
+  void dispose() {
+    for (final controller in _scrollControllers) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
 
   // Thanh tab là một dải nền xanh trời đậm; tab đang chọn là viên thuốc cùng
   // tông nhưng nhạt hơn một nấc. Cả hai nền đều là xanh trung nên chữ và icon
@@ -67,9 +81,37 @@ class _HomeNavigationState extends State<HomeNavigation> {
   static const double _barMarginTop = 6;
 
   void changeTab(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
+    final bool sameTab = index == _currentIndex;
+
+    if (!sameTab) {
+      setState(() {
+        _currentIndex = index;
+      });
+    }
+
+    if (sameTab) {
+      // Bấm lại tab đang mở: vùng cuộn đã gắn sẵn, cuộn được ngay. Đây là
+      // trường hợp chính — người dùng lướt sâu xuống rồi muốn về đầu mà không
+      // phải vuốt ngược cả trang.
+      _scrollToTop(index);
+    } else {
+      // Đổi tab: màn mới chưa dựng nên controller chưa gắn vào đâu cả, gọi ngay
+      // là không có tác dụng. Chờ hết khung hình rồi mới cuộn.
+      WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToTop(index));
+    }
+  }
+
+  void _scrollToTop(int index) {
+    final ScrollController controller = _scrollControllers[index];
+    // `hasClients` false nghĩa là màn đó chưa dựng hoặc nội dung ngắn đến mức
+    // không có gì để cuộn — gọi animateTo lúc ấy là ném exception.
+    if (!controller.hasClients) return;
+
+    controller.animateTo(
+      0,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
   }
 
   /// Một mục của thanh tab.
