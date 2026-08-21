@@ -235,6 +235,26 @@ class AppLocalizationsVi extends AppLocalizations {
   String get clearCacheTitle => 'Xoá bộ nhớ đệm';
 
   @override
+  String get examScheduleTitle => 'Lịch thi';
+
+  @override
+  String get examScheduleEmptyTitle => 'Sắp có';
+
+  @override
+  String get examScheduleEmptyMessage =>
+      'Các ca thi sắp tới của bạn sẽ hiện ở đây kèm môn học, giờ thi và phòng thi. Tính năng đang được xây dựng.';
+
+  @override
+  String get classroomTitle => 'Lớp học';
+
+  @override
+  String get classroomEmptyTitle => 'Sắp có';
+
+  @override
+  String get classroomEmptyMessage =>
+      'Lớp học, tài liệu và bài tập của bạn sẽ hiện ở đây. Tính năng đang được xây dựng.';
+
+  @override
   String get commonCancel => 'Huỷ';
 
   @override
@@ -821,6 +841,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get homeNavAccount => 'Tài khoản';
 
   @override
+  String get homeNavSchedule => 'Lịch thi';
+
+  @override
+  String get homeNavClassroom => 'Lớp học';
+
+  @override
   String get homeNavHistory => 'Lịch sử';
 
   @override
@@ -1114,6 +1140,22 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get msgValidationUsernameDuplicated => 'Tên đăng nhập đã tồn tại.';
+
+  @override
+  String get notificationsDelete => 'Xoá';
+
+  @override
+  String get notificationsDeleteAll => 'Dọn tất cả';
+
+  @override
+  String get notificationsDeleteAllTitle => 'Dọn sạch hộp thư?';
+
+  @override
+  String get notificationsDeleteAllMessage =>
+      'Toàn bộ thông báo sẽ bị gỡ khỏi máy và khỏi tài khoản của bạn. Thao tác này không lùi lại được.';
+
+  @override
+  String get notificationsDeleteAllConfirm => 'Dọn sạch';
 
   @override
   String get notificationsError => 'Không tải được thông báo';

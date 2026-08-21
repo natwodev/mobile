@@ -8,6 +8,8 @@ import '../../models/app_notification.dart';
 import '../../services/notification/notification_cache.dart';
 import '../../services/notification/notification_service.dart';
 import '../../services/notification/push_service.dart';
+import '../../widget/common/app_menu.dart';
+import '../../widget/common/app_modal.dart';
 import '../../widget/common/app_banner.dart';
 import '../../widget/common/app_buttons.dart';
 import '../../widget/common/app_refresh_indicator.dart';
@@ -192,6 +194,94 @@ class _NotificationScreenState extends State<NotificationScreen> {
     showErrorBanner(context, AppLocalizations.of(context).notificationsError);
   }
 
+  /// Vuốt một thư sang bên để gỡ khỏi chuông.
+  ///
+  /// Bỏ khỏi danh sách NGAY rồi mới gọi mạng: `Dismissible` đã trượt dòng đó ra
+  /// khỏi màn hình, giữ nó lại trong danh sách là Flutter dựng lại một dòng đã
+  /// biến mất và ném lỗi.
+  Future<void> _deleteOne(AppNotification item) async {
+    final int index = _items.indexWhere((e) => e.id == item.id);
+    if (index < 0) return;
+
+    setState(() {
+      _items.removeAt(index);
+      if (_total > 0) _total--;
+    });
+    if (!item.isRead) NotificationBadge.instance.decrement();
+
+    final ok = await _service.deleteOne(item.id);
+    if (!mounted || ok) return;
+
+    // Gọi hỏng thì TRẢ LẠI đúng chỗ cũ. Nuốt lỗi ở đây là thư biến mất trước
+    // mắt người dùng nhưng lần mở sau lại hiện nguyên vẹn.
+    setState(() {
+      _items.insert(index.clamp(0, _items.length), item);
+      _total++;
+    });
+    if (!item.isRead) {
+      NotificationBadge.instance.set(NotificationBadge.instance.count + 1);
+    }
+    showErrorBanner(context, AppLocalizations.of(context).notificationsError);
+  }
+
+  /// Dọn sạch hộp thư, có hỏi lại trước.
+  ///
+  /// Hỏi vì đây là thao tác KHÔNG lùi lại được và quét sạch mọi thứ — khác hẳn
+  /// vuốt xoá từng thư, vốn chỉ mất một dòng và người dùng thấy rõ mình đang
+  /// làm gì.
+  Future<void> _deleteAll() async {
+    final l10n = AppLocalizations.of(context);
+
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AppModal(
+        title: l10n.notificationsDeleteAllTitle,
+        icon: HugeIcons.strokeRoundedDelete02,
+        accentColor: AppColors.danger,
+        onClose: () => Navigator.pop(dialogContext, false),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(l10n.commonCancel),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(l10n.notificationsDeleteAllConfirm),
+          ),
+        ],
+        children: [Text(l10n.notificationsDeleteAllMessage)],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    final snapshot = List<AppNotification>.from(_items);
+    final int totalBefore = _total;
+
+    setState(() {
+      _items.clear();
+      _total = 0;
+    });
+    NotificationBadge.instance.clear();
+
+    final ok = await _service.deleteAll();
+    if (!mounted) return;
+
+    if (ok) {
+      await NotificationCache.save(const [], 0);
+      return;
+    }
+
+    setState(() {
+      _items.addAll(snapshot);
+      _total = totalBefore;
+    });
+    await NotificationBadge.instance.refresh();
+    if (!mounted) return;
+    showErrorBanner(context, AppLocalizations.of(context).notificationsError);
+  }
+
   Future<void> _markAllRead() async {
     if (!_items.any((e) => !e.isRead)) return;
 
@@ -237,18 +327,38 @@ class _NotificationScreenState extends State<NotificationScreen> {
         appBar: AppTopBar(
           title: l10n.notificationsTitle,
           showBack: true,
+          // Gom hai hành động vào một menu thay vì bày hai nút chữ: tiêu đề căn
+          // giữa nên chỗ trống hai bên rất hẹp, mà "Dọn tất cả" cũng không phải
+          // thứ nên để lộ ngay tầm tay — bấm nhầm là mất sạch thư.
           actions: [
-            if (hasUnread)
-              TextButton(
-                onPressed: _markAllRead,
-                child: Text(
-                  l10n.notificationsMarkAllRead,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
+            if (_items.isNotEmpty)
+              PopupMenuButton<String>(
+                icon: const HugeIcon(
+                  icon: HugeIcons.strokeRoundedMoreVertical,
+                  color: Colors.white,
+                  size: 20,
                 ),
+                onSelected: (value) {
+                  if (value == 'read') _markAllRead();
+                  if (value == 'delete') _deleteAll();
+                },
+                itemBuilder: (context) => [
+                  AppMenu.item(
+                    value: 'read',
+                    icon: HugeIcons.strokeRoundedCheckmarkCircle02,
+                    label: l10n.notificationsMarkAllRead,
+                    // Hết thư chưa đọc thì khoá mục này lại chứ không giấu đi:
+                    // giấu là menu đổi số dòng theo trạng thái, người dùng phải
+                    // dò lại vị trí mỗi lần mở.
+                    enabled: hasUnread,
+                  ),
+                  AppMenu.item(
+                    value: 'delete',
+                    icon: HugeIcons.strokeRoundedDelete02,
+                    label: l10n.notificationsDeleteAll,
+                    danger: true,
+                  ),
+                ],
               ),
           ],
         ),
@@ -279,11 +389,53 @@ class _NotificationScreenState extends State<NotificationScreen> {
       separatorBuilder: (_, _) => const SizedBox(height: 10),
       itemBuilder: (context, index) {
         if (index >= _items.length) return _buildLoadMore(l10n);
-        return _NotificationTile(
-          item: _items[index],
-          onTap: () => _open(_items[index]),
+
+        final AppNotification item = _items[index];
+
+        return Dismissible(
+          // Khoá theo ID THƯ, không theo chỉ số: xoá một dòng là mọi dòng dưới
+          // tụt chỉ số, Flutter khớp nhầm trạng thái và dòng khác biến mất theo.
+          key: ValueKey(item.id),
+          direction: DismissDirection.endToStart,
+          onDismissed: (_) => _deleteOne(item),
+          background: _buildDeleteBackground(l10n),
+          child: _NotificationTile(item: item, onTap: () => _open(item)),
         );
       },
+    );
+  }
+
+  /// Nền đỏ lộ ra khi vuốt một thư sang trái.
+  ///
+  /// Bo góc BẰNG thẻ thư nằm trên: lệch nhau thì lúc vuốt thấy hai lớp không
+  /// khớp, mảng đỏ thò ra bốn góc.
+  Widget _buildDeleteBackground(AppLocalizations l10n) {
+    return Container(
+      alignment: Alignment.centerRight,
+      padding: const EdgeInsets.only(right: 20),
+      decoration: BoxDecoration(
+        color: AppColors.danger,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const HugeIcon(
+            icon: HugeIcons.strokeRoundedDelete02,
+            color: Colors.white,
+            size: 20,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            l10n.notificationsDelete,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -417,22 +569,28 @@ class _NotificationTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         child: Container(
           padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            // Thư chưa đọc có nền xanh rất nhạt, thư đã đọc nền trắng. Phân
-            // biệt bằng NỀN chứ không chỉ bằng chấm tròn: lướt mắt xuống một
-            // danh sách dài thì mảng màu nhận ra ngay, còn chấm tròn phải nhìn
-            // từng dòng mới thấy.
-            color: item.isRead ? Colors.white : AppColors.accentBg,
-            borderRadius: BorderRadius.circular(12),
-            // Thư chưa đọc viền theo màu MỨC ĐỘ của nó, thư đã đọc viền xám
-            // trung tính — đọc rồi thì không cần đòi sự chú ý nữa.
-            border: item.isRead
-                ? Border.all(
-                    color: AppColors.line,
-                    width: AppSurfaces.borderWidth,
-                  )
-                : AppSurfaces.border(tint: tint),
-          ),
+          // Thư chưa đọc: nền xanh rất nhạt, viền và quầng sáng theo MÀU MỨC ĐỘ
+          // của chính nó. Thư đã đọc: nền trắng, viền xám trung tính, KHÔNG
+          // quầng sáng — đọc rồi thì không cần đòi sự chú ý nữa.
+          //
+          // Phân biệt bằng cả mảng nền lẫn quầng sáng chứ không chỉ bằng chấm
+          // tròn: lướt mắt xuống một danh sách dài thì mảng màu nhận ra ngay,
+          // còn chấm tròn phải nhìn từng dòng mới thấy.
+          //
+          // Dùng `soft` vì đây là danh sách dài — quầng đậm xếp liền nhau thì
+          // cả trang bị ám màu chứ không còn là từng thẻ nổi lên.
+          //
+          // Viền thư đã đọc lấy `disabledInk` chứ không phải `line`: mọi màu
+          // đưa vào đây đều bị hạ xuống 40% độ đục, mà `line` vốn đã rất nhạt
+          // nên hạ tiếp là gần như mất viền. `disabledInk` sau khi hạ mới ra
+          // đúng sắc xám như `line` nguyên bản.
+          decoration: item.isRead
+              ? AppSurfaces.card(tint: AppColors.disabledInk, shadow: false)
+              : AppSurfaces.card(
+                  color: AppColors.accentBg,
+                  tint: tint,
+                  soft: true,
+                ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

@@ -136,6 +136,35 @@ class NotificationService extends BaseService {
     }
   }
 
+  /// Người nhận tự gỡ một thư khỏi chuông của mình.
+  ///
+  /// Coi 404 là THÀNH CÔNG: thư đã biến mất rồi thì kết quả người dùng muốn đã
+  /// đạt được. Chuyện này xảy ra thật — giáo viên thu hồi cả lượt gửi, hoặc
+  /// người dùng xoá cùng lúc trên web. Báo lỗi lúc đó chỉ tổ khó hiểu, và tệ
+  /// hơn là giao diện phải trả dòng vừa xoá về chỗ cũ.
+  ///
+  /// 403 (thân RỖNG, không phải JSON) mới là hỏng thật: đụng vào thư người khác.
+  Future<bool> deleteOne(String id) async {
+    try {
+      final response = await delete('$_base/$id');
+      return response.statusCode == 200 || response.statusCode == 404;
+    } catch (e) {
+      debugPrint('Gỡ thư hỏng: $e');
+      return false;
+    }
+  }
+
+  /// Dọn sạch chuông của chính mình.
+  Future<bool> deleteAll() async {
+    try {
+      final response = await delete('$_base/all');
+      return response.statusCode == 200;
+    } catch (e) {
+      debugPrint('Dọn hộp thư hỏng: $e');
+      return false;
+    }
+  }
+
   /// Đọc số nguyên từ JSON chịu được cả kiểu số lẫn kiểu chuỗi.
   static int _asInt(Object? value, {int fallback = 0}) {
     if (value is int) return value;
