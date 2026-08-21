@@ -8,6 +8,7 @@ import '../l10n/generated/app_localizations.dart';
 import '../widget/common/app_buttons.dart';
 import '../widget/home/home_banner_carousel.dart';
 import '../widget/home/home_news_section.dart';
+import '../widget/common/app_refresh_indicator.dart';
 import '../widget/common/refresh_feedback.dart';
 import '../widget/home/quiz_answer_banner.dart';
 
@@ -29,8 +30,10 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: RefreshIndicator(
-        color: AppColors.accent,
+      body: AppRefreshIndicator(
+        // Trang chủ không có AppBar nên phải tự đẩy vòng xoay xuống dưới thanh
+        // trạng thái; các màn khác có AppBar thì để 0.
+        edgeOffset: MediaQuery.paddingOf(context).top,
         onRefresh: () async {
           final bool ok = await _newsKey.currentState?.reload() ?? false;
           if (!context.mounted || !ok) return;

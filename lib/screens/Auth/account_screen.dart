@@ -8,6 +8,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../widget/common/app_buttons.dart';
 import '../../widget/common/app_modal.dart';
 import '../../widget/common/app_toast.dart';
+import '../../widget/common/app_refresh_indicator.dart';
 import '../../widget/common/refresh_feedback.dart';
 import '../../l10n/locale_controller.dart';
 import '../../models/student.dart';
@@ -349,7 +350,7 @@ class _AccountScreenState extends State<AccountScreen> {
 
     final student = _student!;
 
-    return RefreshIndicator(
+    return AppRefreshIndicator(
       onRefresh: () async {
         await _loadProfile();
         // _loadProfile giữ bản đã lưu khi mạng hỏng, và chỉ đặt _error lúc

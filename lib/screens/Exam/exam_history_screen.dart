@@ -9,6 +9,7 @@ import '../../models/exam_history_item.dart';
 import '../../services/auth/user_services.dart';
 import '../../widget/common/app_buttons.dart';
 import '../../widget/common/app_toast.dart';
+import '../../widget/common/app_refresh_indicator.dart';
 import '../../widget/common/refresh_feedback.dart';
 
 /// Màn "Lịch sử làm bài" — tab giữa của thanh điều hướng.
@@ -234,7 +235,7 @@ class _ExamHistoryScreenState extends State<ExamHistoryScreen> {
 
     final l10n = AppLocalizations.of(context);
 
-    return RefreshIndicator(
+    return AppRefreshIndicator(
       onRefresh: () async {
         await _loadHistory(showSpinner: false);
         // _loadHistory đặt _error khi API trả thất bại; im lặng trong trường
@@ -242,7 +243,6 @@ class _ExamHistoryScreenState extends State<ExamHistoryScreen> {
         if (!mounted || _error != null) return;
         showRefreshDone(context);
       },
-      color: AppColors.accent,
       child: ListView(
         controller: widget.scrollController,
         padding: EdgeInsets.fromLTRB(
@@ -272,7 +272,7 @@ class _ExamHistoryScreenState extends State<ExamHistoryScreen> {
   /// không bắt được cử chỉ — trong khi màn rỗng lại chính là chỗ người dùng
   /// muốn kéo để thử lại nhất.
   Widget _buildRefreshable({required Widget child}) {
-    return RefreshIndicator(
+    return AppRefreshIndicator(
       onRefresh: () async {
         await _loadHistory(showSpinner: false);
         // _loadHistory đặt _error khi API trả thất bại; im lặng trong trường
@@ -280,7 +280,6 @@ class _ExamHistoryScreenState extends State<ExamHistoryScreen> {
         if (!mounted || _error != null) return;
         showRefreshDone(context);
       },
-      color: AppColors.accent,
       child: LayoutBuilder(
         builder: (context, constraints) => SingleChildScrollView(
           // Dùng CHUNG controller với ListView ở nhánh có dữ liệu: hai vùng
