@@ -536,6 +536,12 @@ abstract class AppLocalizations {
   /// **'Chưa cập nhật'**
   String get commonNotUpdated;
 
+  /// No description provided for @commonReloadFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tải lại dữ liệu thất bại'**
+  String get commonReloadFailed;
+
   /// No description provided for @commonReloadSuccess.
   ///
   /// In vi, this message translates to:
@@ -547,6 +553,30 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Thử lại'**
   String get commonRetry;
+
+  /// No description provided for @commonStatusFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thất bại'**
+  String get commonStatusFailed;
+
+  /// No description provided for @commonStatusInfo.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thông tin'**
+  String get commonStatusInfo;
+
+  /// No description provided for @commonStatusSuccess.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thành công'**
+  String get commonStatusSuccess;
+
+  /// No description provided for @commonStatusWarning.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lưu ý'**
+  String get commonStatusWarning;
 
   /// No description provided for @commonSave.
   ///

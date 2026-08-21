@@ -101,8 +101,13 @@
   "commonConfirm": "Xác nhận",
   "commonLoading": "Đang tải...",
   "commonNotUpdated": "Chưa cập nhật",
+  "commonReloadFailed": "Tải lại dữ liệu thất bại",
   "commonReloadSuccess": "Tải lại dữ liệu thành công",
   "commonRetry": "Thử lại",
+  "commonStatusFailed": "Thất bại",
+  "commonStatusInfo": "Thông tin",
+  "commonStatusSuccess": "Thành công",
+  "commonStatusWarning": "Lưu ý",
   "commonSave": "Lưu",
   "contactCopied": "Đã sao chép {value}",
   "@contactCopied": {

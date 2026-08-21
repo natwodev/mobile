@@ -51,6 +51,18 @@ extension _BannerStyle on AppBannerKind {
     AppBannerKind.warning => NotificationSound.warning,
     AppBannerKind.info => NotificationSound.multiline,
   };
+
+  /// Dòng tiêu đề — chỉ nói KẾT QUẢ, không nói chi tiết.
+  ///
+  /// Tách khỏi phần mô tả vì hai thứ trả lời hai câu hỏi khác nhau: "được hay
+  /// hỏng" và "việc gì". Gộp vào một dòng thì người dùng phải đọc hết câu mới
+  /// biết kết quả, trong khi thanh báo chỉ sống ba giây.
+  String title(AppLocalizations l10n) => switch (this) {
+    AppBannerKind.success => l10n.commonStatusSuccess,
+    AppBannerKind.error => l10n.commonStatusFailed,
+    AppBannerKind.warning => l10n.commonStatusWarning,
+    AppBannerKind.info => l10n.commonStatusInfo,
+  };
 }
 
 /// Thanh báo trượt vào từ phải, nằm ngay trên dải tab.
@@ -127,6 +139,19 @@ void showRefreshDone(BuildContext context) => showAppBanner(
   context,
   message: AppLocalizations.of(context).commonReloadSuccess,
   sound: NotificationSound.refresh,
+);
+
+/// Cú kéo-để-tải-lại KHÔNG lấy được dữ liệu — thường là mất mạng.
+///
+/// Trước đây nhánh này im lặng, với lý do "báo thành công lúc hỏng còn tệ hơn
+/// không báo". Lý do đó chỉ đúng khi thanh báo mới có mỗi trạng thái thành
+/// công. Từ khi có trạng thái lỗi thì im lặng lại là dở nhất: người dùng kéo
+/// xong thấy màn hình y như cũ, không biết mạng hỏng hay app đơ, nên kéo tiếp
+/// mấy lần nữa.
+void showRefreshFailed(BuildContext context) => showAppBanner(
+  context,
+  message: AppLocalizations.of(context).commonReloadFailed,
+  kind: AppBannerKind.error,
 );
 
 /// Thanh báo trượt vào từ phải, có thanh đếm ngược và nút đóng.
@@ -241,13 +266,13 @@ class _AppBannerState extends State<_AppBanner> with TickerProviderStateMixin {
               boxShadow: [
                 BoxShadow(
                   color: AppColors.accent.withValues(alpha: 0.30),
-                  // Độ lệch lên ĐÚNG BẰNG độ toả. Bóng toả ra mọi phía chừng
+                  // Độ lệch lên LUÔN BẰNG độ toả. Bóng lan ra mọi phía chừng
                   // `blurRadius`, nên đẩy lên đúng chừng ấy thì mép dưới của
                   // bóng dừng lại ngay ở đáy thanh báo — không còn pixel nào
-                  // rơi xuống dải tab. Lệch ít hơn (ví dụ -4) là vẫn rớt vài
-                  // pixel xuống, thành vệt xám mờ đúng chỗ hai thanh giáp nhau.
-                  blurRadius: 10,
-                  offset: const Offset(0, -10),
+                  // rơi xuống dải tab. Hai số này phải đi cùng nhau: đổi một
+                  // cái mà quên cái kia là bóng lại rớt xuống dải tab.
+                  blurRadius: 6,
+                  offset: const Offset(0, -6),
                 ),
               ],
             ),
@@ -258,12 +283,20 @@ class _AppBannerState extends State<_AppBanner> with TickerProviderStateMixin {
               // đúng một điểm ảnh vật lý — vừa đủ tách thanh báo khỏi nền
               // trắng phía sau, chưa đủ để thành một khung viền lộ liễu.
               //
-              // Viền giữ MÀU XANH ở cả bốn trạng thái, không đổi theo `kind`:
-              // nó là đường bao của thanh báo — thứ luôn giống nhau — còn trạng
-              // thái đã có huy hiệu và thanh thời gian nói hộ.
+              // Viền lấy ĐÚNG màu của trạng thái — cùng màu với thanh thời gian
+              // và huy hiệu — nhưng hạ xuống 40% độ đục.
+              //
+              // Cùng màu để cả thanh báo là một khối thống nhất: nhìn viền là
+              // đã đoán được trạng thái trước khi đọc chữ. Nhạt đi vì viền chạy
+              // hết chu vi, để nguyên độ đục thì nó thành thứ đậm nhất trên
+              // thanh và kéo mắt khỏi huy hiệu lẫn nội dung — trong khi việc
+              // của nó chỉ là tách thanh báo khỏi nền trắng phía sau.
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
-                side: BorderSide(color: AppColors.accent, width: 0.5),
+                side: BorderSide(
+                  color: widget.kind.color.withValues(alpha: 0.4),
+                  width: 0.5,
+                ),
               ),
               clipBehavior: Clip.antiAlias,
               child: Column(
@@ -279,7 +312,10 @@ class _AppBannerState extends State<_AppBanner> with TickerProviderStateMixin {
 
   Widget _buildRow() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(14, 11, 6, 11),
+      // Đệm dọc 9.5 chứ không phải 11: hai dòng chữ (13px + 12px ≈ 33px) vẫn
+      // lọt trong chiều cao huy hiệu 34px, nên chiều cao thanh vẫn do huy hiệu
+      // quyết định — hạ đệm là hạ được thật, không bị chữ chống lên.
+      padding: const EdgeInsets.fromLTRB(14, 9.5, 6, 9.5),
       child: Row(
         children: [
           // Huy hiệu tròn đặc: trên nền trắng thì một icon trơn chìm nghỉm,
@@ -295,13 +331,33 @@ class _AppBannerState extends State<_AppBanner> with TickerProviderStateMixin {
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: Text(
-              widget.message,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: AppColors.ink,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Dòng KẾT QUẢ: đậm, màu theo trạng thái. Đọc một chữ là biết
+                // được hay hỏng, không phải đọc hết câu mô tả.
+                Text(
+                  widget.kind.title(AppLocalizations.of(context)),
+                  style: TextStyle(
+                    fontSize: 13,
+                    height: 1.2,
+                    fontWeight: FontWeight.w700,
+                    color: widget.kind.color,
+                  ),
+                ),
+                // Dòng MÔ TẢ: nhạt và nhỏ hơn, nói rõ việc gì vừa xảy ra.
+                Text(
+                  widget.message,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    height: 1.25,
+                    color: AppColors.inkMuted,
+                  ),
+                ),
+              ],
             ),
           ),
           // Nút đóng: người dùng đọc xong rồi thì không phải chờ hết ba giây,

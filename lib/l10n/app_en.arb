@@ -94,8 +94,13 @@
   "commonConfirm": "Confirm",
   "commonLoading": "Loading...",
   "commonNotUpdated": "Not updated",
+  "commonReloadFailed": "Couldn't reload data",
   "commonReloadSuccess": "Data reloaded successfully",
   "commonRetry": "Retry",
+  "commonStatusFailed": "Failed",
+  "commonStatusInfo": "Information",
+  "commonStatusSuccess": "Success",
+  "commonStatusWarning": "Heads up",
   "commonSave": "Save",
   "contactCopied": "Copied {value}",
   "@contactCopied": {

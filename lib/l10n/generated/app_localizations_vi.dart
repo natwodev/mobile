@@ -242,10 +242,25 @@ class AppLocalizationsVi extends AppLocalizations {
   String get commonNotUpdated => 'Chưa cập nhật';
 
   @override
+  String get commonReloadFailed => 'Tải lại dữ liệu thất bại';
+
+  @override
   String get commonReloadSuccess => 'Tải lại dữ liệu thành công';
 
   @override
   String get commonRetry => 'Thử lại';
+
+  @override
+  String get commonStatusFailed => 'Thất bại';
+
+  @override
+  String get commonStatusInfo => 'Thông tin';
+
+  @override
+  String get commonStatusSuccess => 'Thành công';
+
+  @override
+  String get commonStatusWarning => 'Lưu ý';
 
   @override
   String get commonSave => 'Lưu';
