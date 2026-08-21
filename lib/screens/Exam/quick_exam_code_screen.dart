@@ -355,8 +355,16 @@ class _QuickExamCodeScreenState extends State<QuickExamCodeScreen> {
                       color: AppColors.accent.withOpacity(0.1),
                       shape: BoxShape.circle,
                     ),
+                    // Quiz01, ĐÚNG icon của nút đã mở ra màn này — cả nút trên
+                    // thanh điều hướng lẫn nút nhanh ở Trang chủ đều dùng nó.
+                    // Người dùng vừa chạm một hình rồi thấy hình khác hiện ra
+                    // thì phải dừng lại tự hỏi mình có bấm nhầm không.
+                    //
+                    // Chìa khoá cũ còn sai nghĩa: nó đọc ra là mở khoá hay đổi
+                    // mật khẩu, trong khi việc ở đây là nhập MÃ CA THI. Nút ở
+                    // Trang chủ đã bỏ chìa khoá từ trước, chỉ còn sót lại đây.
                     child: const HugeIcon(
-                      icon: HugeIcons.strokeRoundedKey01,
+                      icon: HugeIcons.strokeRoundedQuiz01,
                       size: 44.0,
                       color: AppColors.accent,
                     ),

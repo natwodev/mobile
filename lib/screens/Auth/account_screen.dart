@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../widget/common/app_buttons.dart';
 import '../../widget/common/app_modal.dart';
+import '../../widget/common/app_sheet.dart';
 import '../../widget/common/app_toast.dart';
 import '../../widget/common/app_top_bar.dart';
 import '../../widget/common/app_refresh_indicator.dart';
@@ -172,61 +173,65 @@ class _AccountScreenState extends State<AccountScreen> {
     }
   }
 
-  /// Hỏi nguồn ảnh rồi tải lên.
+  /// Một lựa chọn nguồn ảnh trên tấm sheet.
   ///
-  /// Tách "chọn nguồn" thành một bảng riêng thay vì mở thẳng thư viện: máy
-  /// thật của sinh viên phần lớn chưa có sẵn ảnh chân dung, mở thẳng thư viện
-  /// là bắt họ thoát ra chụp rồi quay lại.
-  Future<void> _changeAvatar() async {
-    final l10n = AppLocalizations.of(context);
-
-    final source = await showModalBottomSheet<ImageSource>(
-      context: context,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (sheetContext) => SafeArea(
-        top: false,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+  /// Dựng bằng thẻ chứ không dùng `ListTile`: `ListTile` chỉ có chữ và icon nằm
+  /// trần, hai dòng trông như một danh sách để đọc chứ không phải hai nút để
+  /// bấm. Đóng khung lại thì rõ ngay là chọn một trong hai.
+  Widget _buildSourceOption({
+    required List<List<dynamic>> icon,
+    required String label,
+    required ImageSource source,
+  }) {
+    return InkWell(
+      onTap: () => Navigator.pop(context, source),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        decoration: AppSurfaces.card(soft: true),
+        child: Row(
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-              child: Row(
-                children: [
-                  Text(
-                    l10n.authAvatarChangeTitle,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
+            HugeIcon(icon: icon, color: AppColors.accent, size: 22),
+            const SizedBox(width: 14),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: AppColors.ink,
               ),
             ),
-            ListTile(
-              leading: const HugeIcon(
-                icon: HugeIcons.strokeRoundedCamera01,
-                color: AppColors.accent,
-                size: 22,
-              ),
-              title: Text(l10n.authAvatarFromCamera),
-              onTap: () => Navigator.pop(sheetContext, ImageSource.camera),
-            ),
-            ListTile(
-              leading: const HugeIcon(
-                icon: HugeIcons.strokeRoundedImage01,
-                color: AppColors.accent,
-                size: 22,
-              ),
-              title: Text(l10n.authAvatarFromGallery),
-              onTap: () => Navigator.pop(sheetContext, ImageSource.gallery),
-            ),
-            const SizedBox(height: 8),
           ],
         ),
       ),
+    );
+  }
+
+  /// Hỏi nguồn ảnh rồi tải lên.
+  ///
+  /// Tách "chọn nguồn" thành một tấm riêng thay vì mở thẳng thư viện: máy thật
+  /// của sinh viên phần lớn chưa có sẵn ảnh chân dung, mở thẳng thư viện là bắt
+  /// họ thoát ra chụp rồi quay lại.
+  Future<void> _changeAvatar() async {
+    final l10n = AppLocalizations.of(context);
+
+    final source = await showAppSheet<ImageSource>(
+      context: context,
+      title: l10n.authAvatarChangeTitle,
+      icon: HugeIcons.strokeRoundedImageAdd02,
+      children: [
+        _buildSourceOption(
+          icon: HugeIcons.strokeRoundedCamera01,
+          label: l10n.authAvatarFromCamera,
+          source: ImageSource.camera,
+        ),
+        const SizedBox(height: 8),
+        _buildSourceOption(
+          icon: HugeIcons.strokeRoundedImage01,
+          label: l10n.authAvatarFromGallery,
+          source: ImageSource.gallery,
+        ),
+      ],
     );
 
     if (source == null || !mounted) return;
@@ -337,17 +342,11 @@ class _AccountScreenState extends State<AccountScreen> {
   }
 
   void _openDeviceInfo() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const DeviceInfoScreen()),
-    );
+    showDeviceInfoSheet(context);
   }
 
   void _openFeedback() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const FeedbackScreen()),
-    );
+    showFeedbackSheet(context);
   }
 
   /// Hỏi trước khi dọn: nói rõ xoá cái gì và đang chiếm bao nhiêu, vì nghe
@@ -357,28 +356,45 @@ class _AccountScreenState extends State<AccountScreen> {
     final int currentSize = await CacheService.size();
     if (!mounted) return;
 
-    final confirmed = await showDialog<bool>(
+    // Tấm trượt lên chứ không phải hộp thoại giữa màn, dù đây là một câu hỏi
+    // xác nhận. Lý do: xoá bộ nhớ đệm KHÔNG mất gì của người dùng — ảnh và tệp
+    // tạm tải lại được, đăng nhập vẫn còn. Nó khác hẳn đăng xuất hay dọn sạch
+    // hộp thư, hai thứ không lùi lại được nên vẫn giữ `AppModal` chặn đường.
+    final confirmed = await showAppSheet<bool>(
       context: context,
-      builder: (dialogContext) => AppModal(
-        title: l10n.clearCacheTitle,
-        icon: HugeIcons.strokeRoundedDelete02,
-        accentColor: AppColors.accent,
-        onClose: () => Navigator.pop(dialogContext, false),
-        children: [
-          Text(l10n.clearCacheMessage),
-          const SizedBox(height: 8),
-          Text(
+      title: l10n.clearCacheTitle,
+      icon: HugeIcons.strokeRoundedDelete02,
+      children: [
+        Text(
+          l10n.clearCacheMessage,
+          style: const TextStyle(
+            fontSize: 14,
+            height: 1.45,
+            color: AppColors.inkMuted,
+          ),
+        ),
+        const SizedBox(height: 14),
+        // Dung lượng đang chiếm: đây là con số quyết định người dùng có bấm hay
+        // không, nên đóng khung cho nó nổi hẳn khỏi đoạn giải thích.
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: AppSurfaces.card(color: AppColors.accentBg, soft: true),
+          child: Text(
             l10n.clearCacheSize(CacheService.formatBytes(currentSize)),
-            style: const TextStyle(fontWeight: FontWeight.w600),
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: AppColors.accent,
+            ),
           ),
-        ],
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: Text(l10n.clearCacheConfirm),
-          ),
-        ],
-      ),
+        ),
+      ],
+      actions: [
+        ElevatedButton(
+          onPressed: () => Navigator.pop(context, true),
+          child: Text(l10n.clearCacheConfirm),
+        ),
+      ],
     );
 
     if (confirmed != true) return;
@@ -720,7 +736,7 @@ class _AccountScreenState extends State<AccountScreen> {
               children: [
                 Expanded(
                   child: _buildInfoRow(
-                    icon: HugeIcons.strokeRoundedLanguageCircle,
+                    icon: languageIcon,
                     label: l10n.settingsLanguage,
                     value: languageLabel(LocaleController.instance.locale),
                     isLast: true,

@@ -1,7 +1,7 @@
 import 'package:hugeicons/hugeicons.dart';
 import 'package:flutter/material.dart';
 
-import '../../widget/common/app_top_bar.dart';
+import '../../widget/common/app_sheet.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -16,6 +16,21 @@ import '../../widget/common/app_toast.dart';
 /// App chưa có API nhận phản hồi nên nội dung được đẩy sang ứng dụng email của
 /// máy kèm sẵn thông tin thiết bị. Máy không có ứng dụng email thì chép vào
 /// bộ nhớ tạm để người dùng gửi bằng cách khác, thay vì báo lỗi cụt.
+
+/// Mở tấm "Báo lỗi / góp ý" trượt lên từ đáy.
+///
+/// Cùng lý do như Thông tin thiết bị: nội dung chỉ là hai ô nhập và một nút,
+/// không đáng một trang riêng. Sheet còn hợp hơn ở chỗ người dùng gửi xong là
+/// trượt xuống về đúng chỗ cũ.
+Future<bool?> showFeedbackSheet(BuildContext context) {
+  return showAppSheet<bool>(
+    context: context,
+    title: AppLocalizations.of(context).feedbackTitle,
+    icon: HugeIcons.strokeRoundedBug01,
+    children: const [FeedbackScreen()],
+  );
+}
+
 class FeedbackScreen extends StatefulWidget {
   const FeedbackScreen({super.key});
 
@@ -117,114 +132,113 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppTopBar(title: l10n.feedbackTitle, showBack: true),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(16),
+    // Không còn `Scaffold` với AppBar: tiêu đề và nút đóng do `AppSheet` lo.
+    //
+    // `Column` chứ không phải `ListView`: tấm sheet đã tự cuộn, lồng thêm một
+    // vùng cuộn nữa là hai thứ tranh nhau cử chỉ kéo — mà ở đây còn tệ hơn vì
+    // ô nội dung cao 7 dòng cũng cuộn được, thành ba tầng.
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: _buildTypeChip(
-                    label: l10n.feedbackTypeBug,
-                    selected: _isBug,
-                    onTap: () => setState(() => _isBug = true),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildTypeChip(
-                    label: l10n.feedbackTypeIdea,
-                    selected: !_isBug,
-                    onTap: () => setState(() => _isBug = false),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Text(
-              l10n.feedbackContentLabel,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _content,
-              maxLines: 7,
-              textInputAction: TextInputAction.newline,
-              decoration: InputDecoration(
-                hintText: l10n.feedbackContentHint,
-                errorText: _contentError,
+            Expanded(
+              child: _buildTypeChip(
+                label: l10n.feedbackTypeBug,
+                selected: _isBug,
+                onTap: () => setState(() => _isBug = true),
               ),
             ),
-            const SizedBox(height: 16),
-            Text(
-              l10n.feedbackContactLabel,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _contact,
-              decoration: InputDecoration(hintText: l10n.feedbackContactHint),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: const Color(0xFFEFF6FF),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: const Color(0xFFBFDBFE)),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const HugeIcon(
-                    icon: HugeIcons.strokeRoundedInformationCircle,
-                    size: 18,
-                    color: AppColors.accent,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      l10n.feedbackAttachNote,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        height: 1.4,
-                        color: AppColors.ink,
-                      ),
-                    ),
-                  ),
-                ],
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildTypeChip(
+                label: l10n.feedbackTypeIdea,
+                selected: !_isBug,
+                onTap: () => setState(() => _isBug = false),
               ),
             ),
-            const SizedBox(height: 24),
-            // Gửi phản hồi là hành động chính của màn này nên để nguyên
-            // [ElevatedButton] không style — theme đã lo nền, bo góc, cỡ chữ và
-            // chiều cao 48; `SizedBox` chỉ còn giữ ý đồ giãn ngang.
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _sending ? null : _send,
-                child: _sending
-                    // Lúc gửi thì nút bị vô hiệu hoá, nền chuyển sang xám nhạt
-                    // `AppColors.line` — vòng quay màu trắng sẽ tàng hình trên
-                    // nền đó, nên tô bằng màu chữ của trạng thái tắt.
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: AppColors.disabledInk,
-                        ),
-                      )
-                    : Text(l10n.feedbackSend),
-              ),
-            ),
-            const SizedBox(height: 16),
           ],
         ),
-      ),
+        const SizedBox(height: 20),
+        Text(
+          l10n.feedbackContentLabel,
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          controller: _content,
+          maxLines: 7,
+          textInputAction: TextInputAction.newline,
+          decoration: InputDecoration(
+            hintText: l10n.feedbackContentHint,
+            errorText: _contentError,
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          l10n.feedbackContactLabel,
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          controller: _contact,
+          decoration: InputDecoration(hintText: l10n.feedbackContactHint),
+        ),
+        const SizedBox(height: 16),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: const Color(0xFFEFF6FF),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: const Color(0xFFBFDBFE)),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const HugeIcon(
+                icon: HugeIcons.strokeRoundedInformationCircle,
+                size: 18,
+                color: AppColors.accent,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  l10n.feedbackAttachNote,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    height: 1.4,
+                    color: AppColors.ink,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 24),
+        // Gửi phản hồi là hành động chính của màn này nên để nguyên
+        // [ElevatedButton] không style — theme đã lo nền, bo góc, cỡ chữ và
+        // chiều cao 48; `SizedBox` chỉ còn giữ ý đồ giãn ngang.
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: _sending ? null : _send,
+            child: _sending
+                // Lúc gửi thì nút bị vô hiệu hoá, nền chuyển sang xám nhạt
+                // `AppColors.line` — vòng quay màu trắng sẽ tàng hình trên
+                // nền đó, nên tô bằng màu chữ của trạng thái tắt.
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.disabledInk,
+                    ),
+                  )
+                : Text(l10n.feedbackSend),
+          ),
+        ),
+      ],
     );
   }
 

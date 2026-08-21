@@ -23,7 +23,7 @@ packages:
       path: "../animated_app_bar"
       relative: true
     source: path
-    version: "0.3.0"
+    version: "0.4.0"
   archive:
     dependency: transitive
     description:

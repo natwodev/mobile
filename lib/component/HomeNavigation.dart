@@ -8,6 +8,8 @@ import '../l10n/generated/app_localizations.dart';
 import '../screens/auth/account_screen.dart';
 import '../screens/Exam/exam_history_screen.dart';
 import '../screens/home_screen.dart';
+import '../screens/classroom/classroom_screen.dart';
+import '../screens/Exam/exam_schedule_screen.dart';
 import '../controller/notification_badge.dart';
 import '../widget/common/app_buttons.dart';
 import '../screens/notification/notification_screen.dart';
@@ -39,15 +41,17 @@ class _HomeNavigationState extends State<HomeNavigation> {
   /// đang mở về đầu. Dùng chung một bộ cho cả ba là không được: một
   /// `ScrollController` chỉ gắn được vào một vùng cuộn tại một thời điểm.
   final List<ScrollController> _scrollControllers =
-      List<ScrollController>.generate(3, (_) => ScrollController());
+      List<ScrollController>.generate(5, (_) => ScrollController());
 
   /// PHẢI cùng thứ tự với danh sách `items` của thanh tab bên dưới — hai danh
   /// sách này chỉ khớp nhau bằng chỉ số, thêm tab vào giữa mà quên một bên là
   /// bấm "Lịch sử" ra màn "Tài khoản".
   late final List<Widget> _screens = [
     HomeScreen(scrollController: _scrollControllers[0]),
-    ExamHistoryScreen(scrollController: _scrollControllers[1]),
-    AccountScreen(scrollController: _scrollControllers[2]),
+    ExamScheduleScreen(scrollController: _scrollControllers[1]),
+    ExamHistoryScreen(scrollController: _scrollControllers[2]),
+    ClassroomScreen(scrollController: _scrollControllers[3]),
+    AccountScreen(scrollController: _scrollControllers[4]),
   ];
 
   @override
@@ -141,6 +145,13 @@ class _HomeNavigationState extends State<HomeNavigation> {
   /// vẫn nổi cao hơn thanh đó đúng chừng này.
   static const double _barLift = 30;
 
+  /// Chuyển sang một tab. [index] là chỉ số MÀN, khớp một-một với thứ tự các ô
+  /// trên thanh.
+  ///
+  /// Từng có giai đoạn thanh chứa cả nút hành động (Kiểm tra nhanh, Quét mã),
+  /// lúc đó chỉ số ô và chỉ số màn lệch nhau nên phải có một bảng ánh xạ. Giờ
+  /// mọi ô đều là tab nên bỏ bảng đó đi — giữ lại chỉ tổ thêm một tầng phải đọc
+  /// mà không giải quyết gì.
   void changeTab(int index) {
     final bool sameTab = index == _currentIndex;
 
@@ -253,15 +264,33 @@ class _HomeNavigationState extends State<HomeNavigation> {
                   padding: const EdgeInsets.all(_barPadding),
                   itemPadding: const EdgeInsets.symmetric(
                     vertical: _itemPaddingV,
-                    horizontal: 20,
+                    // Thu từ 20 xuống 10: thanh có 5 ô thay vì 3, giữ nguyên là
+                    // chữ của tab đang chọn bị cắt cụt. 5 là trần thực tế —
+                    // thêm ô thứ sáu thì phải tính lại cả cách bố trí.
+                    horizontal: 10,
                   ),
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   textStyle: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),
+                  // THỨ TỰ phải khớp với `_barSlots`. Hai nút hành động đặt vào
+                  // GIỮA chứ không dồn ra cuối: đây là hai thứ sinh viên bấm
+                  // nhiều nhất (vào thi), mà giữa thanh mới là chỗ ngón cái với
+                  // tới dễ nhất khi cầm một tay.
                   items: [
                     _navItem(HugeIcons.strokeRoundedHome01, l10n.homeNavHome),
+                    // Lịch thi đứng NGAY CẠNH Lịch sử: hai tab này là hai đầu
+                    // của cùng một trục thời gian — ca thi sắp tới và bài đã
+                    // làm xong. Xếp liền nhau thì quan hệ đó tự lộ ra, khỏi
+                    // phải giải thích.
+                    //
+                    // Cũng là tab CHƯA CÓ dữ liệu. Backend mới chỉ có endpoint
+                    // trả về phiên thi ĐÃ HOÀN THÀNH, tức nguồn của Lịch sử.
+                    _navItem(
+                      HugeIcons.strokeRoundedCalendarCheckIn01,
+                      l10n.homeNavSchedule,
+                    ),
                     // CheckList thay cho Clock01: màn này là DANH SÁCH bài đã
                     // làm kèm điểm, không phải thứ liên quan tới giờ giấc. Đồng
                     // hồ đọc ra là "thời gian" hoặc "đang chờ" — sai nội dung.
@@ -270,6 +299,14 @@ class _HomeNavigationState extends State<HomeNavigation> {
                     _navItem(
                       HugeIcons.strokeRoundedTaskDone01,
                       l10n.homeNavHistory,
+                    ),
+                    // Lớp học: tab CHƯA CÓ dữ liệu, mới là chỗ giữ sẵn. Dựng
+                    // sớm vì chỗ đứng của nó ảnh hưởng tới chỉ số của mọi tab
+                    // khác — chốt bây giờ thì lúc có API chỉ còn việc đổ dữ
+                    // liệu vào.
+                    _navItem(
+                      HugeIcons.strokeRoundedCourse,
+                      l10n.homeNavClassroom,
                     ),
                     // UserCircle thay cho User trơn: ở cỡ 22px, hình người nằm
                     // trong vòng tròn có khối rõ hơn hẳn mấy nét rời, nhất là
