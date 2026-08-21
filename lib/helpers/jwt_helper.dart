@@ -14,7 +14,9 @@ class JwtHelper {
       if (parts.length != 3) return null;
 
       // base64url trong JWT bị cắt phần đệm '=' nên phải bù lại trước khi giải.
-      final decoded = utf8.decode(base64Url.decode(base64Url.normalize(parts[1])));
+      final decoded = utf8.decode(
+        base64Url.decode(base64Url.normalize(parts[1])),
+      );
       final payload = jsonDecode(decoded);
       return payload is Map<String, dynamic> ? payload : null;
     } catch (_) {

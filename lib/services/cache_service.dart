@@ -67,8 +67,10 @@ class CacheService {
       if (!await dir.exists()) continue;
 
       try {
-        await for (final FileSystemEntity entity
-            in dir.list(recursive: true, followLinks: false)) {
+        await for (final FileSystemEntity entity in dir.list(
+          recursive: true,
+          followLinks: false,
+        )) {
           if (entity is! File) continue;
           try {
             total += handle(entity, await entity.length());

@@ -5,9 +5,9 @@ import 'package:flutter_highlight/themes/github.dart';
 /// Một mẩu nội dung câu hỏi sau khi tách phần code ra khỏi phần chữ.
 class ContentSegment {
   const ContentSegment.text(this.value)
-      : isCode = false,
-        isBlock = false,
-        language = '';
+    : isCode = false,
+      isBlock = false,
+      language = '';
 
   const ContentSegment.code(
     this.value, {
@@ -54,9 +54,7 @@ class CodeContent {
   ///
   /// Đây chính là dạng web coi là code (ProcessedHTML.tsx:27) — đề dạy HTML
   /// hay hỏi "đoạn thẻ sau in ra gì" đều rơi vào đây.
-  static final RegExp _escapedTag = RegExp(
-    r'&lt;\/?[a-zA-Z][^&]*?&gt;',
-  );
+  static final RegExp _escapedTag = RegExp(r'&lt;\/?[a-zA-Z][^&]*?&gt;');
 
   /// Nội dung có code hay không — dùng để bỏ qua toàn bộ nhánh xử lý cho
   /// những câu chữ thuần, vốn là đa số.
@@ -84,17 +82,21 @@ class CodeContent {
         final String raw = regex == _escapedTag
             ? (m.group(0) ?? '')
             : (m.groupCount >= 2 ? (m.group(2) ?? '') : (m.group(1) ?? ''));
-        final String declared =
-            regex == _fenced ? (m.group(1) ?? '').trim() : '';
+        final String declared = regex == _fenced
+            ? (m.group(1) ?? '').trim()
+            : '';
 
-        matches.add(_Match(
-          start: m.start,
-          end: m.end,
-          code: unescape(_stripTags(raw)).trim(),
-          block: block,
-          language: forcedLanguage ??
-              (declared.isNotEmpty ? declared : detectLanguage(raw)),
-        ));
+        matches.add(
+          _Match(
+            start: m.start,
+            end: m.end,
+            code: unescape(_stripTags(raw)).trim(),
+            block: block,
+            language:
+                forcedLanguage ??
+                (declared.isNotEmpty ? declared : detectLanguage(raw)),
+          ),
+        );
       }
     }
 
@@ -115,11 +117,9 @@ class CodeContent {
         segments.add(ContentSegment.text(input.substring(cursor, m.start)));
       }
       if (m.code.isNotEmpty) {
-        segments.add(ContentSegment.code(
-          m.code,
-          language: m.language,
-          isBlock: m.block,
-        ));
+        segments.add(
+          ContentSegment.code(m.code, language: m.language, isBlock: m.block),
+        );
       }
       cursor = m.end;
     }

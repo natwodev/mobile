@@ -55,10 +55,7 @@ class BaseService {
   }
 
   // ===== POST JSON =====
-  Future<http.Response> post(
-    String endpoint,
-    Map<String, dynamic> body,
-  ) async {
+  Future<http.Response> post(String endpoint, Map<String, dynamic> body) async {
     final token = await getToken();
 
     return await http.post(
@@ -130,9 +127,7 @@ class BaseService {
 
     return await http.post(
       Uri.parse('$baseUrl/$endpoint'),
-      headers: {
-        if (token != null) 'Authorization': 'Bearer $token',
-      },
+      headers: {if (token != null) 'Authorization': 'Bearer $token'},
       body: body,
     );
   }

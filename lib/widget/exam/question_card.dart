@@ -101,7 +101,9 @@ class QuestionCard extends StatelessWidget {
       } else if (response == null) {
         // null KHÔNG phải "lỗi không rõ": saveAnswer đã cất câu này vào hàng đợi
         // và sẽ tự gửi lại khi có mạng. Ghi đúng như vậy để đọc log không hoảng.
-        debugPrint('⏳ Chưa gửi được, đã đưa vào hàng đợi: Question $questionId');
+        debugPrint(
+          '⏳ Chưa gửi được, đã đưa vào hàng đợi: Question $questionId',
+        );
       } else {
         debugPrint('❌ Máy chủ từ chối lưu đáp án: ${response.message}');
       }
@@ -131,11 +133,17 @@ class QuestionCard extends StatelessWidget {
         parts.add(
           segment.isBlock
               ? CodeContent.buildBlock(
-                  segment.value, segment.language, fontSize)
+                  segment.value,
+                  segment.language,
+                  fontSize,
+                )
               : Align(
                   alignment: Alignment.centerLeft,
                   child: CodeContent.buildInline(
-                      segment.value, segment.language, fontSize),
+                    segment.value,
+                    segment.language,
+                    fontSize,
+                  ),
                 ),
         );
         continue;
@@ -292,7 +300,11 @@ class QuestionCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          HugeIcon(icon: HugeIcons.strokeRoundedImageNotFound01, color: Colors.grey[600], size: 48),
+          HugeIcon(
+            icon: HugeIcons.strokeRoundedImageNotFound01,
+            color: Colors.grey[600],
+            size: 48,
+          ),
           const SizedBox(height: 8),
           Text(
             message,

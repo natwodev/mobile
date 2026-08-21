@@ -31,9 +31,7 @@ class ExamSubmissionDto {
       startTime: json['startTime'] != null
           ? DateTime.parse(json['startTime'])
           : null,
-      endTime: json['endTime'] != null
-          ? DateTime.parse(json['endTime'])
-          : null,
+      endTime: json['endTime'] != null ? DateTime.parse(json['endTime']) : null,
       studentAnswersString: json['studentAnswersString'] ?? '',
       answerKey: json['answerKey'] ?? '',
     );

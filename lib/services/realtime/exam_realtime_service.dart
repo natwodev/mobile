@@ -192,7 +192,8 @@ class ExamRealtimeService {
     String deviceInfo = '',
   }) async {
     final HubConnection? connection = _connection;
-    if (connection == null || connection.state != HubConnectionState.Connected) {
+    if (connection == null ||
+        connection.state != HubConnectionState.Connected) {
       return false;
     }
     if (userCode.isEmpty || firstName.isEmpty || lastName.isEmpty) {
@@ -201,23 +202,26 @@ class ExamRealtimeService {
     }
 
     try {
-      await connection.invoke('ReportViolation', args: <Object>[
-        <String, dynamic>{
-          'studentExamSessionId': studentExamSessionId,
-          'examSessionSubjectId': examSessionSubjectId,
-          'applicationUserId': studentId,
-          'userCode': userCode,
-          'firstName': firstName,
-          'lastName': lastName,
-          'fullName': fullName ?? '$firstName $lastName'.trim(),
-          'violationType': violationType,
-          'description': description,
-          // Hub giới hạn 32KB mỗi tin nhắn nên cắt ngắn cho chắc.
-          'deviceInfo': deviceInfo.length > 512
-              ? deviceInfo.substring(0, 512)
-              : deviceInfo,
-        }
-      ]);
+      await connection.invoke(
+        'ReportViolation',
+        args: <Object>[
+          <String, dynamic>{
+            'studentExamSessionId': studentExamSessionId,
+            'examSessionSubjectId': examSessionSubjectId,
+            'applicationUserId': studentId,
+            'userCode': userCode,
+            'firstName': firstName,
+            'lastName': lastName,
+            'fullName': fullName ?? '$firstName $lastName'.trim(),
+            'violationType': violationType,
+            'description': description,
+            // Hub giới hạn 32KB mỗi tin nhắn nên cắt ngắn cho chắc.
+            'deviceInfo': deviceInfo.length > 512
+                ? deviceInfo.substring(0, 512)
+                : deviceInfo,
+          },
+        ],
+      );
       return true;
     } catch (e) {
       debugPrint('Gửi ReportViolation hỏng: $e');
@@ -263,38 +267,46 @@ class ExamRealtimeService {
     connection.on('ReceiveExtraTime', (List<Object?>? args) {
       final Map<String, dynamic>? data = _payload(args);
       if (data == null) return;
-      _emit(ExtraTimeEvent(
-        minutes: _asInt(data['minutes']),
-        newEndTime: _asDate(data['newEndTime']),
-        reason: _asString(data['extraTimeReason']),
-        timestamp: data['timestamp']?.toString(),
-      ));
+      _emit(
+        ExtraTimeEvent(
+          minutes: _asInt(data['minutes']),
+          newEndTime: _asDate(data['newEndTime']),
+          reason: _asString(data['extraTimeReason']),
+          timestamp: data['timestamp']?.toString(),
+        ),
+      );
     });
 
     connection.on('ExamSubmittedByTeacher', (List<Object?>? args) {
       final Map<String, dynamic>? data = _payload(args);
-      _emit(TeacherSubmittedEvent(
-        // Chỉ nhánh tự nộp do vi phạm mới có field này.
-        forced: _asBool(data?['forceSubmitted']),
-        reason: _asString(data?['submitReason']),
-        submittedTime: _asDate(data?['submittedTime']),
-      ));
+      _emit(
+        TeacherSubmittedEvent(
+          // Chỉ nhánh tự nộp do vi phạm mới có field này.
+          forced: _asBool(data?['forceSubmitted']),
+          reason: _asString(data?['submitReason']),
+          submittedTime: _asDate(data?['submittedTime']),
+        ),
+      );
     });
 
     connection.on('ReceiveViolationWarning', (List<Object?>? args) {
       final Map<String, dynamic>? data = _payload(args);
       if (data == null) return;
-      _emit(ViolationWarningEvent(
-        violationCount: _asInt(data['violationCount']),
-        threshold: _asInt(data['threshold']),
-      ));
+      _emit(
+        ViolationWarningEvent(
+          violationCount: _asInt(data['violationCount']),
+          threshold: _asInt(data['threshold']),
+        ),
+      );
     });
 
     connection.on('StudentBlocked', (List<Object?>? args) {
       final Map<String, dynamic>? data = _payload(args);
-      _emit(StudentBlockedEvent(
-        examSessionSubjectId: _asString(data?['examSessionSubjectId']),
-      ));
+      _emit(
+        StudentBlockedEvent(
+          examSessionSubjectId: _asString(data?['examSessionSubjectId']),
+        ),
+      );
     });
 
     connection.on('ReceiveNotification', (List<Object?>? args) {
@@ -304,39 +316,45 @@ class ExamRealtimeService {
       if (message.isEmpty) return;
 
       final String title = _asString(data['title']);
-      _emit(TeacherMessageEvent(
-        message: message,
-        // Nhánh gửi cho một sinh viên KHÔNG có title — web ghép cứng
-        // `"${title}: ${message}"` nên hiện ra "undefined: ...", ở đây bỏ hẳn
-        // khi rỗng. Đây là chỗ DUY NHẤT cố ý khác web.
-        title: title.isEmpty ? null : title,
-        durationMs: _asIntOrNull(data['toastDuration']),
-        style: _asStringOrNull(data['toastStyle']),
-        position: _asStringOrNull(data['toastPosition']),
-        // Màu nền giám thị chọn (`#RRGGBB`). Chuỗi rỗng thành null ngay tại đây
-        // nên phía màn hình chỉ còn một trường hợp "không có màu" duy nhất.
-        color: _asStringOrNull(data['toastColor']),
-      ));
+      _emit(
+        TeacherMessageEvent(
+          message: message,
+          // Nhánh gửi cho một sinh viên KHÔNG có title — web ghép cứng
+          // `"${title}: ${message}"` nên hiện ra "undefined: ...", ở đây bỏ hẳn
+          // khi rỗng. Đây là chỗ DUY NHẤT cố ý khác web.
+          title: title.isEmpty ? null : title,
+          durationMs: _asIntOrNull(data['toastDuration']),
+          style: _asStringOrNull(data['toastStyle']),
+          position: _asStringOrNull(data['toastPosition']),
+          // Màu nền giám thị chọn (`#RRGGBB`). Chuỗi rỗng thành null ngay tại đây
+          // nên phía màn hình chỉ còn một trường hợp "không có màu" duy nhất.
+          color: _asStringOrNull(data['toastColor']),
+        ),
+      );
     });
 
     connection.on('ReceiveExamScore', (List<Object?>? args) {
       final Map<String, dynamic>? data = _payload(args);
       if (data == null) return;
       if (!_asBool(data['isSuccess'])) return;
-      _emit(ExamScoreEvent(
-        score: _asDouble(data['score']),
-        resultToken: _asString(data['resultToken']),
-      ));
+      _emit(
+        ExamScoreEvent(
+          score: _asDouble(data['score']),
+          resultToken: _asString(data['resultToken']),
+        ),
+      );
     });
 
     connection.on('ViolationWarningConfigChanged', (List<Object?>? args) {
       final Map<String, dynamic>? data = _payload(args);
       if (data == null) return;
-      _emit(ViolationConfigChangedEvent(
-        examSessionSubjectId: _asString(data['examSessionSubjectId']),
-        enableWarnings: _asBool(data['enableViolationWarnings']),
-        showWarningModal: _asBool(data['showViolationWarningModal']),
-      ));
+      _emit(
+        ViolationConfigChangedEvent(
+          examSessionSubjectId: _asString(data['examSessionSubjectId']),
+          enableWarnings: _asBool(data['enableViolationWarnings']),
+          showWarningModal: _asBool(data['showViolationWarningModal']),
+        ),
+      );
     });
 
     // `Connected` (gửi riêng cho client) và `UserDisconnected` (broadcast cho

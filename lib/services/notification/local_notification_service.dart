@@ -136,11 +136,10 @@ class LocalNotificationService {
     }
   }
 
-  AndroidFlutterLocalNotificationsPlugin? get _android =>
-      _plugin
-          .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin
-          >();
+  AndroidFlutterLocalNotificationsPlugin? get _android => _plugin
+      .resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin
+      >();
 
   /// Xin quyền hiện thông báo. Gọi khi người dùng đã hiểu vì sao cần.
   ///

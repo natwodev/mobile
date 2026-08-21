@@ -8,7 +8,16 @@ import '../../services/notification_sound_service.dart';
 /// Kiểu toast — trùng ĐÚNG 8 giá trị `toastStyle` mà giám thị chọn được trong
 /// bảng cấu hình thông báo bên web
 /// (`frontend_manage/src/components/monitor/ToastOptionsConfig.tsx:38-45`).
-enum AppToastKind { success, error, warning, info, multiline, dark, themed, promise }
+enum AppToastKind {
+  success,
+  error,
+  warning,
+  info,
+  multiline,
+  dark,
+  themed,
+  promise,
+}
 
 /// Toast dùng chung, dựng lại đúng bộ toast của quiz web.
 ///
@@ -46,15 +55,20 @@ class AppToast {
     String? description,
     Duration? duration,
     bool playSound = true,
+
     /// Vị trí do máy chủ chỉ định (`toastPosition`), mặc định góc trên phải.
     AlignmentGeometry? alignment,
+
     /// Nền/chữ tự đặt, dùng cho thông báo có kiểu riêng (ví dụ "bị chặn").
     Color? backgroundColor,
     Color? foregroundColor,
+
     /// Âm báo khác mặc định của [kind].
     NotificationSound? sound,
+
     /// Icon tự đặt (vòng xoay của [showPromise]).
     Widget? icon,
+
     /// Ghi đè kiểu chữ tiêu đề — web có chỗ phóng to chữ cho thông báo nặng
     /// (bị chặn khỏi ca thi: 18px in đậm, `useQuiz.ts:787-797`).
     TextStyle? titleTextStyle,
@@ -71,15 +85,17 @@ class AppToast {
     // toàn nền tối nên luật cũ "khác trắng ⇒ chữ trắng" đúng với nó, nhưng gặp
     // vàng nhạt hay hồng nhạt là chữ trắng mất hút.
     final bool custom = backgroundColor != null;
-    final Color foreground = foregroundColor ??
+    final Color foreground =
+        foregroundColor ??
         (custom
             ? contrastForegroundOn(background)
             : (filled ? Colors.white : _ink));
 
     // Icon vẫn giữ nguyên hình theo [kind]; chỉ MÀU chạy theo tương phản của
     // nền mới, nếu không icon accent (vàng, xanh nhạt...) chìm y như chữ.
-    final Color iconTint =
-        custom ? foreground : (filled ? Colors.white : iconColorOf(kind));
+    final Color iconTint = custom
+        ? foreground
+        : (filled ? Colors.white : iconColorOf(kind));
 
     toastification.show(
       context: context,
@@ -94,12 +110,7 @@ class AppToast {
       borderSide: BorderSide.none,
       boxShadow: _shadow,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      icon: icon ??
-          HugeIcon(
-            icon: iconOf(kind),
-            color: iconTint,
-            size: 22.0,
-          ),
+      icon: icon ?? HugeIcon(icon: iconOf(kind), color: iconTint, size: 22.0),
       title: Text(
         title,
         style: TextStyle(
@@ -139,6 +150,7 @@ class AppToast {
     Duration pending = const Duration(seconds: 2),
     AlignmentGeometry? alignment,
     Duration? duration,
+
     /// Nền do giám thị chọn, CHỈ áp cho toast kết quả (pha thứ hai).
     ///
     /// Pha vòng xoay giữ nền trắng như web: nó là trạng thái "đang xử lý" chung
@@ -228,74 +240,73 @@ class AppToast {
   ///
   /// Web: mọi giá trị lạ đều rơi về `success` (`useQuiz.ts:636-640`).
   static AppToastKind kindFromStyle(String? style) => switch (style) {
-        'error' => AppToastKind.error,
-        'warning' => AppToastKind.warning,
-        'info' => AppToastKind.info,
-        'multiline' => AppToastKind.multiline,
-        'dark' => AppToastKind.dark,
-        'themed' => AppToastKind.themed,
-        'promise' => AppToastKind.promise,
-        _ => AppToastKind.success,
-      };
+    'error' => AppToastKind.error,
+    'warning' => AppToastKind.warning,
+    'info' => AppToastKind.info,
+    'multiline' => AppToastKind.multiline,
+    'dark' => AppToastKind.dark,
+    'themed' => AppToastKind.themed,
+    'promise' => AppToastKind.promise,
+    _ => AppToastKind.success,
+  };
 
   /// Icon của từng kiểu — chép nguyên bảng `styleConfig` của monitor
   /// (`ToastOptionsConfig.tsx:38-45`).
   static List<List<dynamic>> iconOf(AppToastKind kind) => switch (kind) {
-        AppToastKind.success => HugeIcons.strokeRoundedCheckmarkCircle02,
-        AppToastKind.error => HugeIcons.strokeRoundedCancel01,
-        AppToastKind.warning => HugeIcons.strokeRoundedAlert01,
-        AppToastKind.info => HugeIcons.strokeRoundedNotification01,
-        AppToastKind.promise => HugeIcons.strokeRoundedLoading03,
-        AppToastKind.multiline => HugeIcons.strokeRoundedTextAlignJustifyLeft,
-        AppToastKind.dark => HugeIcons.strokeRoundedViewOffSlash,
-        AppToastKind.themed => HugeIcons.strokeRoundedSettings02,
-      };
+    AppToastKind.success => HugeIcons.strokeRoundedCheckmarkCircle02,
+    AppToastKind.error => HugeIcons.strokeRoundedCancel01,
+    AppToastKind.warning => HugeIcons.strokeRoundedAlert01,
+    AppToastKind.info => HugeIcons.strokeRoundedNotification01,
+    AppToastKind.promise => HugeIcons.strokeRoundedLoading03,
+    AppToastKind.multiline => HugeIcons.strokeRoundedTextAlignJustifyLeft,
+    AppToastKind.dark => HugeIcons.strokeRoundedViewOffSlash,
+    AppToastKind.themed => HugeIcons.strokeRoundedSettings02,
+  };
 
   /// Màu icon, cũng từ bảng `styleConfig` của monitor.
   static Color iconColorOf(AppToastKind kind) => switch (kind) {
-        AppToastKind.success => const Color(0xFF16A34A),
-        AppToastKind.error => const Color(0xFFDC2626),
-        AppToastKind.warning => const Color(0xFFF59E0B),
-        AppToastKind.info => const Color(0xFF0EA5E9),
-        AppToastKind.promise => const Color(0xFF6366F1),
-        AppToastKind.multiline => const Color(0xFF64748B),
-        AppToastKind.dark => const Color(0xFF111827),
-        AppToastKind.themed => const Color(0xFF8B5CF6),
-      };
+    AppToastKind.success => const Color(0xFF16A34A),
+    AppToastKind.error => const Color(0xFFDC2626),
+    AppToastKind.warning => const Color(0xFFF59E0B),
+    AppToastKind.info => const Color(0xFF0EA5E9),
+    AppToastKind.promise => const Color(0xFF6366F1),
+    AppToastKind.multiline => const Color(0xFF64748B),
+    AppToastKind.dark => const Color(0xFF111827),
+    AppToastKind.themed => const Color(0xFF8B5CF6),
+  };
 
   /// Nền, theo đúng cách web dựng từng loại toast (`toast.tsx:271-315`).
   static Color _backgroundOf(AppToastKind kind) => switch (kind) {
-        AppToastKind.warning => const Color(0xFFF59E0B),
-        AppToastKind.info => const Color(0xFFFFAE44),
-        AppToastKind.dark => const Color(0xFF1A1A1A),
-        // Web dùng gradient tím #667eea → #764ba2; toast mobile chỉ nhận một
-        // màu nền nên lấy màu giữa.
-        AppToastKind.themed => const Color(0xFF6D5BB8),
-        _ => _surface,
-      };
+    AppToastKind.warning => const Color(0xFFF59E0B),
+    AppToastKind.info => const Color(0xFFFFAE44),
+    AppToastKind.dark => const Color(0xFF1A1A1A),
+    // Web dùng gradient tím #667eea → #764ba2; toast mobile chỉ nhận một
+    // màu nền nên lấy màu giữa.
+    AppToastKind.themed => const Color(0xFF6D5BB8),
+    _ => _surface,
+  };
 
   static ToastificationType _typeOf(AppToastKind kind) => switch (kind) {
-        AppToastKind.success || AppToastKind.promise =>
-          ToastificationType.success,
-        AppToastKind.error => ToastificationType.error,
-        AppToastKind.warning => ToastificationType.warning,
-        _ => ToastificationType.info,
-      };
+    AppToastKind.success || AppToastKind.promise => ToastificationType.success,
+    AppToastKind.error => ToastificationType.error,
+    AppToastKind.warning => ToastificationType.warning,
+    _ => ToastificationType.info,
+  };
 
   /// Âm báo theo đúng bảng của web.
   static NotificationSound _soundOf(AppToastKind kind) => switch (kind) {
-        AppToastKind.success => NotificationSound.success,
-        AppToastKind.error => NotificationSound.error,
-        AppToastKind.warning => NotificationSound.warning,
-        AppToastKind.promise => NotificationSound.promise,
-        // `dark` và `themed` từng rơi vào nhánh bao quát bên dưới và kêu tiếng
-        // của `multiline`. Web có âm riêng cho hai kiểu này, mà đây lại đúng
-        // hai kiểu giám thị chọn được khi gửi thông báo giữa phiên thi — kêu
-        // sai tiếng là sinh viên nghe một đằng, giám thị tưởng một nẻo.
-        AppToastKind.dark => NotificationSound.dark,
-        AppToastKind.themed => NotificationSound.themed,
-        _ => NotificationSound.multiline,
-      };
+    AppToastKind.success => NotificationSound.success,
+    AppToastKind.error => NotificationSound.error,
+    AppToastKind.warning => NotificationSound.warning,
+    AppToastKind.promise => NotificationSound.promise,
+    // `dark` và `themed` từng rơi vào nhánh bao quát bên dưới và kêu tiếng
+    // của `multiline`. Web có âm riêng cho hai kiểu này, mà đây lại đúng
+    // hai kiểu giám thị chọn được khi gửi thông báo giữa phiên thi — kêu
+    // sai tiếng là sinh viên nghe một đằng, giám thị tưởng một nẻo.
+    AppToastKind.dark => NotificationSound.dark,
+    AppToastKind.themed => NotificationSound.themed,
+    _ => NotificationSound.multiline,
+  };
 }
 
 /// Icon xoay tròn, dùng cho trạng thái "đang xử lý".

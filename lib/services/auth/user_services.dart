@@ -1149,9 +1149,7 @@ class UserService extends BaseService {
         continue;
       }
 
-      originKeysByWireKey
-          .putIfAbsent(wireKey, () => <String>[])
-          .add(item.key);
+      originKeysByWireKey.putIfAbsent(wireKey, () => <String>[]).add(item.key);
 
       final at = payloadIndexByWireKey[wireKey];
       if (at != null) {
@@ -1176,9 +1174,7 @@ class UserService extends BaseService {
 
       if (response.statusCode != 200) {
         // Gồm cả 404 khi backend chưa deploy endpoint gộp.
-        print(
-          'saveAnswersBulk hỏng: ${response.statusCode} ${response.body}',
-        );
+        print('saveAnswersBulk hỏng: ${response.statusCode} ${response.body}');
         return null;
       }
 

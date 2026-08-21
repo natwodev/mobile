@@ -3,11 +3,7 @@ class SubmitExamResponse {
   final String message;
   final SubmitExamData? data;
 
-  SubmitExamResponse({
-    required this.success,
-    required this.message,
-    this.data,
-  });
+  SubmitExamResponse({required this.success, required this.message, this.data});
 
   factory SubmitExamResponse.fromJson(Map<String, dynamic> json) {
     return SubmitExamResponse(
@@ -15,7 +11,9 @@ class SubmitExamResponse {
       message: json['message'] ?? json['code'] ?? '',
       data: json['resultToken'] != null
           ? SubmitExamData(resultToken: json['resultToken'])
-          : (json['data'] != null ? SubmitExamData.fromJson(json['data']) : null),
+          : (json['data'] != null
+                ? SubmitExamData.fromJson(json['data'])
+                : null),
     );
   }
 }
@@ -26,8 +24,6 @@ class SubmitExamData {
   SubmitExamData({required this.resultToken});
 
   factory SubmitExamData.fromJson(Map<String, dynamic> json) {
-    return SubmitExamData(
-      resultToken: json['resultToken'] ?? '',
-    );
+    return SubmitExamData(resultToken: json['resultToken'] ?? '');
   }
 }

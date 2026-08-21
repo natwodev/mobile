@@ -51,7 +51,9 @@ class HomeScreen extends StatelessWidget {
           // Thanh tab nổi đè lên nội dung, nên phần cuối màn phải chừa đúng chỗ
           // nó chiếm (giá trị do HomeNavigation bơm vào MediaQuery) — không thì
           // cuộn hết cỡ vẫn còn một mẩu nằm khuất dưới thanh.
-          padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom),
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.paddingOf(context).bottom,
+          ),
           child: Column(
             children: [
               // Header với Banner + 3 nút nhanh
