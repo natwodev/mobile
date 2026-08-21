@@ -13,6 +13,14 @@ import '../widget/common/app_buttons.dart';
 class HomeNavigation extends StatefulWidget {
   const HomeNavigation({super.key});
 
+  /// Khoảng hở giữa nội dung màn và mép trên dải tab.
+  ///
+  /// CÔNG KHAI vì thanh báo thành công cần đặt mép dưới của nó đúng vào mép
+  /// trên dải tab. Phần chừa mà `HomeNavigation` bơm vào `MediaQuery` đã gồm cả
+  /// khoảng hở này, nên muốn nằm SÁT dải tab thì phải trừ nó ra — thiếu bước
+  /// đó là còn một khe để lọt nội dung trang phía sau.
+  static const double barMarginTop = 6;
+
   @override
   State<HomeNavigation> createState() => _HomeNavigationState();
 
@@ -76,9 +84,6 @@ class _HomeNavigationState extends State<HomeNavigation> {
   /// máy chứ không thay thế nó, nên trên máy có thanh vuốt điều hướng thì dải
   /// vẫn nổi cao hơn thanh đó đúng chừng này.
   static const double _barLift = 33;
-
-  /// Khoảng hở giữa nội dung và mép trên dải tab.
-  static const double _barMarginTop = 6;
 
   void changeTab(int index) {
     final bool sameTab = index == _currentIndex;
@@ -149,7 +154,7 @@ class _HomeNavigationState extends State<HomeNavigation> {
     // `MediaQuery` bên dưới bơm sẵn khoảng đó vào padding dưới để `SafeArea`
     // và các `ListView` của từng màn cứ thế đọc ra.
     final mq = MediaQuery.of(context);
-    final barSpace = _barHeight + _barLift + _barMarginTop;
+    final barSpace = _barHeight + _barLift + HomeNavigation.barMarginTop;
 
     return Scaffold(
       extendBody: true,
@@ -173,7 +178,12 @@ class _HomeNavigationState extends State<HomeNavigation> {
         left: false,
         right: false,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(12, _barMarginTop, 12, _barLift),
+          padding: const EdgeInsets.fromLTRB(
+            12,
+            HomeNavigation.barMarginTop,
+            12,
+            _barLift,
+          ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(_barRadius),
             child: BackdropFilter(

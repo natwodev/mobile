@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../component/HomeNavigation.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../services/notification_sound_service.dart';
 import 'app_colors.dart';
@@ -134,11 +135,16 @@ class _RefreshBannerState extends State<_RefreshBanner>
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      left: 16,
-      right: 16,
-      // Ngay TRÊN thanh điều hướng: bottomInset đã gồm cả chiều cao thanh tab
-      // lẫn phần chừa của hệ điều hành, chỉ cộng thêm một khe hở mỏng.
-      bottom: widget.bottomInset + 10,
+      // Trùng lề ngang với dải tab để hai thanh thẳng cột với nhau.
+      left: 12,
+      right: 12,
+      // Mép dưới thanh báo đặt ĐÚNG vào mép trên dải tab, không chừa khe.
+      //
+      // `bottomInset` là phần chừa mà HomeNavigation bơm vào MediaQuery, và nó
+      // đã gồm cả `barMarginTop` — khoảng hở giữa nội dung và dải tab. Cộng
+      // thêm như trước là để lại một khe cho nội dung trang lọt qua giữa hai
+      // thanh; trừ đi thì thanh báo nằm sát dải tab thành một khối liền.
+      bottom: widget.bottomInset - HomeNavigation.barMarginTop,
       child: SlideTransition(
         // Từ PHẢI qua trái. 1.08 thay vì 1.0 để thanh báo bắt đầu từ ngoài hẳn
         // mép màn, kể cả phần đổ bóng cũng không ló ra ở khung hình đầu tiên.
@@ -165,7 +171,7 @@ class _RefreshBannerState extends State<_RefreshBanner>
 
   Widget _buildRow() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(14, 12, 6, 12),
+      padding: const EdgeInsets.fromLTRB(14, 11, 6, 11),
       child: Row(
         children: [
           // Huy hiệu tròn đặc: trên nền trắng thì một icon trơn chìm nghỉm,
@@ -198,8 +204,15 @@ class _RefreshBannerState extends State<_RefreshBanner>
             color: AppColors.disabledInk,
             splashRadius: 20,
             visualDensity: VisualDensity.compact,
+            // Ghim kích thước lại: IconButton mặc định cao 40px, lớn hơn cả
+            // huy hiệu 34px — tức chính nó mới quyết định chiều cao thanh báo.
+            // Không ghim thì giảm đệm bao nhiêu cũng không thấy thanh thấp đi.
+            // 34 để bằng đúng huy hiệu bên trái, vẫn đủ rộng để bấm trúng.
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
             tooltip: MaterialLocalizations.of(context).closeButtonLabel,
           ),
+          const SizedBox(width: 6),
         ],
       ),
     );
@@ -214,7 +227,7 @@ class _RefreshBannerState extends State<_RefreshBanner>
       animation: _timer,
       builder: (_, _) => LinearProgressIndicator(
         value: 1 - _timer.value,
-        minHeight: 3,
+        minHeight: 2,
         backgroundColor: AppColors.line,
         valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF16A34A)),
       ),
