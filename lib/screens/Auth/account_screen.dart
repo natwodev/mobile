@@ -10,7 +10,7 @@ import '../../widget/common/app_modal.dart';
 import '../../widget/common/app_toast.dart';
 import '../../widget/common/app_top_bar.dart';
 import '../../widget/common/app_refresh_indicator.dart';
-import '../../widget/common/success_banner.dart';
+import '../../widget/common/app_banner.dart';
 import '../../l10n/locale_controller.dart';
 import '../../models/student.dart';
 import '../../services/auth/user_services.dart';
@@ -201,8 +201,14 @@ class _AccountScreenState extends State<AccountScreen> {
     }
   }
 
+  /// Báo một việc người dùng vừa làm KHÔNG xong: tải ảnh đại diện hỏng, chọn
+  /// ảnh bị từ chối quyền.
+  ///
+  /// Cùng chỗ, cùng kiểu với [_showMessage] lúc thành công. Bắt người dùng nhìn
+  /// xuống đáy màn khi xong rồi ngước lên góc trên khi hỏng là bắt họ học hai
+  /// chỗ cho cùng một thao tác.
   void _showError(String message) {
-    AppToast.show(context, kind: AppToastKind.error, title: message);
+    showErrorBanner(context, message);
   }
 
   /// Xác nhận một việc người dùng vừa làm xong: lưu hồ sơ, đổi mật khẩu, đổi

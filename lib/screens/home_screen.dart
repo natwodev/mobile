@@ -9,7 +9,7 @@ import '../widget/common/app_buttons.dart';
 import '../widget/home/home_banner_carousel.dart';
 import '../widget/home/home_news_section.dart';
 import '../widget/common/app_refresh_indicator.dart';
-import '../widget/common/success_banner.dart';
+import '../widget/common/app_banner.dart';
 import '../widget/home/quiz_answer_banner.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -138,7 +138,10 @@ class HomeScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.accent.withValues(alpha: 0.18),
+                    // 0.28 thay vì 0.18: ở mức cũ, bóng toả tới 25px nên màu bị
+                    // dàn quá mỏng, đặt trên băng ảnh nhiều màu là gần như mất
+                    // hút — thẻ trông như dán phẳng lên chứ không nổi lên.
+                    color: AppColors.accent.withValues(alpha: 0.28),
                     blurRadius: 25,
                     offset: Offset(0, 5),
                     spreadRadius: 0,

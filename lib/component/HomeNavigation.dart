@@ -83,7 +83,7 @@ class _HomeNavigationState extends State<HomeNavigation> {
   /// Khoảng nhấc dải tab lên khỏi mép dưới — cộng thêm vào vùng an toàn của
   /// máy chứ không thay thế nó, nên trên máy có thanh vuốt điều hướng thì dải
   /// vẫn nổi cao hơn thanh đó đúng chừng này.
-  static const double _barLift = 33;
+  static const double _barLift = 30;
 
   void changeTab(int index) {
     final bool sameTab = index == _currentIndex;

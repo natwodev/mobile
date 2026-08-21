@@ -11,7 +11,7 @@ import '../../widget/common/app_buttons.dart';
 import '../../widget/common/app_toast.dart';
 import '../../widget/common/app_top_bar.dart';
 import '../../widget/common/app_refresh_indicator.dart';
-import '../../widget/common/success_banner.dart';
+import '../../widget/common/app_banner.dart';
 
 /// Màn "Lịch sử làm bài" — tab giữa của thanh điều hướng.
 ///
