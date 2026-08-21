@@ -3,11 +3,7 @@ class SaveAnswerResponse {
   final String message;
   final SaveAnswerData? data;
 
-  SaveAnswerResponse({
-    required this.success,
-    required this.message,
-    this.data,
-  });
+  SaveAnswerResponse({required this.success, required this.message, this.data});
 
   factory SaveAnswerResponse.fromJson(Map<String, dynamic> json) {
     return SaveAnswerResponse(

@@ -152,7 +152,9 @@ class _QrResultDialogState extends State<QrResultDialog> {
       return;
     }
 
-    debugPrint('[QR] Vào phòng thi OK: ${examResult.studentSession.studentExamSessionId}');
+    debugPrint(
+      '[QR] Vào phòng thi OK: ${examResult.studentSession.studentExamSessionId}',
+    );
     Navigator.of(dialogContext).pop();
 
     Navigator.of(parentContext).pushReplacement(

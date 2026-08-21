@@ -790,15 +790,17 @@ class _ExamScreenState extends State<ExamScreen> {
 
     // `promise` là hai pha: vòng xoay "Đang xử lý..." rồi mới tới nội dung.
     if (kind == AppToastKind.promise) {
-      unawaited(AppToast.showPromise(
-        context,
-        title: title,
-        description: event.message,
-        duration: Duration(milliseconds: duration),
-        alignment: _toastAlignment(event.position),
-        // Chỉ toast KẾT QUẢ mang màu; pha vòng xoay vẫn nền trắng như web.
-        backgroundColor: background,
-      ));
+      unawaited(
+        AppToast.showPromise(
+          context,
+          title: title,
+          description: event.message,
+          duration: Duration(milliseconds: duration),
+          alignment: _toastAlignment(event.position),
+          // Chỉ toast KẾT QUẢ mang màu; pha vòng xoay vẫn nền trắng như web.
+          backgroundColor: background,
+        ),
+      );
       return;
     }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
 
 import '../../component/HomeNavigation.dart';
 import '../../helpers/exam_result_helper.dart';
@@ -26,7 +27,7 @@ class HomeButton extends StatelessWidget {
                 (Route<dynamic> route) => false,
               );
             },
-        icon: const Icon(Icons.home_outlined, size: 20),
+        icon: const HugeIcon(icon: HugeIcons.strokeRoundedHome01, size: 20),
         label: Text(
           AppLocalizations.of(context).examResultHomeButton,
           style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),

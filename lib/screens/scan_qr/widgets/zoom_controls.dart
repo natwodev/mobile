@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
 
 class ZoomControls extends StatelessWidget {
   final double zoomFactor;
@@ -40,8 +41,8 @@ class ZoomControls extends StatelessWidget {
                     width: 48,
                     height: 48,
                     alignment: Alignment.center,
-                    child: const Icon(
-                      Icons.remove_circle_outline,
+                    child: const HugeIcon(
+                      icon: HugeIcons.strokeRoundedMinusSign,
                       color: Colors.white,
                       size: 28,
                     ),
@@ -76,8 +77,8 @@ class ZoomControls extends StatelessWidget {
                     width: 48,
                     height: 48,
                     alignment: Alignment.center,
-                    child: const Icon(
-                      Icons.add_circle_outline,
+                    child: const HugeIcon(
+                      icon: HugeIcons.strokeRoundedPlusSign,
                       color: Colors.white,
                       size: 28,
                     ),

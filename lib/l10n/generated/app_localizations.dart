@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In vi, this message translates to:
-  /// **'HUTECH Campus Info'**
+  /// **'Trắc nghiệm'**
   String get appTitle;
 
   /// No description provided for @authAccountTitle.
@@ -115,6 +115,18 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Ảnh đại diện'**
   String get authAvatarChangeTitle;
+
+  /// No description provided for @authAvatarCropTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Cắt ảnh đại diện'**
+  String get authAvatarCropTitle;
+
+  /// No description provided for @authAvatarTooLarge.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ảnh quá lớn, tối đa {mb}MB.'**
+  String authAvatarTooLarge(int mb);
 
   /// No description provided for @authAvatarFromCamera.
   ///
@@ -1567,6 +1579,12 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Không tải được tin giáo dục.'**
   String get homeNewsError;
+
+  /// No description provided for @homeNewsLoadMore.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tải thêm tin'**
+  String get homeNewsLoadMore;
 
   /// No description provided for @homeNewsOpenFailed.
   ///

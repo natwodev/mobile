@@ -9,13 +9,21 @@ class AppLocalizationsVi extends AppLocalizations {
   AppLocalizationsVi([String locale = 'vi']) : super(locale);
 
   @override
-  String get appTitle => 'HUTECH Campus Info';
+  String get appTitle => 'Trắc nghiệm';
 
   @override
   String get authAccountTitle => 'Tài khoản';
 
   @override
   String get authAvatarChangeTitle => 'Ảnh đại diện';
+
+  @override
+  String get authAvatarCropTitle => 'Cắt ảnh đại diện';
+
+  @override
+  String authAvatarTooLarge(int mb) {
+    return 'Ảnh quá lớn, tối đa ${mb}MB.';
+  }
 
   @override
   String get authAvatarFromCamera => 'Chụp ảnh mới';
@@ -823,6 +831,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get homeNewsError => 'Không tải được tin giáo dục.';
+
+  @override
+  String get homeNewsLoadMore => 'Tải thêm tin';
 
   @override
   String get homeNewsOpenFailed => 'Không mở được bài viết.';

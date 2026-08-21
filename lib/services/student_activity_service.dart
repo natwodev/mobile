@@ -6,10 +6,7 @@ class StudentActivityService {
   final String baseUrl;
   final String? authToken;
 
-  StudentActivityService({
-    required this.baseUrl,
-    this.authToken,
-  });
+  StudentActivityService({required this.baseUrl, this.authToken});
 
   /// Ghi nhận một hành động của sinh viên
   Future<bool> recordActivity({
@@ -30,10 +27,8 @@ class StudentActivityService {
         if (metadata != null) 'metadata': jsonEncode(metadata),
       };
 
-      final headers = <String, String>{
-        'Content-Type': 'application/json',
-      };
-      
+      final headers = <String, String>{'Content-Type': 'application/json'};
+
       if (authToken != null && authToken!.isNotEmpty) {
         headers['Authorization'] = 'Bearer $authToken';
       }
@@ -47,7 +42,9 @@ class StudentActivityService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return true;
       } else {
-        print('❌ Error recording activity: ${response.statusCode} - ${response.body}');
+        print(
+          '❌ Error recording activity: ${response.statusCode} - ${response.body}',
+        );
         return false;
       }
     } catch (e) {
@@ -66,9 +63,7 @@ class StudentActivityService {
       studentCode: studentCode,
       activityType: 'AppBackground',
       description: 'Ứng dụng chuyển sang background',
-      metadata: {
-        'timestamp': DateTime.now().toIso8601String(),
-      },
+      metadata: {'timestamp': DateTime.now().toIso8601String()},
     );
   }
 
@@ -82,9 +77,7 @@ class StudentActivityService {
       studentCode: studentCode,
       activityType: 'AppForeground',
       description: 'Ứng dụng quay lại foreground',
-      metadata: {
-        'timestamp': DateTime.now().toIso8601String(),
-      },
+      metadata: {'timestamp': DateTime.now().toIso8601String()},
     );
   }
 
@@ -116,9 +109,7 @@ class StudentActivityService {
       studentCode: studentCode,
       activityType: 'AppSwitch',
       description: 'Chuyển sang ứng dụng khác',
-      metadata: {
-        'timestamp': DateTime.now().toIso8601String(),
-      },
+      metadata: {'timestamp': DateTime.now().toIso8601String()},
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
 
 import '../../component/HomeNavigation.dart';
 import '../../l10n/generated/app_localizations.dart';
@@ -36,11 +37,14 @@ extension _BannerStyle on AppBannerKind {
     AppBannerKind.info => AppColors.accent,
   };
 
-  IconData get icon => switch (this) {
-    AppBannerKind.success => Icons.check,
-    AppBannerKind.error => Icons.close,
-    AppBannerKind.warning => Icons.priority_high,
-    AppBannerKind.info => Icons.info_outline,
+  /// Kiểu trả về là `List<List<dynamic>>` chứ không phải `IconData`: HugeIcons
+  /// lưu icon dưới dạng dữ liệu đường vẽ, không phải điểm mã phông chữ như
+  /// `Icons` của Material.
+  List<List<dynamic>> get icon => switch (this) {
+    AppBannerKind.success => HugeIcons.strokeRoundedTick01,
+    AppBannerKind.error => HugeIcons.strokeRoundedCancel01,
+    AppBannerKind.warning => HugeIcons.strokeRoundedAlert02,
+    AppBannerKind.info => HugeIcons.strokeRoundedInformationCircle,
   };
 
   /// Tiếng kêu lấy đúng bộ âm dùng chung với toast, để cùng một loại tin thì
@@ -327,7 +331,11 @@ class _AppBannerState extends State<_AppBanner> with TickerProviderStateMixin {
               color: widget.kind.color,
               shape: BoxShape.circle,
             ),
-            child: Icon(widget.kind.icon, color: Colors.white, size: 20),
+            child: HugeIcon(
+              icon: widget.kind.icon,
+              color: Colors.white,
+              size: 20,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -364,7 +372,11 @@ class _AppBannerState extends State<_AppBanner> with TickerProviderStateMixin {
           // nhất là khi thanh báo che mất đúng chỗ vừa vuốt.
           IconButton(
             onPressed: _close,
-            icon: const Icon(Icons.close, size: 16),
+            icon: HugeIcon(
+              icon: HugeIcons.strokeRoundedCancel01,
+              color: AppColors.disabledInk,
+              size: 16,
+            ),
             color: AppColors.disabledInk,
             splashRadius: 20,
             visualDensity: VisualDensity.compact,

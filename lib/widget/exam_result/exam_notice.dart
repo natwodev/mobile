@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
 
 import '../../helpers/exam_result_helper.dart';
 import '../../l10n/generated/app_localizations.dart';
@@ -24,8 +25,8 @@ class ExamNotice extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(
-            Icons.info_outline,
+          const HugeIcon(
+            icon: HugeIcons.strokeRoundedInformationCircle,
             size: 20,
             color: ExamResultHelper.slate500,
           ),

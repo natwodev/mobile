@@ -209,12 +209,13 @@ class PendingSubmitService {
   /// Gọi trước [save] để chắc chắn không lỡ mất kết cục của một lần gửi rất
   /// nhanh. Nếu app bị tắt thì chẳng ai đợi Future này — hàng chờ trên đĩa mới
   /// là thứ giữ cho bài không mất.
-  Future<PendingSubmitOutcome> outcomeFor(String studentExamSessionId) => _waiters
-      .putIfAbsent(
-        studentExamSessionId,
-        () => Completer<PendingSubmitOutcome>(),
-      )
-      .future;
+  Future<PendingSubmitOutcome> outcomeFor(String studentExamSessionId) =>
+      _waiters
+          .putIfAbsent(
+            studentExamSessionId,
+            () => Completer<PendingSubmitOutcome>(),
+          )
+          .future;
 
   /// Ghi lệnh nộp xuống đĩa. Tách khỏi [queue] để test điều khiển được thời
   /// điểm gửi.

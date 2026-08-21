@@ -1,8 +1,17 @@
 {
   "@@locale": "en",
-  "appTitle": "HUTECH Campus Info",
+  "appTitle": "Trắc nghiệm",
   "authAccountTitle": "Account",
   "authAvatarChangeTitle": "Profile photo",
+  "authAvatarCropTitle": "Crop photo",
+  "authAvatarTooLarge": "Image too large, {mb}MB max.",
+  "@authAvatarTooLarge": {
+    "placeholders": {
+      "mb": {
+        "type": "int"
+      }
+    }
+  },
   "authAvatarFromCamera": "Take a photo",
   "authAvatarFromGallery": "Choose from library",
   "authAvatarUpdateSuccess": "Profile photo updated.",
@@ -353,6 +362,7 @@
   "homeNavHome": "Home",
   "homeNewsEmpty": "No news yet.",
   "homeNewsError": "Couldn't load education news.",
+  "homeNewsLoadMore": "Load more",
   "homeNewsOpenFailed": "Couldn't open the article.",
   "homeNewsRetry": "Try again",
   "homeNewsSource": "Source: VnExpress",

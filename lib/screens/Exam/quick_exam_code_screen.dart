@@ -159,7 +159,6 @@ class _QuickExamCodeScreenState extends State<QuickExamCodeScreen> {
     );
   }
 
-
   /// Hộp xác nhận thông tin ca thi vừa tìm được. Trả `true` khi sinh viên
   /// đồng ý bắt đầu làm bài.
   Future<bool?> _confirmSession(ExamSessionSummary session) {

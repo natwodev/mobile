@@ -145,8 +145,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           decoration: InputDecoration(
                             labelText: l10n.authUsernameLabel,
                             hintText: l10n.authUsernameHint,
-                            prefixIcon: const Icon(
-                              Icons.account_circle_outlined,
+                            prefixIcon: const HugeIcon(
+                              icon: HugeIcons.strokeRoundedUserCircle,
                             ),
                             border: const OutlineInputBorder(),
                           ),
@@ -173,12 +173,14 @@ class _LoginScreenState extends State<LoginScreen> {
                           decoration: InputDecoration(
                             labelText: l10n.authPasswordLabel,
                             hintText: l10n.authPasswordHint,
-                            prefixIcon: const Icon(Icons.lock_outline),
+                            prefixIcon: const HugeIcon(
+                              icon: HugeIcons.strokeRoundedSquareLock01,
+                            ),
                             suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscurePassword
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
+                              icon: HugeIcon(
+                                icon: _obscurePassword
+                                    ? HugeIcons.strokeRoundedViewOff
+                                    : HugeIcons.strokeRoundedView,
                               ),
                               onPressed: () {
                                 setState(() {

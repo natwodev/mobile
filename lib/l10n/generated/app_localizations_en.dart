@@ -9,13 +9,21 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'HUTECH Campus Info';
+  String get appTitle => 'Trắc nghiệm';
 
   @override
   String get authAccountTitle => 'Account';
 
   @override
   String get authAvatarChangeTitle => 'Profile photo';
+
+  @override
+  String get authAvatarCropTitle => 'Crop photo';
+
+  @override
+  String authAvatarTooLarge(int mb) {
+    return 'Image too large, ${mb}MB max.';
+  }
 
   @override
   String get authAvatarFromCamera => 'Take a photo';
@@ -832,6 +840,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homeNewsError => 'Couldn\'t load education news.';
+
+  @override
+  String get homeNewsLoadMore => 'Load more';
 
   @override
   String get homeNewsOpenFailed => 'Couldn\'t open the article.';

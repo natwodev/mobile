@@ -112,7 +112,10 @@ class _ContactTile extends StatelessWidget {
       leading: HugeIcon(icon: icon, color: AppColors.accent, size: 22.0),
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
       subtitle: Text(value),
-      trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+      trailing: const HugeIcon(
+        icon: HugeIcons.strokeRoundedArrowRight01,
+        color: Colors.grey,
+      ),
       onTap: () => _open(context),
     );
   }

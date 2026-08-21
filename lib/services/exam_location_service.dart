@@ -82,15 +82,15 @@ class ExamLocationService {
   /// treo im không trả về gì.
   static LocationSettings get _settings =>
       defaultTargetPlatform == TargetPlatform.android
-          ? AndroidSettings(
-              forceLocationManager: true,
-              accuracy: LocationAccuracy.high,
-              timeLimit: _timeout,
-            )
-          : const LocationSettings(
-              accuracy: LocationAccuracy.high,
-              timeLimit: _timeout,
-            );
+      ? AndroidSettings(
+          forceLocationManager: true,
+          accuracy: LocationAccuracy.high,
+          timeLimit: _timeout,
+        )
+      : const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: _timeout,
+        );
 
   static Future<ExamLocationResult> current() async {
     try {

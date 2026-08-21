@@ -25,10 +25,7 @@ class PinnedQuestionsStore {
       final decoded = jsonDecode(raw);
       if (decoded is! List) return <String>{};
 
-      return decoded
-          .whereType<String>()
-          .where((id) => id.isNotEmpty)
-          .toSet();
+      return decoded.whereType<String>().where((id) => id.isNotEmpty).toSet();
     } catch (e) {
       debugPrint('Không đọc được danh sách câu đã ghim: $e');
       return <String>{};

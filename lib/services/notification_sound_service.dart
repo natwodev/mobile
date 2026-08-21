@@ -30,8 +30,8 @@ enum NotificationSound {
 class NotificationSoundService {
   const NotificationSoundService._();
 
-  static const Map<NotificationSound, String> _assets =
-      <NotificationSound, String>{
+  static const Map<NotificationSound, String>
+  _assets = <NotificationSound, String>{
     NotificationSound.success: 'sounds/toast-success.mp3',
     NotificationSound.error: 'sounds/toast-error.mp3',
     NotificationSound.warning: 'sounds/toast-warning.mp3',
