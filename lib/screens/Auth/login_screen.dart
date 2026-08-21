@@ -11,6 +11,7 @@ import '../../services/notification/push_service.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../widget/common/app_buttons.dart';
 import '../../widget/common/app_toast.dart';
+import 'forgot_password_sheet.dart';
 import '../../widget/language_selector.dart';
 import 'package:hugeicons/hugeicons.dart';
 
@@ -208,7 +209,38 @@ class _LoginScreenState extends State<LoginScreen> {
                           },
                         ),
 
-                        SizedBox(height: 30),
+                        // Quên mật khẩu: nằm NGAY DƯỚI ô mật khẩu và căn phải.
+                        //
+                        // Đây là chỗ người dùng nhìn tới đúng vào lúc cần nó —
+                        // sau khi gõ sai mật khẩu. Đặt dưới nút Đăng nhập thì
+                        // họ đã bấm nút và nhận lỗi rồi mới thấy.
+                        //
+                        // Chữ nhỏ, không viền: đây là lối thoát phụ, không được
+                        // tranh chấp với nút Đăng nhập ngay bên dưới.
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: () => showForgotPasswordSheet(context),
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              minimumSize: Size.zero,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                            child: Text(
+                              l10n.authForgotPasswordLink,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.accent,
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        SizedBox(height: 18),
 
                         // BUTTON LOGIN
                         // Chỉ giữ `width` — chiếm trọn bề ngang là ý đồ bố cục;

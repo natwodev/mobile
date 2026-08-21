@@ -77,6 +77,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authEditProfileTitle => 'Edit personal information';
 
   @override
+  String get authEmailRequired => 'Please enter your email';
+
+  @override
+  String get authForgotPasswordTitle => 'Forgot password';
+
+  @override
+  String get authForgotPasswordLink => 'Forgot password?';
+
+  @override
+  String get authForgotPasswordMessage =>
+      'Enter the email registered with your school. We will send a password reset link to that inbox.';
+
+  @override
+  String get authForgotPasswordSend => 'Send request';
+
+  @override
+  String get authForgotPasswordFailed =>
+      'Could not send the request. Please try again.';
+
+  @override
+  String get authForgotPasswordSentTitle => 'Request sent';
+
+  @override
+  String get authForgotPasswordSentMessage =>
+      'If this email is in the system, a reset link will arrive within a few minutes. Remember to check your spam folder.';
+
+  @override
   String get authEmailHint => 'Enter your email...';
 
   @override
@@ -93,6 +120,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get authFullNameRequired => 'Please enter your full name';
+
+  @override
+  String get authPickGender => 'Select gender';
 
   @override
   String get authGenderFemale => 'Female';
@@ -593,9 +623,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get examResultTitle => 'Exam result';
-
-  @override
-  String get examSavingIndicator => 'Saving...';
 
   @override
   String get examScoreCommentAverage => 'Average!';
@@ -1284,7 +1311,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'All words in the bank have been used';
 
   @override
-  String get questionFillBlankInstruction => 'Tap a word, then tap a blank:';
+  String get questionFillBlankInstruction =>
+      'Drag a word into a blank, or tap a word then a blank:';
 
   @override
   String get questionHighlightClear => 'Clear selection';
