@@ -11,23 +11,66 @@ import 'app_colors.dart';
 /// nhau, cái cuối còn nằm lại rất lâu sau khi người dùng đã bỏ đi.
 OverlayEntry? _current;
 
-/// Báo một việc người dùng vừa làm đã XONG XUÔI.
+/// Trạng thái của thanh báo — quyết định màu huy hiệu, icon, thanh thời gian
+/// và tiếng kêu.
 ///
-/// Dùng cho những xác nhận thoáng qua do chính thao tác của người dùng sinh ra:
-/// kéo tải lại, lưu hồ sơ, đổi mật khẩu, đổi ảnh đại diện. KHÁC với [AppToast]
-/// — toast dành cho tin từ hệ thống (giám thị nhắn, bị chặn khỏi ca thi) và
-/// luôn nằm góc trên phải. Trộn hai thứ vào một kiểu hiển thị là mất khả năng
-/// nhìn phát biết ngay tin đến từ đâu.
+/// Bốn trạng thái chứ không phải hai: chỉ có đúng/sai thì mọi thứ "chưa hỏng
+/// nhưng cũng chưa xong" đều bị dồn vào một trong hai đầu, và người dùng đọc ra
+/// nặng hơn hoặc nhẹ hơn thực tế.
+enum AppBannerKind {
+  success,
+  error,
+
+  /// Việc xong nhưng có điều cần lưu ý.
+  warning,
+
+  /// Chỉ thông tin, không phải kết quả của việc gì.
+  info,
+}
+
+extension _BannerStyle on AppBannerKind {
+  Color get color => switch (this) {
+    AppBannerKind.success => const Color(0xFF16A34A),
+    AppBannerKind.error => AppColors.danger,
+    AppBannerKind.warning => const Color(0xFFF59E0B),
+    AppBannerKind.info => AppColors.accent,
+  };
+
+  IconData get icon => switch (this) {
+    AppBannerKind.success => Icons.check,
+    AppBannerKind.error => Icons.close,
+    AppBannerKind.warning => Icons.priority_high,
+    AppBannerKind.info => Icons.info_outline,
+  };
+
+  /// Tiếng kêu lấy đúng bộ âm dùng chung với toast, để cùng một loại tin thì
+  /// nghe giống nhau dù hiện bằng thanh báo hay bằng toast.
+  NotificationSound get sound => switch (this) {
+    AppBannerKind.success => NotificationSound.success,
+    AppBannerKind.error => NotificationSound.error,
+    AppBannerKind.warning => NotificationSound.warning,
+    AppBannerKind.info => NotificationSound.multiline,
+  };
+}
+
+/// Thanh báo trượt vào từ phải, nằm ngay trên dải tab.
+///
+/// Dùng cho phản hồi thoáng qua do chính thao tác của người dùng sinh ra: kéo
+/// tải lại, lưu hồ sơ, đổi mật khẩu, đổi ảnh đại diện — cả lúc xong lẫn lúc
+/// hỏng. KHÁC với [AppToast]: toast dành cho tin từ HỆ THỐNG (giám thị nhắn,
+/// bị chặn khỏi ca thi) và luôn nằm góc trên phải. Trộn hai thứ vào một kiểu
+/// hiển thị là mất khả năng nhìn phát biết ngay tin đến từ đâu.
 ///
 /// KHÔNG dùng `SnackBar` của Material: nó cố định trượt từ dưới lên, không có
-/// chỗ cho thanh đếm giờ và cũng không có nút đóng. Ba thứ đó phải tự dựng nên
-/// đây là một overlay riêng.
-///
-/// CHỈ gọi khi việc THÀNH CÔNG. Hỏng mà vẫn báo "thành công" thì tệ hơn hẳn
-/// việc im lặng.
-void showSuccessBanner(BuildContext context, String message) {
+/// chỗ cho thanh đếm giờ và cũng không có nút đóng.
+void showAppBanner(
+  BuildContext context, {
+  required String message,
+  AppBannerKind kind = AppBannerKind.success,
+  NotificationSound? sound,
+}) {
   // Âm thanh phát độc lập, không chờ thanh báo dựng xong.
-  NotificationSoundService.play(NotificationSound.refresh).ignore();
+  NotificationSoundService.play(sound ?? kind.sound).ignore();
 
   final OverlayState overlay = Overlay.of(context);
 
@@ -42,8 +85,9 @@ void showSuccessBanner(BuildContext context, String message) {
 
   late final OverlayEntry entry;
   entry = OverlayEntry(
-    builder: (_) => _RefreshBanner(
+    builder: (_) => _AppBanner(
       message: message,
+      kind: kind,
       bottomInset: bottomInset,
       onClosed: () {
         if (_current == entry) _current = null;
@@ -56,34 +100,54 @@ void showSuccessBanner(BuildContext context, String message) {
   overlay.insert(entry);
 }
 
+/// Việc người dùng vừa làm đã xong xuôi.
+void showSuccessBanner(BuildContext context, String message) =>
+    showAppBanner(context, message: message);
+
+/// Việc người dùng vừa làm KHÔNG xong.
+///
+/// Hiện bằng thanh báo chứ không bằng toast, vì nó là phản hồi cho đúng thao
+/// tác người dùng vừa bấm — cùng chỗ, cùng kiểu với lúc thành công. Bắt người
+/// ta nhìn xuống đáy màn khi xong rồi ngước lên góc trên khi hỏng là bắt họ
+/// học hai chỗ cho một việc.
+void showErrorBanner(BuildContext context, String message) =>
+    showAppBanner(context, message: message, kind: AppBannerKind.error);
+
 /// Xác nhận riêng cho cú kéo-để-tải-lại.
 ///
 /// Vòng xoay của `RefreshIndicator` chỉ nói "đang chạy" rồi biến mất, không nói
 /// được kết quả. Kéo xong mà màn hình trông y như cũ — vì thật sự không có gì
 /// mới — thì người dùng không phân biệt được là đã tải lại hay thao tác bị
 /// trượt.
-void showRefreshDone(BuildContext context) {
-  showSuccessBanner(context, AppLocalizations.of(context).commonReloadSuccess);
-}
+///
+/// Giữ tiếng chuông riêng của việc tải lại thay vì tiếng "thành công" chung:
+/// kéo tải lại là thao tác lặp đi lặp lại nhiều lần trong một phiên, nghe mãi
+/// một tiếng với lúc lưu hồ sơ thì hai việc lẫn vào nhau.
+void showRefreshDone(BuildContext context) => showAppBanner(
+  context,
+  message: AppLocalizations.of(context).commonReloadSuccess,
+  sound: NotificationSound.refresh,
+);
 
 /// Thanh báo trượt vào từ phải, có thanh đếm ngược và nút đóng.
-class _RefreshBanner extends StatefulWidget {
-  const _RefreshBanner({
+class _AppBanner extends StatefulWidget {
+  const _AppBanner({
     required this.message,
+    required this.kind,
     required this.bottomInset,
     required this.onClosed,
   });
 
   final String message;
+  final AppBannerKind kind;
   final double bottomInset;
   final VoidCallback onClosed;
 
   @override
-  State<_RefreshBanner> createState() => _RefreshBannerState();
+  State<_AppBanner> createState() => _AppBannerState();
 }
 
-class _RefreshBannerState extends State<_RefreshBanner>
-    with TickerProviderStateMixin {
+class _AppBannerState extends State<_AppBanner> with TickerProviderStateMixin {
   /// Thời gian thanh báo nằm lại. Dài hơn mức 2 giây trước đây vì giờ có thanh
   /// đếm ngược — chạy vèo trong hai giây thì người dùng không kịp thấy nó chạy.
   static const Duration _visibleFor = Duration(seconds: 3);
@@ -190,7 +254,17 @@ class _RefreshBannerState extends State<_RefreshBanner>
             child: Material(
               color: Colors.white,
               elevation: 0,
-              borderRadius: BorderRadius.circular(12),
+              // Viền 0.5px màu xanh chủ đạo. Mảnh đến mức trên màn 3x chỉ dày
+              // đúng một điểm ảnh vật lý — vừa đủ tách thanh báo khỏi nền
+              // trắng phía sau, chưa đủ để thành một khung viền lộ liễu.
+              //
+              // Viền giữ MÀU XANH ở cả bốn trạng thái, không đổi theo `kind`:
+              // nó là đường bao của thanh báo — thứ luôn giống nhau — còn trạng
+              // thái đã có huy hiệu và thanh thời gian nói hộ.
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(color: AppColors.accent, width: 0.5),
+              ),
               clipBehavior: Clip.antiAlias,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -213,11 +287,11 @@ class _RefreshBannerState extends State<_RefreshBanner>
           Container(
             width: 34,
             height: 34,
-            decoration: const BoxDecoration(
-              color: Color(0xFF16A34A),
+            decoration: BoxDecoration(
+              color: widget.kind.color,
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.check, color: Colors.white, size: 20),
+            child: Icon(widget.kind.icon, color: Colors.white, size: 20),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -263,7 +337,7 @@ class _RefreshBannerState extends State<_RefreshBanner>
         value: 1 - _timer.value,
         minHeight: 2,
         backgroundColor: AppColors.line,
-        valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF16A34A)),
+        valueColor: AlwaysStoppedAnimation<Color>(widget.kind.color),
       ),
     );
   }
