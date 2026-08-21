@@ -364,10 +364,25 @@ class _AppBannerState extends State<_AppBanner> with TickerProviderStateMixin {
           // nhất là khi thanh báo che mất đúng chỗ vừa vuốt.
           IconButton(
             onPressed: _close,
-            icon: const Icon(Icons.close, size: 18),
+            icon: const Icon(Icons.close, size: 16),
             color: AppColors.disabledInk,
             splashRadius: 20,
             visualDensity: VisualDensity.compact,
+            // Viền tròn quanh dấu ✕, cùng công thức viền của cả app (màu chủ
+            // thể hạ 40% độ đục, 0.5px). Đặt theo màu TRẠNG THÁI nên nó cân
+            // với huy hiệu tròn đặc bên trái: một khối đặc, một khối rỗng, hai
+            // đầu thanh báo có cùng hình dạng.
+            //
+            // Icon thu 18 -> 16 để chừa chỗ cho đường viền: giữ 18 thì dấu ✕
+            // chạm sát viền, nhìn ra là chật chứ không phải một nút tròn.
+            style: IconButton.styleFrom(
+              shape: CircleBorder(
+                side: BorderSide(
+                  color: widget.kind.color.withValues(alpha: 0.4),
+                  width: 0.5,
+                ),
+              ),
+            ),
             // Ghim kích thước lại: IconButton mặc định cao 40px, lớn hơn cả
             // huy hiệu 34px — tức chính nó mới quyết định chiều cao thanh báo.
             // Không ghim thì giảm đệm bao nhiêu cũng không thấy thanh thấp đi.

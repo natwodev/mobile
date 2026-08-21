@@ -79,8 +79,23 @@ class HomeScreen extends StatelessWidget {
     // trông như trôi lơ lửng.
     return Container(
       width: double.infinity,
-      color: AppColors.surfaceMuted,
-      padding: const EdgeInsets.symmetric(vertical: 14),
+      // Màu phải chuyển vào `decoration`: `Container` không nhận đồng thời
+      // `color` và `decoration` — khai cả hai là Flutter ném assert ngay.
+      decoration: const BoxDecoration(
+        color: AppColors.surfaceMuted,
+        borderRadius: BorderRadius.all(Radius.circular(20)),
+      ),
+      // BẮT BUỘC khi `decoration` có bo góc: `Container` KHÔNG tự cắt widget
+      // con theo hình nền của nó. Thiếu dòng này thì hai tấm ảnh hai bên vẫn
+      // vẽ tràn qua bốn góc bo và chạy thẳng ra mép màn — nhìn ra là ảnh nằm
+      // ĐÈ LÊN dải xám chứ không nằm TRONG nó, và bo góc coi như vô nghĩa.
+      clipBehavior: Clip.antiAlias,
+      // KHÔNG đệm dọc: dải xám phải cao ĐÚNG BẰNG tấm ảnh giữa.
+      //
+      // Băng ảnh đặt `aspectRatio` nên chiều cao khung đã cố định theo bề
+      // ngang, và `enlargeStrategy: height` cho tấm giữa cao hết khung ấy. Bỏ
+      // đệm đi thì mép trên/dưới của dải xám trùng khít mép tấm giữa — thêm 14
+      // như trước là thừa ra một viền xám ôm quanh ảnh.
       child: const HomeBannerCarousel(
         slides: [
           HomeBannerSlide(asset: 'assets/banners/38_chon_dap_an.gif'),
@@ -152,12 +167,15 @@ class HomeScreen extends StatelessWidget {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    // 0.28 thay vì 0.18: ở mức cũ, bóng toả tới 25px nên màu bị
-                    // dàn quá mỏng, đặt trên băng ảnh nhiều màu là gần như mất
-                    // hút — thẻ trông như dán phẳng lên chứ không nổi lên.
-                    color: AppColors.accent.withValues(alpha: 0.28),
-                    blurRadius: 25,
-                    offset: Offset(0, 5),
+                    // Bóng MỎNG mà ĐẬM, thay cho rộng mà nhạt như trước
+                    // (25px @ 18%). Toả 25px làm màu bị dàn mỏng đến mức đặt
+                    // trên băng ảnh nhiều màu là gần như mất hút, thẻ trông
+                    // như dán phẳng lên. Thu về 12px rồi nâng độ đục lên 38%
+                    // thì viền sáng bám sát mép thẻ, đọc ra là "nổi lên" rõ
+                    // ràng mà không loang ra nền.
+                    color: AppColors.accent.withValues(alpha: 0.42),
+                    blurRadius: 8,
+                    offset: Offset(0, 3),
                     spreadRadius: 0,
                   ),
                 ],
